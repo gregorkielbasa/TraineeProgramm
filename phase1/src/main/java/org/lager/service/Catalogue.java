@@ -7,21 +7,29 @@ import java.util.Map;
 
 public class Catalogue {
 
-    private Map<String, Product> database;
+    private final Map<String, Product> database;
 
     public Catalogue() {
-        this.database = new HashMap();
+        this.database = new HashMap<>();
     }
 
-    public void insert (Product newProduct){
+    public void insert(Product newProduct) {
         String key = newProduct.getName();
-        database.put(key, newProduct);
+        if (isProductNew(key))
+            database.put(key, newProduct);
     }
-    public Product search (String name){
+
+    private boolean isProductNew(String name) {
+        return search(name) == null;
+    }
+
+    public Product search(String name) {
+        if (null == name)
+            return null;
         return database.get(name);
     }
 
-    public void remove (String name){
+    public void remove(String name) {
         database.remove(name);
     }
 }
