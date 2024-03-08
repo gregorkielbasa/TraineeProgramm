@@ -2,21 +2,25 @@ package org.lager.service;
 
 import org.lager.model.Product;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Catalogue {
 
-    private final Map<String, Product> database;
+    private final Map<String, Product> products;
 
     public Catalogue() {
-        this.database = new HashMap<>();
+        this.products = new HashMap<>();
     }
 
-    public void insert(Product newProduct) {
+    public List<Product> insert(Product newProduct) {
+        if (null == newProduct)
+            throw new CatalogueException("Product is not valid");
         String key = newProduct.getName();
-        if (isProductNew(key))
-            database.put(key, newProduct);
+        if (!isProductNew(key))
+            throw new CatalogueException("Product already exists in the Catalogue");
+
+        products.put(key, newProduct);
+        return new ArrayList<>(products.values());
     }
 
     private boolean isProductNew(String name) {
@@ -26,10 +30,12 @@ public class Catalogue {
     public Product search(String name) {
         if (null == name)
             return null;
-        return database.get(name);
+        return products.get(name);
     }
 
-    public void remove(String name) {
-        database.remove(name);
+    public List<Product> remove(String name) {
+        if (null != name)
+            products.remove(name);
+        return new ArrayList<>(products.values());
     }
 }

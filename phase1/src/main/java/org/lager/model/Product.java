@@ -7,7 +7,7 @@ public class Product {
 
     public Product(String name) {
         if (isNameUnacceptable(name))
-            throw new RuntimeException();
+            throw new ProductException("Product's name is unacceptable");
         this.name = name;
     }
 
@@ -15,7 +15,7 @@ public class Product {
         return name;
     }
 
-    public static boolean isNameUnacceptable(String name) {
+    public boolean isNameUnacceptable(String name) {
         return (null == name || name.isEmpty());
     }
 
