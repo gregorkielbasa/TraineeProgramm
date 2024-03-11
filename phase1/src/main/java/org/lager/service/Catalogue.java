@@ -1,5 +1,6 @@
 package org.lager.service;
 
+import org.lager.exception.CatalogueException;
 import org.lager.model.Product;
 
 import java.util.*;

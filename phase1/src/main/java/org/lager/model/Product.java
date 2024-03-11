@@ -1,5 +1,7 @@
 package org.lager.model;
 
+import org.lager.exception.ProductException;
+
 import java.util.Objects;
 
 public class Product {
