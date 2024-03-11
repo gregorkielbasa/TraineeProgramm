@@ -19,7 +19,7 @@ public class Customer {
     }
 
     private static void validName(String name) {
-        if (name == null || !name.matches("^[a-z]{3,16}$"))
+        if (name == null || !name.matches("^[a-zA-Z]{3,16}$"))
             throw new CustomerException("Customer's name is invalid");
     }
 
