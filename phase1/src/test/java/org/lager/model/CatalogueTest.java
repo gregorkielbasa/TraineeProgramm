@@ -1,7 +1,7 @@
-package org.lager.service;
+package org.lager.model;
 
 import org.junit.jupiter.api.*;
-import org.lager.model.Product;
+import org.lager.exception.CatalogueException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,10 +44,7 @@ class CatalogueTest {
             catalogue.insert(product2);
             List<Product> actual = catalogue.insert(product3);
             List<Product> expected = Arrays.asList(product1, product2, product3);
-
-            //assertEquals(expected, actual);
-            //assertArrayEquals(expected.toArray(), actual.toArray());
-            //assertEquals(Collections.sort(expected), Collections.sort(actual));
+            
             assertTrue(expected.containsAll(actual));
             assertEquals(expected.size(), actual.size());
         }
@@ -55,7 +52,7 @@ class CatalogueTest {
         @Test
         @DisplayName("NULL Product throws an exception")
         void insertNull() {
-            assertThrows(Exception.class, () -> {
+            assertThrows(CatalogueException.class, () -> {
                 catalogue.insert(null);
             });
         }
@@ -67,7 +64,7 @@ class CatalogueTest {
             Product product2 = new Product(new String("test"));
 
             catalogue.insert(product1);
-            assertThrows(Exception.class, () -> {
+            assertThrows(CatalogueException.class, () -> {
                 catalogue.insert(product2);
             });
         }

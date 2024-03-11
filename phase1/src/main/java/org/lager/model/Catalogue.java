@@ -1,4 +1,4 @@
-package org.lager.service;
+package org.lager.model;
 
 import org.lager.exception.CatalogueException;
 import org.lager.model.Product;
