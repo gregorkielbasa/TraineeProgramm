@@ -1,5 +1,9 @@
 package org.lager.model;
 
+import org.lager.exception.CustomerException;
+
+import java.util.Objects;
+
 public class Customer {
     private String name;
     private long number;
@@ -15,11 +19,13 @@ public class Customer {
     }
 
     private static void validName(String name) {
-
+        if (name == null || !name.matches("^[a-z]{3,16}$"))
+            throw new CustomerException("Customer's name is invalid");
     }
 
     private static void validNumber(long number) {
-
+        if (number<100_000_000 || number>999_999_999)
+            throw new CustomerException("Customer's number is invalid");
     }
 
     public String getName() {
@@ -42,5 +48,18 @@ public class Customer {
 
     public Basket getBasket() {
         return basket;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Customer customer = (Customer) o;
+        return number == customer.number && Objects.equals(name, customer.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, number);
     }
 }
