@@ -1,8 +1,5 @@
 package org.lager;
 
-import org.lager.model.Product;
-import org.lager.model.Catalogue;
-
 public class Main {
     public static void main(String[] args) {
 

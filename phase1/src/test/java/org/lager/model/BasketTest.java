@@ -15,7 +15,7 @@ class BasketTest {
 
     @DisplayName("when empty")
     @Nested
-    class Empty {
+    class BasketTestEmpty {
 
         @BeforeEach
         void init() {
@@ -67,7 +67,7 @@ class BasketTest {
 
     @DisplayName("contains 5 elements")
     @Nested
-    class NotEmpty {
+    class BasketTestNotEmpty {
 
         Map<Product, Integer> expected;
 
@@ -181,7 +181,43 @@ class BasketTest {
 
     @DisplayName("throws an exception")
     @Nested
-    class Exceptions {
+    class BasketTestExceptions {
+
+        @BeforeEach
+        void init() {
+            basket = new Basket();
+
+            basket.insert(new Product("test"), 1);
+        }
+
+        @Test
+        @DisplayName("when tries to insert NULL")
+        void insert() {
+            assertThrows(BasketException.class, () -> {
+                basket.insert(null, 1);
+            });
+        }
+
+        @Test
+        @DisplayName("when tries to remove NULL")
+        void remove() {
+            assertThrows(BasketException.class, () -> {
+                basket.remove(null);
+            });
+        }
+
+        @Test
+        @DisplayName("when tries to get Amount of NULL")
+        void getAmountOf() {
+            assertThrows(BasketException.class, () -> {
+                basket.getAmountOf(null);
+            });
+        }
+    }
+
+    @DisplayName("when concats with")
+    @Nested
+    class BasketTestConcat {
 
         @BeforeEach
         void init() {

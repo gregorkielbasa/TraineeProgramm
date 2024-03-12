@@ -5,9 +5,12 @@ import org.lager.exception.CustomerException;
 import java.util.Objects;
 
 public class Customer {
+    private static final String NAME_REGEX = "^[a-zA-Z]{3,16}$";
+    private static final long NUMBER_MIN = 100_000_000;
+    private static final long NUMBER_MAX = 999_999_999;
+
     private String name;
-    private long number;
-    private final Basket basket;
+    private final long number;
 
     public Customer(String name, long number) {
         validName(name);
@@ -15,17 +18,16 @@ public class Customer {
 
         this.name = name;
         this.number = number;
-        this.basket = new Basket();
     }
 
     private static void validName(String name) {
-        if (name == null || !name.matches("^[a-zA-Z]{3,16}$"))
-            throw new CustomerException("Customer's name is invalid");
+        if (name == null || !name.matches(NAME_REGEX))
+            throw new CustomerException("Customer's name is invalid: " + name);
     }
 
     private static void validNumber(long number) {
-        if (number<100_000_000 || number>999_999_999)
-            throw new CustomerException("Customer's number is invalid");
+        if (number < NUMBER_MIN || number > NUMBER_MAX)
+            throw new CustomerException("Customer's number is invalid: " + number);
     }
 
     public String getName() {
@@ -39,15 +41,6 @@ public class Customer {
 
     public long getNumber() {
         return number;
-    }
-
-    public void setNumber(long number) {
-        validNumber(number);
-        this.number = number;
-    }
-
-    public Basket getBasket() {
-        return basket;
     }
 
     @Override

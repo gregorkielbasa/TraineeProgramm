@@ -10,7 +10,7 @@ class CustomerTest {
 
     @Nested
     @DisplayName("throws Exception when is created")
-    class ExceptionWhen {
+    class CustomerTestException {
 
         @Test
         @DisplayName("with NULL name")
@@ -71,7 +71,7 @@ class CustomerTest {
 
     @Nested
     @DisplayName("when created with proper name and number")
-    class properConstructor {
+    class CustomerTestProperConstructor {
 
         Customer customer;
 
@@ -81,11 +81,13 @@ class CustomerTest {
         }
 
         @Test
-        @DisplayName("returns empty Basket")
-        void checkBasket() {
-            int actual = customer.getBasket().getAll().size();
+        @DisplayName("returns name and number")
+        void checkNameAndNumber() {
+            long actualNumber = customer.getNumber();
+            String actualName = customer.getName();
 
-            assertEquals(0, actual);
+            assertEquals("TestABCabc", actualName);
+            assertEquals(123_123_123, actualNumber);
         }
 
         @Test
@@ -97,21 +99,11 @@ class CustomerTest {
 
             assertEquals(expected, actual);
         }
-
-        @Test
-        @DisplayName("should allow to change customer-number")
-        void setNumber() {
-            long expected = 123_456_678;
-            customer.setNumber(expected);
-            long actual = customer.getNumber();
-
-            assertEquals(expected, actual);
-        }
     }
 
     @Nested
     @DisplayName("compares its HashCode to")
-    class TestHashCode {
+    class CustomerTestHashCode {
 
         Customer customer1;
 
@@ -156,7 +148,7 @@ class CustomerTest {
 
     @Nested
     @DisplayName("compares its Equality to")
-    class TestEquals {
+    class CustomerTestEquals {
         Customer customer1;
 
         @BeforeEach

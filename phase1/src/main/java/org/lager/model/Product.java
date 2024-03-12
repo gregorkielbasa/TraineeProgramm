@@ -5,11 +5,11 @@ import org.lager.exception.ProductException;
 import java.util.Objects;
 
 public class Product {
+    private static final String NAME_REGEX = "^[a-zA-Z0-9- ]{3,24}$";
     private String name;
 
     public Product(String name) {
-        if (isNameUnacceptable(name))
-            throw new ProductException("Product's name is unacceptable");
+        validName(name);
         this.name = name;
     }
 
@@ -17,8 +17,9 @@ public class Product {
         return name;
     }
 
-    public boolean isNameUnacceptable(String name) {
-        return (null == name || name.isEmpty());
+    private void validName(String name) {
+        if (null == name || !name.matches(NAME_REGEX))
+            throw new ProductException("Product's name is invalid: " + name);
     }
 
     @Override

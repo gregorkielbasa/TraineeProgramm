@@ -11,7 +11,7 @@ class ProductTest {
 
     @Nested
     @DisplayName("throws Exception when")
-    class ExceptionWhen {
+    class ProductTestException {
 
         @Test
         @DisplayName("instantiated with NULL name")
@@ -52,7 +52,7 @@ class ProductTest {
 
     @Nested
     @DisplayName("is NOT Equal")
-    class NotEquals {
+    class ProductTestNotEquals {
 
         @Test
         @DisplayName("when comparing to NULL")
