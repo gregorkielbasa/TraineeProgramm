@@ -1,13 +1,15 @@
 package org.lager.service;
 
-import org.lager.exception.ProductServiceException;
 import org.lager.model.Product;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ProductService {
-
-    private final Map<String, Product> products;
+    private static long newProductID = 100_000_000;
+    private final Map<Long, Product> products;
 
     public ProductService() {
         this.products = new HashMap<>();
@@ -18,26 +20,24 @@ public class ProductService {
     }
 
     public Product insert(String newProductName) {
-        Product newProduct = new Product(newProductName);
-        String key = newProduct.getName();
-        if (!isProductNew(key))
-            throw new ProductServiceException("Product already exists in the Catalogue: " + newProductName);
-        return products.put(key, newProduct);
+        Product newProduct = new Product(newProductID, newProductName);
+        products.put(newProductID, newProduct);
+        newProductID++;
+        return newProduct;
     }
 
-    private boolean isProductNew(String name) {
-        return search(name) == null;
+    public Product search(long ID) {
+        return products.get(ID);
     }
 
-    public Product search(String name) {
-        if (null == name)
-            return null;
-        return products.get(name);
+    public Product remove(long ID) {
+        return products.remove(ID);
     }
 
-    public Product remove(String name) {
-        if (null != name)
-            return products.remove(name);
-        return null;
+    public Product rename(long ID, String ProductNewName) {
+        Product product = search(ID);
+        if (null != product)
+            product.setName(ProductNewName);
+        return product;
     }
 }

@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CustomerService {
-
-    private Map<Long, Customer> customers;
     private static long newCustomerNumber = 100_000_000;
+    private final Map<Long, Customer> customers;
 
     public CustomerService() {
         this.customers = new HashMap<>();
@@ -21,7 +20,7 @@ public class CustomerService {
     }
 
     public Customer create(String newCustomerName) {
-        Customer newCustomer = new Customer(newCustomerName, newCustomerNumber);
+        Customer newCustomer = new Customer(newCustomerNumber, newCustomerName);
         customers.put(newCustomerNumber, newCustomer);
         newCustomerNumber++;
         return newCustomer;
@@ -37,8 +36,8 @@ public class CustomerService {
 
     public Customer rename(long customerNumber, String customerNewName) {
         Customer customer = search(customerNumber);
-        if (null != customers)
+        if (null != customer)
             customer.setName(customerNewName);
-        return search(customerNumber);
+        return customer;
     }
 }

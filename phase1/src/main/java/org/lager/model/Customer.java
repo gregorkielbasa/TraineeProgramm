@@ -8,26 +8,25 @@ public class Customer {
     private static final String NAME_REGEX = "^[a-zA-Z]{3,16}$";
     private static final long NUMBER_MIN = 100_000_000;
     private static final long NUMBER_MAX = 999_999_999;
-
-    private String name;
     private final long number;
+    private String name;
 
-    public Customer(String name, long number) {
-        validName(name);
+    public Customer(long number, String name) {
         validNumber(number);
+        validName(name);
 
         this.name = name;
         this.number = number;
     }
 
-    private static void validName(String name) {
-        if (name == null || !name.matches(NAME_REGEX))
-            throw new CustomerException("Customer's name is invalid: " + name);
-    }
-
     private static void validNumber(long number) {
         if (number < NUMBER_MIN || number > NUMBER_MAX)
             throw new CustomerException("Customer's number is invalid: " + number);
+    }
+
+    private static void validName(String name) {
+        if (name == null || !name.matches(NAME_REGEX))
+            throw new CustomerException("Customer's name is invalid: " + name);
     }
 
     public String getName() {

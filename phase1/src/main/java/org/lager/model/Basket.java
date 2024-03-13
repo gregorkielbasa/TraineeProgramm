@@ -1,65 +1,52 @@
 package org.lager.model;
 
-import org.lager.exception.BasketException;
-
 import java.util.*;
 
 public class Basket {
 
-    private final Map<Product, Integer> products;
-    private long customerNumber = 0;
+    private final Map<Long, Integer> products; //ProductID, Amount
+    private final long customerNumber;
 
-    public Basket() {
+    public Basket(long customerNumber) {
         this.products = new HashMap<>();
+        this.customerNumber = customerNumber;
     }
 
-    public Map<Product, Integer> getAll() {
+    public Map<Long, Integer> getAll() {
         return products;
     }
 
-    public void insert(Product product, int amount) {
+    public void insert(long productID, int amount) {
         int newAmount = amount;
-        if (isProductPresent(product))
-            newAmount += products.get(product);
+        if (isProductPresent(productID))
+            newAmount += products.get(productID);
         if (newAmount > 0)
-            products.put(product, newAmount);
+            products.put(productID, newAmount);
         else
-            products.remove(product);
+            products.remove(productID);
     }
 
-    private boolean isProductPresent(Product product) {
-        if (null == product)
-            throw new BasketException("Product does not exist");
-        return products.containsKey(product);
+    private boolean isProductPresent(long productID) {
+        return products.containsKey(productID);
     }
 
-    public void remove(Product product) {
-        if (null == product)
-            throw new BasketException("Product does not exist");
-        products.remove(product);
+    public void remove(long productID) {
+        products.remove(productID);
     }
 
-    public int getAmountOf(Product product) {
-        if (null == product)
-            throw new BasketException("Product does not exist");
-        if (isProductPresent(product))
-            return products.get(product);
-        else
-            return 0;
+    public int getAmountOf(long productID) {
+        return isProductPresent(productID)
+                ? products.get(productID)
+                : 0;
     }
 
     public void concatWith(Basket basket) {
         if (basket != null)
-            for (Map.Entry<Product, Integer> entry : basket.getAll().entrySet()) {
+            for (Map.Entry<Long, Integer> entry : basket.getAll().entrySet())
                 this.insert(entry.getKey(), entry.getValue());
-            }
     }
 
     public long getCustomerNumber() {
         return customerNumber;
-    }
-
-    public void setCustomerNumber(long customerNumber) {
-        this.customerNumber = customerNumber;
     }
 }
