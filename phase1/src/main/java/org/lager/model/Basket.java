@@ -13,7 +13,7 @@ public class Basket {
     }
 
     public Map<Long, Integer> getAll() {
-        return products;
+        return Map.copyOf(products);
     }
 
     public void insert(long productID, int amount) {

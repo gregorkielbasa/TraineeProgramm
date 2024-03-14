@@ -1,113 +1,214 @@
-//package org.lager.model;
-//
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Nested;
-//import org.junit.jupiter.api.Test;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//
-//@DisplayName("Product")
-//class ProductTest {
-//
-//    @Nested
-//    @DisplayName("throws Exception when")
-//    class ProductTestException {
-//
-//        @Test
-//        @DisplayName("instantiated with NULL name")
-//        void ProductNull() {
-//            assertThrows(Exception.class, () -> {
-//                Product product = new Product(null);
-//            });
-//        }
-//
-//        @Test
-//        @DisplayName("instantiated with empty name")
-//        void ProductEmpty() {
-//            assertThrows(Exception.class, () -> {
-//                Product product = new Product("");
-//            });
-//        }
-//
-//    }
-//
-//    @Test
-//    @DisplayName("with a proper name")
-//    void getName() {
-//        String expected = "proper name";
-//        Product product = new Product("proper name");
-//        String actual = product.getName();
-//
-//        assertEquals(expected, actual);
-//    }
-//
-//    @Test
-//    @DisplayName("is Equal")
-//    void testEquals() {
-//        Product product1 = new Product(new String("product name"));
-//        Product product2 = new Product(new String("product name"));
-//
-//        assertEquals(product1, product2);
-//    }
-//
-//    @Nested
-//    @DisplayName("is NOT Equal")
-//    class ProductTestNotEquals {
-//
-//        @Test
-//        @DisplayName("when comparing to NULL")
-//        void testNotEqualsNull() {
-//            Product product1 = new Product(new String("product name1"));
-//            Product product2 = null;
-//
-//            assertNotEquals(product1, product2);
-//        }
-//
-//        @Test
-//        @DisplayName("when comparing to an object")
-//        void testNotEqualsObject() {
-//            Product product1 = new Product(new String("product name1"));
-//            Object product2 = new Object();
-//
-//            assertNotEquals(product1, product2);
-//        }
-//
-//        @Test
-//        @DisplayName("when comparing two different objects")
-//        void testNotEquals() {
-//            Product product1 = new Product(new String("product name1"));
-//            Product product2 = new Product(new String("product name2"));
-//
-//            assertNotEquals(product1, product2);
-//        }
-//
-//    }
-//
-//    @Test
-//    @DisplayName("hash code should be the same")
-//    void testHashCodeEquals() {
-//        Product product1 = new Product(new String("product name1"));
-//        Product product2 = new Product(new String("product name1"));
-//
-//        assertEquals(product1.hashCode(), product2.hashCode());
-//    }
-//
-//    @Test
-//    @DisplayName("hash code should be diffrent")
-//    void testHashCodeNotEquals() {
-//        Product product1 = new Product(new String("product name1"));
-//        Product product2 = new Product(new String("product name2"));
-//
-//        assertNotEquals(product1, product2);
-//    }
-//
-//    @Test
-//    @DisplayName("to String")
-//    void testToString() {
-//        String expected = "Product{name='test'}";
-//        Product product = new Product(new String("test"));
-//        String actual = product.toString();
-//
-//        assertEquals(expected, actual);
-//    }
-//}
+package org.lager.model;
+
+import org.assertj.core.api.WithAssertions;
+import org.junit.jupiter.api.*;
+import org.lager.exception.ProductException;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@DisplayName("Product")
+class ProductTest implements WithAssertions {
+
+    @Nested
+    @DisplayName("throws Exception when is created with")
+    class ProductTestException {
+
+        @Nested
+        @DisplayName("name")
+        class ProductNameTestException {
+
+            @Test
+            @DisplayName("NULL")
+            void nullName() {
+                assertThatThrownBy(() -> new Product(123_123_123, null))
+                        .isInstanceOf(ProductException.class);
+            }
+
+            @Test
+            @DisplayName("empty")
+            void emptyName() {
+                assertThatThrownBy(() -> new Product(123_123_123, ""))
+                        .isInstanceOf(ProductException.class);
+            }
+
+            @Test
+            @DisplayName("too short")
+            void shortName() {
+                assertThatThrownBy(() -> new Product(123_123_123, "na"))
+                        .isInstanceOf(ProductException.class);
+            }
+
+            @Test
+            @DisplayName("too long")
+            void longName() { //25 characters
+                assertThatThrownBy(() -> new Product(123_123_123, "namenamenamenamenamenamen"))
+                        .isInstanceOf(ProductException.class);
+            }
+
+            @Test
+            @DisplayName("contains illegal character")
+            void illegalCharacterName() { //illegal '.'
+                assertThatThrownBy(() -> new Product(123_123_123, "name123.321name"))
+                        .isInstanceOf(ProductException.class);
+            }
+        }
+
+        @Nested
+        @DisplayName("number")
+        class ProductNumberTestException {
+
+            @Test
+            @DisplayName("too short")
+            void shortName() {
+                assertThatThrownBy(() -> new Product(123_123_12, "name"))
+                        .isInstanceOf(ProductException.class);
+            }
+
+            @Test
+            @DisplayName("too long")
+            void longName() {
+                assertThatThrownBy(() -> new Product(123_123_123_1, "name"))
+                        .isInstanceOf(ProductException.class);
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("with a proper name and number")
+    void getNameAndNumber() {
+        Product product = new Product(123_123_123, "proper name");
+
+        assertThat(product.getID()).isEqualTo(123_123_123L);
+        assertThat(product.getName()).isEqualTo("proper name");
+    }
+
+    @Nested
+    @DisplayName("when tries to change name")
+    class ProductSetNameTest {
+
+        Product product;
+
+        @BeforeEach
+        void init() {
+            product = new Product(123_123_123L, "name");
+        }
+
+        @Test
+        @DisplayName("works with a proper name")
+        void properCase() {
+            product.setName("new name");
+            assertThat(product.getName()).isEqualTo("new name");
+        }
+
+        @Test
+        @DisplayName("throws an exception with too long name")
+        void longName() {  //25 characters
+            assertThatThrownBy(() -> product.setName("namenamenamenamenamenamen"))
+                    .isInstanceOf(ProductException.class);
+        }
+
+        @Test
+        @DisplayName("throws an exception when name contains illegal character")
+        void illegalCharacterName() {  //illegal '.'
+            assertThatThrownBy(() -> product.setName("name123.321name"))
+                    .isInstanceOf(ProductException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("is equal")
+    class ProductTestEquals {
+
+        Product product1 = new Product(123_123_123L, new String("product name"));
+
+        @Test
+        @DisplayName("is Equal when its exactly the same Product")
+        void testEqualsExactlySame() {
+            assertTrue(product1.equals(product1));
+        }
+
+        @Test
+        @DisplayName("when has the same properties")
+        void testEquals() {
+            Product product2 = new Product(123_123_123L, new String("product name"));
+
+            assertTrue(product1.equals(product2));
+        }
+    }
+
+    @Nested
+    @DisplayName("is NOT equal")
+    class ProductTestNotEquals {
+
+        Product product1 = new Product(123_123_123L, new String("product name"));
+
+        @Test
+        @DisplayName("when comparing to NULL")
+        void testNotEqualsNull() {
+            Product product2 = null;
+
+            assertFalse(product1.equals(product2));
+        }
+
+        @Test
+        @DisplayName("when comparing two different classes")
+        void testNotEquals() {
+            String product2 = new String("test");
+
+            assertFalse(product1.equals(product2));
+        }
+
+        @Test
+        @DisplayName("when comparing to an object with a different properties")
+        void testEquals() {
+            Product product2 = new Product(123_123_123L, new String("product different name"));
+
+            assertFalse(product1.equals(product2));
+        }
+    }
+
+    @Nested
+    @DisplayName("compares its HashCode to")
+    class HashCodeTest {
+
+        Product product1 = new Product(123_123_123L, new String("product name"));
+
+        @Test
+        @DisplayName("the same objects")
+        void testHashCodeExactlySame() {
+            assertThat(product1.hashCode()).isEqualTo(product1.hashCode());
+        }
+
+        @Test
+        @DisplayName("an objects with the same properties")
+        void testHashCodeEquals() {
+            Product product2 = new Product(123_123_123L, "product name");
+
+            assertThat(product1.hashCode()).isEqualTo(product2.hashCode());
+        }
+
+        @Test
+        @DisplayName("an object with different Numbers")
+        void testHashCodeDifferentID() {
+            Product product2 = new Product(123_000_123L, "product name");
+
+            assertThat(product1.hashCode()).isNotEqualTo(product2.hashCode());
+        }
+
+        @Test
+        @DisplayName("an object with different Names")
+        void testHashCodeDifferentName() {
+            Product product2 = new Product(123_123_123L, "product two");
+
+            assertThat(product1.hashCode()).isNotEqualTo(product2.hashCode());
+        }
+
+        @Test
+        @DisplayName("to String")
+        void testToString() {
+            Product product = new Product(123_123_123L, "test");
+
+            assertThat(product.toString()).isEqualTo("Product{ID=123123123, name='test'}");
+        }
+    }
+}

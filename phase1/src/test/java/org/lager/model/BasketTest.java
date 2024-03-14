@@ -74,7 +74,6 @@ class BasketTest implements WithAssertions {
         @Test
         @DisplayName("should add 6th one")
         void insertNewOne() {
-            ;
             basket.insert(123_000_006L, 6);
             expected.put(123_000_006L, 6);
 

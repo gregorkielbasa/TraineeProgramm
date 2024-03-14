@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ProductService {
-    private static long newProductID = 100_000_000;
+    private long newProductID = 100_000_000;
     private final Map<Long, Product> products;
 
     public ProductService() {

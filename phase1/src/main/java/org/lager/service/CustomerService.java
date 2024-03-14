@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CustomerService {
-    private static long newCustomerNumber = 100_000_000;
+    private long newCustomerNumber = 100_000_000;
     private final Map<Long, Customer> customers;
 
     public CustomerService() {
