@@ -146,7 +146,7 @@ class ProductServiceTest implements WithAssertions {
     }
 
     @Nested
-    @DisplayName("")
+    @DisplayName("when renames")
     class RenameProductServiceTest {
 
         ProductService productService;

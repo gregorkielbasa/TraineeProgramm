@@ -10,11 +10,12 @@ public class BasketService {
 
     private final ProductService productService;
     private final CustomerService customerService;
-    private static final Map<Long, Basket> baskets = new HashMap<>();
+    private final Map<Long, Basket> baskets;
 
-    public BasketService(ProductService productService, CustomerService customerService) {
-        this.productService = productService;
+    public BasketService(CustomerService customerService, ProductService productService) {
         this.customerService = customerService;
+        this.productService = productService;
+        this.baskets = new HashMap<>();
     }
 
     public void emptyBasket(long customerNumber) {
@@ -45,7 +46,8 @@ public class BasketService {
     private Basket createBasket(long customerNumber) {
         validateCustomer(customerNumber);
         Basket newBasket = new Basket(customerNumber);
-        return baskets.put(customerNumber, newBasket);
+        baskets.put(customerNumber, newBasket);
+        return newBasket;
     }
 
     private void validateCustomer(long customerNumber) {
