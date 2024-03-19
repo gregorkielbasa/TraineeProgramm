@@ -2,7 +2,8 @@ package org.lager.model;
 
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.*;
-import org.lager.exception.CustomerException;
+import org.lager.exception.CustomerIllegalNameException;
+import org.lager.exception.CustomerIllegalNumberException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,42 +22,42 @@ class CustomerTest implements WithAssertions {
             @DisplayName("NULL")
             void nullName() {
                 assertThatThrownBy(() -> new Customer(123_123_123, null))
-                        .isInstanceOf(CustomerException.class);
+                        .isInstanceOf(CustomerIllegalNameException.class);
             }
 
             @Test
             @DisplayName("empty")
             void emptyName() {
                 assertThatThrownBy(() -> new Customer(123_123_123, ""))
-                        .isInstanceOf(CustomerException.class);
+                        .isInstanceOf(CustomerIllegalNameException.class);
             }
 
             @Test
             @DisplayName("too short")
             void shortName() {
                 assertThatThrownBy(() -> new Customer(123_123_123, "na"))
-                        .isInstanceOf(CustomerException.class);
+                        .isInstanceOf(CustomerIllegalNameException.class);
             }
 
             @Test
             @DisplayName("too long")
             void longName() { //25 characters
                 assertThatThrownBy(() -> new Customer(123_123_123, "namenamenamenamenamenamen"))
-                        .isInstanceOf(CustomerException.class);
+                        .isInstanceOf(CustomerIllegalNameException.class);
             }
 
             @Test
             @DisplayName("contains digits")
             void nameWithDigits() {
                 assertThatThrownBy(() -> new Customer(123_123_123, "name123name"))
-                        .isInstanceOf(CustomerException.class);
+                        .isInstanceOf(CustomerIllegalNameException.class);
             }
 
             @Test
             @DisplayName("contains illegal character")
             void nameWithWhiteSymbols() { //illegal '.'
-                assertThatThrownBy(() -> new Customer(123_123_123, "abcabc "))
-                        .isInstanceOf(CustomerException.class);
+                assertThatThrownBy(() -> new Customer(123_123_123, "abc.abc"))
+                        .isInstanceOf(CustomerIllegalNameException.class);
             }
         }
 
@@ -68,14 +69,14 @@ class CustomerTest implements WithAssertions {
             @DisplayName("too short")
             void shortName() {
                 assertThatThrownBy(() -> new Customer(123_123_12, "name"))
-                        .isInstanceOf(CustomerException.class);
+                        .isInstanceOf(CustomerIllegalNumberException.class);
             }
 
             @Test
             @DisplayName("too long")
             void longName() {
                 assertThatThrownBy(() -> new Customer(123_123_123_1, "name"))
-                        .isInstanceOf(CustomerException.class);
+                        .isInstanceOf(CustomerIllegalNumberException.class);
             }
         }
     }
@@ -111,14 +112,14 @@ class CustomerTest implements WithAssertions {
         @DisplayName("throws an exception with too long name")
         void longName() { //25 characters
             assertThatThrownBy(() -> customer.setName("namenamenamenamenamenamen"))
-                    .isInstanceOf(CustomerException.class);
+                    .isInstanceOf(CustomerIllegalNameException.class);
         }
 
         @Test
         @DisplayName("throws an exception when name contains illegal character")
         void illegalCharacterName() { //illegal '.'
-            assertThatThrownBy(() -> customer.setName("name123.321name"))
-                    .isInstanceOf(CustomerException.class);
+            assertThatThrownBy(() -> customer.setName("name.name"))
+                    .isInstanceOf(CustomerIllegalNameException.class);
         }
     }
 

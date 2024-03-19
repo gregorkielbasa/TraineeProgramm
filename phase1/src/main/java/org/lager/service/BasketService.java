@@ -1,10 +1,11 @@
 package org.lager.service;
 
-import org.lager.exception.BasketServiceException;
 import org.lager.model.Basket;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class BasketService {
 
@@ -18,45 +19,37 @@ public class BasketService {
         this.baskets = new HashMap<>();
     }
 
+    private Optional<Basket> getBasket(long customerNumber) {
+        return Optional.ofNullable(baskets.get(customerNumber));
+    }
+
     public void emptyBasket(long customerNumber) {
         baskets.remove(customerNumber);
     }
 
-    public void removeFromBasket(long customerNumber, long productID) {
-        Basket basket = baskets.get(customerNumber);
-        if (basket != null)
-            basket.remove(productID);
+    public void removeFromBasket(long customerNumber, long productNumber) {
+        getBasket(customerNumber)
+                .ifPresent((basket) -> basket.remove(productNumber));
     }
 
-    public Map<Long, Integer> getBasket(long customerNumber) {
-        Basket basket = baskets.get(customerNumber);
-        if (basket == null)
-            return new HashMap<>();
-        return basket.getAll();
+    public Map<Long, Integer> getContentOfBasket(long customerNumber) {
+        return getBasket(customerNumber)
+                .map(Basket::getContent)
+                .orElse(Collections.emptyMap());
     }
 
-    public void addToBasket(long customerNumber, long productID, int amount) {
-        Basket basket = baskets.get(customerNumber);
-        if (basket == null)
-            basket = createBasket(customerNumber);
-        validateProduct(productID);
-        basket.insert(productID, amount);
+    public void addToBasket(long customerNumber, long productNumber, int amount) {
+        productService.validatePresence(productNumber);
+        Basket basket = getBasket(customerNumber)
+                .orElse(createBasket(customerNumber));
+        basket.insert(productNumber, amount);
     }
 
     private Basket createBasket(long customerNumber) {
-        validateCustomer(customerNumber);
+        System.out.printf("new customer");
+        customerService.validatePresence(customerNumber);
         Basket newBasket = new Basket(customerNumber);
         baskets.put(customerNumber, newBasket);
         return newBasket;
-    }
-
-    private void validateCustomer(long customerNumber) {
-        if (customerService.search(customerNumber) == null)
-            throw new BasketServiceException("Customer does not exist: " + customerNumber);
-    }
-
-    private void validateProduct(long productID) {
-        if (productService.search(productID) == null)
-            throw new BasketServiceException("Product does not exist: " + productID);
     }
 }

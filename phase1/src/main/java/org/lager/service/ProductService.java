@@ -1,14 +1,12 @@
 package org.lager.service;
 
+import org.lager.exception.NoSuchProductException;
 import org.lager.model.Product;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ProductService {
-    private long newProductID = 100_000_000;
+    private long newProductNumber = 100_000_000;
     private final Map<Long, Product> products;
 
     public ProductService() {
@@ -20,24 +18,29 @@ public class ProductService {
     }
 
     public Product insert(String newProductName) {
-        Product newProduct = new Product(newProductID, newProductName);
-        products.put(newProductID, newProduct);
-        newProductID++;
+        Product newProduct = new Product(newProductNumber, newProductName);
+        products.put(newProductNumber, newProduct);
+        newProductNumber++;
         return newProduct;
     }
 
-    public Product search(long ID) {
-        return products.get(ID);
+    public Optional<Product> search(long number) {
+        return Optional.ofNullable(products.get(number));
     }
 
-    public Product remove(long ID) {
-        return products.remove(ID);
+    public boolean validatePresence(long number) {
+        search(number)
+                .orElseThrow(() -> new NoSuchProductException(number));
+        return true;
     }
 
-    public Product rename(long ID, String ProductNewName) {
-        Product product = search(ID);
-        if (null != product)
-            product.setName(ProductNewName);
-        return product;
+    public void remove(long number) {
+        products.remove(number);
+    }
+
+    public void rename(long number, String ProductNewName) {
+        Product product = search(number)
+                .orElseThrow(() -> new NoSuchProductException(number));
+        product.setName(ProductNewName);
     }
 }

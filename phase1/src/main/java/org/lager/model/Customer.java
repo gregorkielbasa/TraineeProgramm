@@ -1,6 +1,7 @@
 package org.lager.model;
 
-import org.lager.exception.CustomerException;
+import org.lager.exception.CustomerIllegalNameException;
+import org.lager.exception.CustomerIllegalNumberException;
 
 import java.util.Objects;
 
@@ -12,21 +13,21 @@ public class Customer {
     private String name;
 
     public Customer(long number, String name) {
-        validNumber(number);
-        validName(name);
+        validateNumber(number);
+        validateName(name);
 
         this.name = name;
         this.number = number;
     }
 
-    private static void validNumber(long number) {
+    private static void validateNumber(long number) {
         if (number < NUMBER_MIN || number > NUMBER_MAX)
-            throw new CustomerException("Customer's number is invalid: " + number);
+            throw new CustomerIllegalNumberException(number);
     }
 
-    private static void validName(String name) {
+    private static void validateName(String name) {
         if (name == null || !name.matches(NAME_REGEX))
-            throw new CustomerException("Customer's name is invalid: " + name);
+            throw new CustomerIllegalNameException(name);
     }
 
     public String getName() {
@@ -34,7 +35,7 @@ public class Customer {
     }
 
     public void setName(String name) {
-        validName(name);
+        validateName(name);
         this.name = name;
     }
 

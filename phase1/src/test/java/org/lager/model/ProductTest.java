@@ -2,7 +2,8 @@ package org.lager.model;
 
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.*;
-import org.lager.exception.ProductException;
+import org.lager.exception.ProductIllegalNameException;
+import org.lager.exception.ProductIllegalNumberException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,35 +22,35 @@ class ProductTest implements WithAssertions {
             @DisplayName("NULL")
             void nullName() {
                 assertThatThrownBy(() -> new Product(123_123_123, null))
-                        .isInstanceOf(ProductException.class);
+                        .isInstanceOf(ProductIllegalNameException.class);
             }
 
             @Test
             @DisplayName("empty")
             void emptyName() {
                 assertThatThrownBy(() -> new Product(123_123_123, ""))
-                        .isInstanceOf(ProductException.class);
+                        .isInstanceOf(ProductIllegalNameException.class);
             }
 
             @Test
             @DisplayName("too short")
             void shortName() {
                 assertThatThrownBy(() -> new Product(123_123_123, "na"))
-                        .isInstanceOf(ProductException.class);
+                        .isInstanceOf(ProductIllegalNameException.class);
             }
 
             @Test
             @DisplayName("too long")
             void longName() { //25 characters
                 assertThatThrownBy(() -> new Product(123_123_123, "namenamenamenamenamenamen"))
-                        .isInstanceOf(ProductException.class);
+                        .isInstanceOf(ProductIllegalNameException.class);
             }
 
             @Test
             @DisplayName("contains illegal character")
             void illegalCharacterName() { //illegal '.'
                 assertThatThrownBy(() -> new Product(123_123_123, "name123.321name"))
-                        .isInstanceOf(ProductException.class);
+                        .isInstanceOf(ProductIllegalNameException.class);
             }
         }
 
@@ -61,14 +62,14 @@ class ProductTest implements WithAssertions {
             @DisplayName("too short")
             void shortName() {
                 assertThatThrownBy(() -> new Product(123_123_12, "name"))
-                        .isInstanceOf(ProductException.class);
+                        .isInstanceOf(ProductIllegalNumberException.class);
             }
 
             @Test
             @DisplayName("too long")
             void longName() {
                 assertThatThrownBy(() -> new Product(123_123_123_1, "name"))
-                        .isInstanceOf(ProductException.class);
+                        .isInstanceOf(ProductIllegalNumberException.class);
             }
         }
     }
@@ -78,7 +79,7 @@ class ProductTest implements WithAssertions {
     void getNameAndNumber() {
         Product product = new Product(123_123_123, "proper name");
 
-        assertThat(product.getID()).isEqualTo(123_123_123L);
+        assertThat(product.getNumber()).isEqualTo(123_123_123L);
         assertThat(product.getName()).isEqualTo("proper name");
     }
 
@@ -104,14 +105,14 @@ class ProductTest implements WithAssertions {
         @DisplayName("throws an exception with too long name")
         void longName() {  //25 characters
             assertThatThrownBy(() -> product.setName("namenamenamenamenamenamen"))
-                    .isInstanceOf(ProductException.class);
+                    .isInstanceOf(ProductIllegalNameException.class);
         }
 
         @Test
         @DisplayName("throws an exception when name contains illegal character")
         void illegalCharacterName() {  //illegal '.'
             assertThatThrownBy(() -> product.setName("name123.321name"))
-                    .isInstanceOf(ProductException.class);
+                    .isInstanceOf(ProductIllegalNameException.class);
         }
     }
 
@@ -208,7 +209,7 @@ class ProductTest implements WithAssertions {
         void testToString() {
             Product product = new Product(123_123_123L, "test");
 
-            assertThat(product.toString()).isEqualTo("Product{ID=123123123, name='test'}");
+            assertThat(product.toString()).isEqualTo("Product{number=123123123, name='test'}");
         }
     }
 }

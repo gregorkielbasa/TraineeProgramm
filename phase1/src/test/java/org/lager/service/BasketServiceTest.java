@@ -6,15 +6,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.lager.exception.BasketServiceException;
+import org.lager.exception.NoSuchCustomerException;
+import org.lager.exception.NoSuchProductException;
 import org.lager.model.Basket;
 import org.lager.model.Customer;
 import org.lager.model.Product;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.swing.text.html.Option;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BasketService")
@@ -34,7 +37,7 @@ class BasketServiceTest implements WithAssertions {
     @Test
     @DisplayName("when adds in non-existing Basket")
     void nonExistingBasket() {
-        assertThat(basketService.getBasket(100_100_100)).isEmpty();
+        assertThat(basketService.getContentOfBasket(100_100_100)).isEmpty();
     }
 
     @Nested
@@ -44,42 +47,48 @@ class BasketServiceTest implements WithAssertions {
         @Test
         @DisplayName("in non-exisitng Basket")
         void nonExistingBasket() {
-            Mockito.when(customerService.search(100_100_100)).thenReturn(new Customer(123_123_123, "name"));
-            Mockito.when(productService.search(200_200_200)).thenReturn(new Product(123_123_123, "name"));
             basketService.addToBasket(100_100_100, 200_200_200, 1);
 
-            assertThat(basketService.getBasket(100_100_100)).containsOnly(Map.entry(200_200_200L, 1));
+            assertThat(basketService.getContentOfBasket(100_100_100))
+                    .containsOnly(Map.entry(200_200_200L, 1));
+            Mockito.verify(customerService).validatePresence(100_100_100);
+            Mockito.verify(productService).validatePresence(200_200_200);
         }
 
         @Test
         @DisplayName("in empty Basket")
         void emptyBasket() {
-            Mockito.when(customerService.search(100_100_100)).thenReturn(new Customer(123_123_123, "name"));
-            Mockito.when(productService.search(200_200_200)).thenReturn(new Product(123_123_123, "name"));
             basketService.addToBasket(100_100_100, 200_200_200, 1);
             basketService.removeFromBasket(100_100_100, 200_200_200);
             basketService.addToBasket(100_100_100, 200_200_200, 1);
 
-            assertThat(basketService.getBasket(100_100_100)).containsOnly(Map.entry(200_200_200L, 1));
+            assertThat(basketService.getContentOfBasket(100_100_100))
+                    .containsOnly(Map.entry(200_200_200L, 1));
+            Mockito.verify(productService).validatePresence(200_200_200);
+            Mockito.verify(customerService).validatePresence(100_100_100);
         }
 
         @Test
         @DisplayName("non-exisitng Customer")
         void nonExistingCustomer() {
-            Mockito.when(customerService.search(100_100_100)).thenReturn(null);
+            Mockito.when(customerService.validatePresence(100_100_100))
+                    .thenThrow(NoSuchCustomerException.class);
 
             assertThatThrownBy(() -> basketService.addToBasket(100_100_100, 200_200_200, 1))
-                    .isInstanceOf(BasketServiceException.class);
+                    .isInstanceOf(NoSuchCustomerException.class);
+            Mockito.verify(customerService).validatePresence(100_100_100);
+            Mockito.verify(productService).validatePresence(200_200_200);
         }
 
         @Test
         @DisplayName("non-exisitng Product")
         void nonExistingProduct() {
-            Mockito.when(customerService.search(100_100_100)).thenReturn(new Customer(123_123_123, "name"));
-            Mockito.when(productService.search(200_200_200)).thenReturn(null);
+            Mockito.when(productService.validatePresence(200_200_200))
+                    .thenThrow(NoSuchProductException.class);
 
             assertThatThrownBy(() -> basketService.addToBasket(100_100_100, 200_200_200, 1))
-                    .isInstanceOf(BasketServiceException.class);
+                    .isInstanceOf(NoSuchProductException.class);
+            Mockito.verify(productService).validatePresence(200_200_200);
         }
     }
 
@@ -89,8 +98,6 @@ class BasketServiceTest implements WithAssertions {
 
         @BeforeEach
         void init() {
-            Mockito.when(customerService.search(100_100_100)).thenReturn(new Customer(123_123_123, "name"));
-            Mockito.when(productService.search(200_200_200)).thenReturn(new Product(123_123_123, "name"));
             basketService.addToBasket(100_100_100, 200_200_200, 1);
         }
 
@@ -127,14 +134,13 @@ class BasketServiceTest implements WithAssertions {
         @Test
         @DisplayName("from empty Basket")
         void emptyBasket() {
-            Mockito.when(customerService.search(100_100_100)).thenReturn(new Customer(123_123_123, "name"));
-            Mockito.when(productService.search(200_200_200)).thenReturn(new Product(123_123_123, "name"));
-
             basketService.addToBasket(100_100_100, 200_200_200, 1);
             basketService.removeFromBasket(100_100_100, 200_200_200);
             basketService.removeFromBasket(100_100_100, 200_200_200);
 
-            assertThat(basketService.getBasket(100_100_100)).isEmpty();
+            assertThat(basketService.getContentOfBasket(100_100_100)).isEmpty();
+            Mockito.verify(customerService).validatePresence(100_100_100);
+            Mockito.verify(productService).validatePresence(200_200_200);
         }
 
         @Test

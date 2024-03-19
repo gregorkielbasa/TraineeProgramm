@@ -24,7 +24,7 @@ class BasketTest implements WithAssertions {
         @Test
         @DisplayName("should return an empty map and right customer number")
         void getAllEmpty() {
-            assertThat(basket.getAll()).isEmpty();
+            assertThat(basket.getContent()).isEmpty();
             assertThat(basket.getCustomerNumber()).isEqualTo(123_123_123L);
         }
 
@@ -34,7 +34,7 @@ class BasketTest implements WithAssertions {
             basket.insert(123_123_123, 1);
             basket.insert(321_321_321, 2);
 
-            assertThat(basket.getAll()).containsOnly(
+            assertThat(basket.getContent()).containsOnly(
                     Map.entry(321_321_321L, 2),
                     Map.entry(123_123_123L, 1));
         }
@@ -43,8 +43,9 @@ class BasketTest implements WithAssertions {
         @DisplayName("should remove nothing (Non-existing) and return an empty map")
         void removeNonExisting() {
             basket.remove(123_123_123L);
+            basket.remove(999_999_999L);
 
-            assertThat(basket.getAll()).isEmpty();
+            assertThat(basket.getContent()).isEmpty();
         }
     }
 
@@ -77,7 +78,7 @@ class BasketTest implements WithAssertions {
             basket.insert(123_000_006L, 6);
             expected.put(123_000_006L, 6);
 
-            assertThat(basket.getAll()).containsExactlyInAnyOrderEntriesOf(expected);
+            assertThat(basket.getContent()).containsExactlyInAnyOrderEntriesOf(expected);
         }
 
         @Test
@@ -86,7 +87,7 @@ class BasketTest implements WithAssertions {
             basket.insert(123_000_005L, 5);
             expected.put(123_000_005L, 10);
 
-            assertThat(basket.getAll()).containsExactlyInAnyOrderEntriesOf(expected);
+            assertThat(basket.getContent()).containsExactlyInAnyOrderEntriesOf(expected);
         }
 
         @Test
@@ -95,7 +96,7 @@ class BasketTest implements WithAssertions {
             basket.insert(123_000_005L, -5);
             expected.remove(123_000_005L);
 
-            assertThat(basket.getAll()).containsExactlyInAnyOrderEntriesOf(expected);
+            assertThat(basket.getContent()).containsExactlyInAnyOrderEntriesOf(expected);
         }
 
         @Test
@@ -103,7 +104,7 @@ class BasketTest implements WithAssertions {
         void insertZeroAmount() {
             basket.insert(123_000_005L, 0);
 
-            assertThat(basket.getAll()).containsExactlyInAnyOrderEntriesOf(expected);
+            assertThat(basket.getContent()).containsExactlyInAnyOrderEntriesOf(expected);
         }
 
         @Test
@@ -112,7 +113,7 @@ class BasketTest implements WithAssertions {
             basket.remove(123_000_005L);
             expected.remove(123_000_005L);
 
-            assertThat(basket.getAll()).containsExactlyInAnyOrderEntriesOf(expected);
+            assertThat(basket.getContent()).containsExactlyInAnyOrderEntriesOf(expected);
         }
 
         @Test
@@ -151,7 +152,7 @@ class BasketTest implements WithAssertions {
         void insert() {
             basket1.concatWith(null);
 
-            assertThat(basket1.getAll()).containsOnly(
+            assertThat(basket1.getContent()).containsOnly(
                     Map.entry(123_000_005L, 5),
                     Map.entry(123_000_001L, 1));
         }
@@ -161,7 +162,7 @@ class BasketTest implements WithAssertions {
         void remove() {
             basket1.concatWith(basket2);
 
-            assertThat(basket1.getAll()).containsOnly(
+            assertThat(basket1.getContent()).containsOnly(
                     Map.entry(123_000_005L, 10),
                     Map.entry(123_000_002L, 2),
                     Map.entry(123_000_001L, 1));

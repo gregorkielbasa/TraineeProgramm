@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Basket {
 
-    private final Map<Long, Integer> products; //ProductID, Amount
+    private final Map<Long, Integer> products; //ProductNumber, Amount
     private final long customerNumber;
 
     public Basket(long customerNumber) {
@@ -12,7 +12,7 @@ public class Basket {
         this.customerNumber = customerNumber;
     }
 
-    public Map<Long, Integer> getAll() {
+    public Map<Long, Integer> getContent() {
         return Map.copyOf(products);
     }
 
@@ -42,7 +42,7 @@ public class Basket {
 
     public void concatWith(Basket basket) {
         if (basket != null)
-            for (Map.Entry<Long, Integer> entry : basket.getAll().entrySet())
+            for (Map.Entry<Long, Integer> entry : basket.getContent().entrySet())
                 this.insert(entry.getKey(), entry.getValue());
     }
 

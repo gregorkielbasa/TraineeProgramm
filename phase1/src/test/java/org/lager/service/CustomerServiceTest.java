@@ -2,38 +2,41 @@ package org.lager.service;
 
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.*;
-import org.lager.exception.CustomerException;
+import org.lager.exception.CustomerIllegalNameException;
+import org.lager.exception.NoSuchCustomerException;
 import org.lager.model.Customer;
 
-@DisplayName("CustomerService")
+import java.util.Optional;
+
+@DisplayName("customerService")
 class CustomerServiceTest implements WithAssertions {
 
     @Test
     @DisplayName("when is empty returns an empty list")
     void getAllEmpty() {
-        CustomerService CustomerService = new CustomerService();
-        assertThat(CustomerService.getAll()).isEmpty();
+        CustomerService customerService = new CustomerService();
+        assertThat(customerService.getAll()).isEmpty();
     }
 
     @Nested
     @DisplayName("when tries to create")
     class InsertCustomerServiceTest {
 
-        CustomerService CustomerService;
+        CustomerService customerService;
 
         @BeforeEach
         void init() {
-            CustomerService = new CustomerService();
+            customerService = new CustomerService();
 
-            CustomerService.create(new String("testOne"));
+            customerService.create(new String("testOne"));
         }
 
         @Test
         @DisplayName("a new customer should have 2 customers")
         void newOne() {
-            CustomerService.create("testTwo");
+            customerService.create("testTwo");
 
-            assertThat(CustomerService.getAll()).containsExactlyInAnyOrder(
+            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
                     new Customer(100_000_000, "testOne"),
                     new Customer(100_000_001, "testTwo")
             );
@@ -42,9 +45,9 @@ class CustomerServiceTest implements WithAssertions {
         @Test
         @DisplayName("a customer with existing name should have 2 customers")
         void sameName() {
-            CustomerService.create("testOne");
+            customerService.create("testOne");
 
-            assertThat(CustomerService.getAll()).containsExactlyInAnyOrder(
+            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
                     new Customer(100_000_000, "testOne"),
                     new Customer(100_000_001, "testOne")
             );
@@ -53,15 +56,15 @@ class CustomerServiceTest implements WithAssertions {
         @Test
         @DisplayName("a customer with null Name should throw an exception")
         void nullName() {
-            assertThatThrownBy(() -> CustomerService.create(null))
-                    .isInstanceOf(CustomerException.class);
+            assertThatThrownBy(() -> customerService.create(null))
+                    .isInstanceOf(CustomerIllegalNameException.class);
         }
 
         @Test
         @DisplayName("a customer with invalid Name should throw an exception")
         void invalidName() {
-            assertThatThrownBy(() -> CustomerService.create("Test!!§$%&/()=Test"))
-                    .isInstanceOf(CustomerException.class);
+            assertThatThrownBy(() -> customerService.create("Test!!§$%&/()=Test"))
+                    .isInstanceOf(CustomerIllegalNameException.class);
         }
     }
 
@@ -69,34 +72,69 @@ class CustomerServiceTest implements WithAssertions {
     @DisplayName("when searches for")
     class SearchCustomerServiceTest {
 
-        CustomerService CustomerService;
+        CustomerService customerService;
 
         @BeforeEach
         void init() {
-            CustomerService = new CustomerService();
+            customerService = new CustomerService();
 
-            CustomerService.create(new String("testOne"));
-            CustomerService.create(new String("testTwo"));
+            customerService.create(new String("testOne"));
+            customerService.create(new String("testTwo"));
         }
 
         @Test
         @DisplayName("existing one")
         void existingID() {
-            assertThat(CustomerService.search(100_000_000)).isEqualTo(
-                    new Customer(100_000_000, "testOne")
+            assertThat(customerService.search(100_000_000)).isEqualTo(
+                    Optional.of(new Customer(100_000_000, "testOne"))
             );
         }
 
         @Test
         @DisplayName("non-existing one")
         void nonExistingID() {
-            assertThat(CustomerService.search(999_999_999)).isNull();
+            assertThat(customerService.search(999_999_999)).isEmpty();
         }
 
         @Test
         @DisplayName("invalid ID")
         void invalidID() {
-            assertThat(CustomerService.search(1)).isNull();
+            assertThat(customerService.search(1)).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("when check Presence")
+    class ValidatePresenceCustomerServiceTest {
+
+        CustomerService customerService;
+
+        @BeforeEach
+        void init() {
+            customerService = new CustomerService();
+
+            customerService.create(new String("testOne"));
+            customerService.create(new String("testTwo"));
+        }
+
+        @Test
+        @DisplayName("existing one")
+        void existingID() {
+            assertThat(customerService.validatePresence(100_000_000)).isTrue();
+        }
+
+        @Test
+        @DisplayName("non-existing one")
+        void nonExistingID() {
+            assertThatThrownBy(() -> customerService.validatePresence(999_999_999))
+                    .isInstanceOf(NoSuchCustomerException.class);
+        }
+
+        @Test
+        @DisplayName("invalid ID")
+        void invalidID() {
+            assertThatThrownBy(() -> customerService.validatePresence(1))
+                    .isInstanceOf(NoSuchCustomerException.class);
         }
     }
 
@@ -104,22 +142,22 @@ class CustomerServiceTest implements WithAssertions {
     @DisplayName("when tries to remove")
     class RemoveCustomerServiceTest {
 
-        CustomerService CustomerService;
+        CustomerService customerService;
 
         @BeforeEach
         void init() {
-            CustomerService = new CustomerService();
+            customerService = new CustomerService();
 
-            CustomerService.create(new String("testOne"));
-            CustomerService.create(new String("testTwo"));
+            customerService.create(new String("testOne"));
+            customerService.create(new String("testTwo"));
         }
 
         @Test
         @DisplayName("existing one")
         void existingID() {
-            assertThat(CustomerService.remove(100_000_000)).isEqualTo(
-                    new Customer(100_000_000, "testOne"));
-            assertThat(CustomerService.getAll()).containsExactlyInAnyOrder(
+            customerService.remove(100_000_000);
+
+            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
                     new Customer(100_000_001, "testTwo")
             );
         }
@@ -127,8 +165,9 @@ class CustomerServiceTest implements WithAssertions {
         @Test
         @DisplayName("non-existing one")
         void nonExistingID() {
-            assertThat(CustomerService.remove(999_999_999)).isNull();
-            assertThat(CustomerService.getAll()).containsExactlyInAnyOrder(
+            customerService.remove(999_999_999);
+
+            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
                     new Customer(100_000_000, "testOne"),
                     new Customer(100_000_001, "testTwo")
             );
@@ -137,8 +176,9 @@ class CustomerServiceTest implements WithAssertions {
         @Test
         @DisplayName("invalid ID")
         void invalidID() {
-            assertThat(CustomerService.remove(1)).isNull();
-            assertThat(CustomerService.getAll()).containsExactlyInAnyOrder(
+            customerService.remove(1);
+
+            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
                     new Customer(100_000_000, "testOne"),
                     new Customer(100_000_001, "testTwo")
             );
@@ -149,54 +189,45 @@ class CustomerServiceTest implements WithAssertions {
     @DisplayName("when tries to rename")
     class RenameCustomerServiceTest {
 
-        CustomerService CustomerService;
+        CustomerService customerService;
 
         @BeforeEach
         void init() {
-            CustomerService = new CustomerService();
+            customerService = new CustomerService();
 
-            CustomerService.create(new String("testOne"));
-            CustomerService.create(new String("testTwo"));
+            customerService.create(new String("testOne"));
+            customerService.create(new String("testTwo"));
         }
 
         @Test
         @DisplayName("existing one with a new proper name")
         void existingID() {
-            assertThat(CustomerService.rename(100_000_000, "newName")).isEqualTo(
-                    new Customer(100_000_000, "newName"));
-            assertThat(CustomerService.getAll()).containsExactlyInAnyOrder(
+            customerService.rename(100_000_000, "newName");
+
+            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
                     new Customer(100_000_000, "newName"),
                     new Customer(100_000_001, "testTwo"));
         }
 
         @Test
-        @DisplayName("existing one with a new invalid name")
+        @DisplayName("existing one with a new invalid name throws an exception")
         void invalidNameExistingID() {
-            assertThat(CustomerService.rename(100_000_000, "newName")).isEqualTo(
-                    new Customer(100_000_000, "newName"));
-            assertThat(CustomerService.getAll()).containsExactlyInAnyOrder(
-                    new Customer(100_000_000, "newName"),
-                    new Customer(100_000_001, "testTwo"));
+            assertThatThrownBy(() -> customerService.rename(100_000_000, "new . Name"))
+                    .isInstanceOf(CustomerIllegalNameException.class);
         }
 
         @Test
-        @DisplayName("non-existing one with a new proper name")
+        @DisplayName("non-existing one throws an exception")
         void nonExistingID() {
-            assertThat(CustomerService.rename(999_999_999, "newName")).isNull();
-            assertThat(CustomerService.getAll()).containsExactlyInAnyOrder(
-                    new Customer(100_000_000, "testOne"),
-                    new Customer(100_000_001, "testTwo")
-            );
+            assertThatThrownBy(() -> customerService.rename(999_999_999, "newName"))
+                    .isInstanceOf(NoSuchCustomerException.class);
         }
 
         @Test
-        @DisplayName("invalid ID with a new proper name")
+        @DisplayName("invalid ID throws an exception")
         void invalidID() {
-            assertThat(CustomerService.rename(1, "newName")).isNull();
-            assertThat(CustomerService.getAll()).containsExactlyInAnyOrder(
-                    new Customer(100_000_000, "testOne"),
-                    new Customer(100_000_001, "testTwo")
-            );
+            assertThatThrownBy(() -> customerService.rename(1, "newName"))
+                    .isInstanceOf(NoSuchCustomerException.class);
         }
     }
 }

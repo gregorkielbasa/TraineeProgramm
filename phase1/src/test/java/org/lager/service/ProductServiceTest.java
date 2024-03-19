@@ -2,8 +2,11 @@ package org.lager.service;
 
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.*;
-import org.lager.exception.ProductException;
+import org.lager.exception.NoSuchProductException;
+import org.lager.exception.ProductIllegalNameException;
 import org.lager.model.Product;
+
+import java.util.Optional;
 
 @DisplayName("ProductService")
 class ProductServiceTest implements WithAssertions {
@@ -54,14 +57,14 @@ class ProductServiceTest implements WithAssertions {
         @DisplayName("a product with null Name should throw an exception")
         void nullName() {
             assertThatThrownBy(() -> productService.insert(null))
-                    .isInstanceOf(ProductException.class);
+                    .isInstanceOf(ProductIllegalNameException.class);
         }
 
         @Test
         @DisplayName("a product with invalid Name should throw an exception")
         void invalidName() {
             assertThatThrownBy(() -> productService.insert("Test!!§$%&/()=Test"))
-                    .isInstanceOf(ProductException.class);
+                    .isInstanceOf(ProductIllegalNameException.class);
         }
     }
 
@@ -83,20 +86,55 @@ class ProductServiceTest implements WithAssertions {
         @DisplayName("existing one")
         void existingID() {
             assertThat(productService.search(100_000_000)).isEqualTo(
-                    new Product(100_000_000, "test1")
+                    Optional.of(new Product(100_000_000, "test1"))
             );
         }
 
         @Test
         @DisplayName("non-existing one")
         void nonExistingID() {
-            assertThat(productService.search(999_999_999)).isNull();
+            assertThat(productService.search(999_999_999)).isEmpty();
         }
 
         @Test
         @DisplayName("invalid ID")
         void invalidID() {
-            assertThat(productService.search(1)).isNull();
+            assertThat(productService.search(1)).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("when check Presence")
+    class ValidatePresenceProductServiceTest {
+
+        ProductService productService;
+
+        @BeforeEach
+        void init() {
+            productService = new ProductService();
+
+            productService.insert(new String("test1"));
+            productService.insert(new String("test2"));
+        }
+
+        @Test
+        @DisplayName("existing one")
+        void existingID() {
+            assertThat(productService.validatePresence(100_000_000)).isTrue();
+        }
+
+        @Test
+        @DisplayName("non-existing one")
+        void nonExistingID() {
+            assertThatThrownBy(() -> productService.validatePresence(999_999_999))
+                    .isInstanceOf(NoSuchProductException.class);
+        }
+
+        @Test
+        @DisplayName("invalid ID")
+        void invalidID() {
+            assertThatThrownBy(() -> productService.validatePresence(1))
+                    .isInstanceOf(NoSuchProductException.class);
         }
     }
 
@@ -117,8 +155,8 @@ class ProductServiceTest implements WithAssertions {
         @Test
         @DisplayName("existing one")
         void existingID() {
-            assertThat(productService.remove(100_000_000)).isEqualTo(
-                    new Product(100_000_000, "test1"));
+            productService.remove(100_000_000);
+
             assertThat(productService.getAll()).containsExactlyInAnyOrder(
                     new Product(100_000_001, "test2")
             );
@@ -127,7 +165,8 @@ class ProductServiceTest implements WithAssertions {
         @Test
         @DisplayName("non-existing one")
         void nonExistingID() {
-            assertThat(productService.remove(999_999_999)).isNull();
+            productService.remove(999_999_999);
+
             assertThat(productService.getAll()).containsExactlyInAnyOrder(
                     new Product(100_000_000, "test1"),
                     new Product(100_000_001, "test2")
@@ -137,7 +176,8 @@ class ProductServiceTest implements WithAssertions {
         @Test
         @DisplayName("invalid ID")
         void invalidID() {
-            assertThat(productService.remove(1)).isNull();
+            productService.remove(1);
+
             assertThat(productService.getAll()).containsExactlyInAnyOrder(
                     new Product(100_000_000, "test1"),
                     new Product(100_000_001, "test2")
@@ -160,33 +200,34 @@ class ProductServiceTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("existing one")
+        @DisplayName("existing one with a new proper name")
         void existingID() {
-            assertThat(productService.rename(100_000_000, "new test1")).isEqualTo(
-                    new Product(100_000_000, "new test1"));
+            productService.rename(100_000_000, "new test1");
+
             assertThat(productService.getAll()).containsExactlyInAnyOrder(
                     new Product(100_000_000, "new test1"),
                     new Product(100_000_001, "test2"));
         }
 
         @Test
-        @DisplayName("non-existing one")
-        void nonExistingID() {
-            assertThat(productService.rename(999_999_999, "some")).isNull();
-            assertThat(productService.getAll()).containsExactlyInAnyOrder(
-                    new Product(100_000_000, "test1"),
-                    new Product(100_000_001, "test2")
-            );
+        @DisplayName("existing one with a new invalid name throws an exception")
+        void invalidNameExistingID() {
+            assertThatThrownBy(() -> productService.rename(100_000_000, "new %%&(%$§test1"))
+                    .isInstanceOf(ProductIllegalNameException.class);
         }
 
         @Test
-        @DisplayName("invalid ID")
+        @DisplayName("non-existing one throws an exception")
+        void nonExistingID() {
+            assertThatThrownBy(() -> productService.rename(999_999_999, "some"))
+                    .isInstanceOf(NoSuchProductException.class);
+        }
+
+        @Test
+        @DisplayName("invalid ID throws an exception")
         void invalidID() {
-            assertThat(productService.rename(1, "some")).isNull();
-            assertThat(productService.getAll()).containsExactlyInAnyOrder(
-                    new Product(100_000_000, "test1"),
-                    new Product(100_000_001, "test2")
-            );
+            assertThatThrownBy(() -> productService.rename(1, "some"))
+                    .isInstanceOf(NoSuchProductException.class);
         }
     }
 }

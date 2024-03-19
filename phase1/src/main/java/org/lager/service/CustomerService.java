@@ -1,11 +1,9 @@
 package org.lager.service;
 
+import org.lager.exception.NoSuchCustomerException;
 import org.lager.model.Customer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CustomerService {
     private long newCustomerNumber = 100_000_000;
@@ -15,7 +13,7 @@ public class CustomerService {
         this.customers = new HashMap<>();
     }
 
-    public List<Customer> getAll () {
+    public List<Customer> getAll() {
         return new ArrayList<>(customers.values());
     }
 
@@ -26,18 +24,23 @@ public class CustomerService {
         return newCustomer;
     }
 
-    public Customer search(long customerNumber) {
-        return customers.get(customerNumber);
+    public Optional<Customer> search(long customerNumber) {
+        return Optional.ofNullable(customers.get(customerNumber));
     }
 
-    public Customer remove(long customerNumber) {
-        return customers.remove(customerNumber);
+    public boolean validatePresence(long number) {
+        search(number)
+                .orElseThrow(() -> new NoSuchCustomerException(number));
+        return true;
     }
 
-    public Customer rename(long customerNumber, String customerNewName) {
-        Customer customer = search(customerNumber);
-        if (null != customer)
-            customer.setName(customerNewName);
-        return customer;
+    public void remove(long customerNumber) {
+        customers.remove(customerNumber);
+    }
+
+    public void rename(long customerNumber, String customerNewName) {
+        Customer customer = search(customerNumber)
+                .orElseThrow(() -> new NoSuchCustomerException(customerNumber));
+        customer.setName(customerNewName);
     }
 }
