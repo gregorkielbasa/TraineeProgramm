@@ -1,0 +1,66 @@
+package org.lager.model;
+
+import org.lager.exception.ProductIllegalNameException;
+import org.lager.exception.ProductIllegalNumberException;
+
+import java.util.Objects;
+
+public class Product {
+    private static final String NAME_REGEX = "^[a-zA-Z0-9- ]{3,24}$";
+    private static final long NUMBER_MIN = 100_000_000;
+    private static final long NUMBER_MAX = 999_999_999;
+    private final long number;
+    private String name;
+
+    public Product(long number, String name) {
+        validateNumber(number);
+        validateName(name);
+
+        this.number = number;
+        this.name = name;
+    }
+
+    private static void validateNumber(long number) {
+        if (number < NUMBER_MIN || number > NUMBER_MAX)
+            throw new ProductIllegalNumberException(number);
+    }
+
+    private void validateName(String name) {
+        if (null == name || !name.matches(NAME_REGEX))
+            throw new ProductIllegalNameException(name);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        validateName(name);
+        this.name = name;
+    }
+
+    public long getNumber() {
+        return number;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "number=" + number +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return number == product.number && Objects.equals(name, product.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, number);
+    }
+}
