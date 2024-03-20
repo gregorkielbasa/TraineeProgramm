@@ -41,12 +41,11 @@ public class BasketService {
     public void addToBasket(long customerNumber, long productNumber, int amount) {
         productService.validatePresence(productNumber);
         Basket basket = getBasket(customerNumber)
-                .orElse(createBasket(customerNumber));
+                .orElseGet(() -> createBasket(customerNumber));
         basket.insert(productNumber, amount);
     }
 
     private Basket createBasket(long customerNumber) {
-        System.out.printf("new customer");
         customerService.validatePresence(customerNumber);
         Basket newBasket = new Basket(customerNumber);
         baskets.put(customerNumber, newBasket);

@@ -9,15 +9,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.NoSuchProductException;
 import org.lager.model.Basket;
-import org.lager.model.Customer;
-import org.lager.model.Product;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.swing.text.html.Option;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BasketService")
@@ -60,11 +56,12 @@ class BasketServiceTest implements WithAssertions {
         void emptyBasket() {
             basketService.addToBasket(100_100_100, 200_200_200, 1);
             basketService.removeFromBasket(100_100_100, 200_200_200);
-            basketService.addToBasket(100_100_100, 200_200_200, 1);
+            basketService.addToBasket(100_100_100, 300_300_300, 1);
 
             assertThat(basketService.getContentOfBasket(100_100_100))
-                    .containsOnly(Map.entry(200_200_200L, 1));
+                    .containsOnly(Map.entry(300_300_300L, 1));
             Mockito.verify(productService).validatePresence(200_200_200);
+            Mockito.verify(productService).validatePresence(300_300_300);
             Mockito.verify(customerService).validatePresence(100_100_100);
         }
 
