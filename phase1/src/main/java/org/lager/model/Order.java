@@ -14,7 +14,6 @@ public class Order {
     private final long customerNumber;
     private final LocalDateTime dateTime;
     private final List<OrderItem> items;
-
     public Order(long ID, long customerNumber, List<OrderItem> items) {
         validateID(ID);
         this.ID = ID;
@@ -32,6 +31,10 @@ public class Order {
     private void validateItems(List<OrderItem> items) {
         if (items == null || items.isEmpty())
             throw new OrderItemListNotPresentException(ID);
+    }
+
+    public long getID() {
+        return ID;
     }
 
     public long getCustomerNumber() {

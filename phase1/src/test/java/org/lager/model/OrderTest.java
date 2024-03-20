@@ -4,17 +4,12 @@ import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.OrderIllegalIDException;
 import org.lager.exception.OrderItemListNotPresentException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Order")
 class OrderTest implements WithAssertions {
