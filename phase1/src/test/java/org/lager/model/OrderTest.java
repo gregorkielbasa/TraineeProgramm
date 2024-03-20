@@ -63,7 +63,7 @@ class OrderTest implements WithAssertions {
 
             assertThat(order.getCustomerNumber()).isEqualTo(123_123_123L);
             assertThat(order.getDateTime()).isEqualToIgnoringNanos(LocalDateTime.now());
-            assertThat(order.getItems()).hasSameElementsAs(VALID_ITEM_LIST);
+            assertThat(order.getItems()).containsExactlyInAnyOrderElementsOf(VALID_ITEM_LIST);
         }
 
         @Test
