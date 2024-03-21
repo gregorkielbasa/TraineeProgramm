@@ -46,7 +46,7 @@ class OrderServiceTest implements WithAssertions {
         @Test
         @DisplayName("throws an Exception when ordered with NULL Basket")
         void orderNull() {
-            Mockito.when(basketService.getContentOfBasket(ANY_CUSTOMER_NUMBER)).thenReturn(null);
+            Mockito.when(basketService.getContentOfBasket(ANY_CUSTOMER_NUMBER)).thenReturn(Mockito.any());
 
             assertThatThrownBy(() -> orderService.order(ANY_CUSTOMER_NUMBER))
                     .isInstanceOf(OrderItemListNotPresentException.class);

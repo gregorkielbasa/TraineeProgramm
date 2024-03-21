@@ -3,6 +3,8 @@ package org.lager.service;
 import org.lager.exception.OrderItemListNotPresentException;
 import org.lager.model.Order;
 import org.lager.model.OrderItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +16,7 @@ public class OrderService {
     private long newOrderID = 1000;
     private List<Order> orders;
     private final BasketService basketService;
+    private final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     public OrderService(BasketService basketService) {
         this.basketService = basketService;
@@ -21,10 +24,12 @@ public class OrderService {
     }
 
     public long order(long customerNumber) {
+        logger.debug("OrderService starts to order {} Basket", customerNumber);
         List<OrderItem> items = getOrderItemsFromBasket(customerNumber);
         Order newOrder = new Order(newOrderID, customerNumber, items);
         orders.add(newOrder);
         basketService.emptyBasket(customerNumber);
+        logger.debug("OrderService finished to order {} Basket", customerNumber);
         return newOrderID++;
     }
 

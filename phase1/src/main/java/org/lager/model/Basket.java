@@ -1,15 +1,20 @@
 package org.lager.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 public class Basket {
 
     private final Map<Long, Integer> products; //ProductNumber, Amount
     private final long customerNumber;
+    private final Logger logger = LoggerFactory.getLogger(Basket.class);
 
     public Basket(long customerNumber) {
         this.products = new HashMap<>();
         this.customerNumber = customerNumber;
+        logger.info("New Basket {} has been created.", customerNumber);
     }
 
     public Map<Long, Integer> getContent() {
@@ -17,6 +22,7 @@ public class Basket {
     }
 
     public void insert(long productID, int amount) {
+        logger.debug("Basket {} is changing amount of {} Product about {}", customerNumber, productID, amount);
         int newAmount = amount;
         if (isProductPresent(productID))
             newAmount += products.get(productID);
@@ -31,6 +37,7 @@ public class Basket {
     }
 
     public void remove(long productID) {
+        logger.debug("Basket {} is removing {} Product", customerNumber, productID);
         products.remove(productID);
     }
 
