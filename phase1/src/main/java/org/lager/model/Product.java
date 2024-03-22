@@ -2,6 +2,8 @@ package org.lager.model;
 
 import org.lager.exception.ProductIllegalNameException;
 import org.lager.exception.ProductIllegalNumberException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -11,6 +13,7 @@ public class Product {
     private static final long NUMBER_MAX = 999_999_999;
     private final long number;
     private String name;
+    private final Logger logger = LoggerFactory.getLogger(Product.class);
 
     public Product(long number, String name) {
         validateNumber(number);
@@ -18,6 +21,8 @@ public class Product {
 
         this.number = number;
         this.name = name;
+
+        logger.info("New Product {} has been created. Its name is {}", number, name);
     }
 
     private static void validateNumber(long number) {
@@ -35,6 +40,7 @@ public class Product {
     }
 
     public void setName(String name) {
+        logger.info("Product {} with {} name is changing its name to {}.", this.number, this.name, name);
         validateName(name);
         this.name = name;
     }

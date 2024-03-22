@@ -2,6 +2,8 @@ package org.lager.model;
 
 import org.lager.exception.CustomerIllegalNameException;
 import org.lager.exception.CustomerIllegalNumberException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -12,12 +14,16 @@ public class Customer {
     private final long number;
     private String name;
 
+    private final Logger logger = LoggerFactory.getLogger(Customer.class);
+
     public Customer(long number, String name) {
         validateNumber(number);
         validateName(name);
 
         this.name = name;
         this.number = number;
+
+        logger.info("New Customer {} has been created.", number);
     }
 
     private static void validateNumber(long number) {
@@ -35,6 +41,7 @@ public class Customer {
     }
 
     public void setName(String name) {
+        logger.info("Customer {} with {} name is changing its name to {}.", this.number, this.name, name);
         validateName(name);
         this.name = name;
     }
