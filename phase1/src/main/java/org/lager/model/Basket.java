@@ -21,29 +21,29 @@ public class Basket {
         return Map.copyOf(products);
     }
 
-    public void insert(long productID, int amount) {
-        logger.debug("Basket {} is changing amount of {} Product about {}", customerNumber, productID, amount);
+    public void insert(long productId, int amount) {
+        logger.debug("Basket {} is changing amount of {} Product about {}", customerNumber, productId, amount);
         int newAmount = amount;
-        if (isProductPresent(productID))
-            newAmount += products.get(productID);
+        if (isProductPresent(productId))
+            newAmount += products.get(productId);
         if (newAmount > 0)
-            products.put(productID, newAmount);
+            products.put(productId, newAmount);
         else
-            products.remove(productID);
+            products.remove(productId);
     }
 
-    private boolean isProductPresent(long productID) {
-        return products.containsKey(productID);
+    private boolean isProductPresent(long productId) {
+        return products.containsKey(productId);
     }
 
-    public void remove(long productID) {
-        logger.debug("Basket {} is removing {} Product", customerNumber, productID);
-        products.remove(productID);
+    public void remove(long productId) {
+        logger.debug("Basket {} is removing {} Product", customerNumber, productId);
+        products.remove(productId);
     }
 
-    public int getAmountOf(long productID) {
-        return isProductPresent(productID)
-                ? products.get(productID)
+    public int getAmountOf(long productId) {
+        return isProductPresent(productId)
+                ? products.get(productId)
                 : 0;
     }
 

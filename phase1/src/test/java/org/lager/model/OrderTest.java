@@ -4,7 +4,7 @@ import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.lager.exception.OrderIllegalIDException;
+import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemListNotPresentException;
 
 import java.time.LocalDateTime;
@@ -29,7 +29,7 @@ class OrderTest implements WithAssertions {
         @DisplayName("created with invalid ID")
         void invalidID() {
             assertThatThrownBy(() -> new Order(INVALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST))
-                    .isInstanceOf(OrderIllegalIDException.class);
+                    .isInstanceOf(OrderIllegalIdException.class);
         }
 
         @Test
