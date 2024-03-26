@@ -1,11 +1,11 @@
 package org.lager.model;
 
-import org.lager.exception.ProductIllegalNameException;
-import org.lager.exception.ProductIllegalNumberException;
+import org.lager.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class Product {
     private static final String NAME_REGEX = "^[a-zA-Z0-9- ]{3,24}$";
@@ -13,7 +13,7 @@ public class Product {
     private static final long NUMBER_MAX = 999_999_999;
     private final long number;
     private String name;
-    private final Logger logger = LoggerFactory.getLogger(Product.class);
+    private final static Logger logger = LoggerFactory.getLogger(Product.class);
 
     public Product(long number, String name) {
         validateNumber(number);
@@ -47,6 +47,30 @@ public class Product {
 
     public long getNumber() {
         return number;
+    }
+
+    public String toCsvRecord() {
+        return number + "," + name;
+    }
+
+    public static Optional<Product> getFromCsvRecord(String csvRecord) {
+        Optional<Product> result = Optional.empty();
+        try {
+            String[] values = csvRecord.split(",");
+            long number = Long.parseLong(values[0]);
+            String name = values[1];
+            Product newProduct = new Product(number, name);
+            result = Optional.of(newProduct);
+        } catch (NullPointerException e) {
+            logger.warn("Product CSV Record is NULL");
+        } catch (NumberFormatException e) {
+            logger.warn("Product CSV Record contains incorrect Product Number");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            logger.warn("Product CSV Record is incomplete");
+        } catch (ProductIllegalNumberException | ProductIllegalNameException e) {
+            logger.warn("Product CSV Record is invalid: " + e);
+        }
+        return result;
     }
 
     @Override
