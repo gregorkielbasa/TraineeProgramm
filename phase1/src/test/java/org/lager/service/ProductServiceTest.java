@@ -2,69 +2,182 @@ package org.lager.service;
 
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.*;
-import org.lager.exception.NoSuchProductException;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.ProductIllegalNameException;
+import org.lager.exception.NoSuchProductException;
 import org.lager.model.Product;
+import org.lager.repository.ProductCsvEditor;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
-@DisplayName("ProductService")
+@ExtendWith(MockitoExtension.class)
+@DisplayName("productService")
 class ProductServiceTest implements WithAssertions {
 
-    @Test
-    @DisplayName("when is empty returns an empty list")
-    void getAllEmpty() {
-        ProductService productService = new ProductService();
-        assertThat(productService.getAll()).isEmpty();
+    private final static long PRODUCT_NUMBER_1 = 100_000_000L;
+    private final static Product PRODUCT_1 = new Product(PRODUCT_NUMBER_1, "test1");
+    private final static long PRODUCT_NUMBER_2 = 100_000_001L;
+    private final static Product PRODUCT_2 = new Product(PRODUCT_NUMBER_2, "test2");
+
+    @Captor
+    private ArgumentCaptor<List<Product>> argumentCaptor;
+    @Mock
+    private ProductCsvEditor csvEditor;
+
+    @Nested
+    @DisplayName("tests getAll() method and")
+    class GetAllTest {
+
+        @Test
+        @DisplayName("is empty when no CVS File exists")
+        void nonExistingCsv() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenThrow(IOException.class);
+
+            ProductService productService = new ProductService(csvEditor);
+
+            assertThat(productService.getAll()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("is empty when no CVS File is empty")
+        void emptyCsv() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of());
+
+            ProductService productService = new ProductService(csvEditor);
+
+            assertThat(productService.getAll()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("has one record")
+        void oneRecordInCSV() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(PRODUCT_1));
+
+            ProductService productService = new ProductService(csvEditor);
+
+            assertThat(productService.getAll())
+                    .containsExactlyInAnyOrderElementsOf(List.of(PRODUCT_1));
+        }
+
+        @Test
+        @DisplayName("has more records")
+        void moreRecordsInCSV() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(PRODUCT_1, PRODUCT_2));
+
+            ProductService productService = new ProductService(csvEditor);
+
+            assertThat(productService.getAll())
+                    .containsExactlyInAnyOrderElementsOf(List.of(PRODUCT_1, PRODUCT_2));
+        }
     }
 
     @Nested
-    @DisplayName("when tries to insert")
-    class InsertProductServiceTest {
-
-        ProductService productService;
-
-        @BeforeEach
-        void init() {
-            productService = new ProductService();
-
-            productService.insert(new String("test1"));
-        }
+    @DisplayName("tests insert() method and")
+    class CreateTest {
 
         @Test
-        @DisplayName("a new product should have 2 products")
-        void newOne() {
-            productService.insert("test2");
+        @DisplayName("adds one to an empty List")
+        void nonExistingCsv() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of());
+            ProductService productService = new ProductService(csvEditor);
 
-            assertThat(productService.getAll()).containsExactlyInAnyOrder(
-                    new Product(100_000_000, "test1"),
-                    new Product(100_000_001, "test2")
-            );
-        }
-
-        @Test
-        @DisplayName("a product with existing name should have 2 products")
-        void sameName() {
             productService.insert("test1");
 
-            assertThat(productService.getAll()).containsExactlyInAnyOrder(
-                    new Product(100_000_000, "test1"),
-                    new Product(100_000_001, "test1")
-            );
+            Mockito.verify(csvEditor).loadFromFile();
+            Mockito.verify(csvEditor).saveToFile(argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrderElementsOf(List.of(PRODUCT_1));
+
+        }
+
+        @Test
+        @DisplayName("adds 2nd element with new name")
+        void oneExistingCsv() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(PRODUCT_1));
+            ProductService productService = new ProductService(csvEditor);
+
+            productService.insert("test2");
+
+            Mockito.verify(csvEditor).loadFromFile();
+            Mockito.verify(csvEditor).saveToFile(argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrderElementsOf(List.of(PRODUCT_1, PRODUCT_2));
+        }
+
+        @Test
+        @DisplayName("adds 2nd element with the same name")
+        void oneTwoWithSameName() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(PRODUCT_1));
+            ProductService productService = new ProductService(csvEditor);
+
+            productService.insert("test1");
+
+            Mockito.verify(csvEditor).loadFromFile();
+            Mockito.verify(csvEditor).saveToFile(argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrderElementsOf(List.of(PRODUCT_1, new Product(PRODUCT_NUMBER_2, "test1")));
+        }
+
+        @Test
+        @DisplayName("adds 2nd element to a List with high ProductNumber")
+        void highProductNumber() throws IOException {
+            Product highProduct = new Product(111_000_000L, "name");
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(highProduct));
+            ProductService productService = new ProductService(csvEditor);
+
+            productService.insert("newName");
+
+            Mockito.verify(csvEditor).loadFromFile();
+            Mockito.verify(csvEditor).saveToFile(argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrderElementsOf(List.of(highProduct, new Product(111_000_001L, "newName")));
         }
 
         @Test
         @DisplayName("a product with null Name should throw an exception")
-        void nullName() {
+        void nullName() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(PRODUCT_1));
+            ProductService productService = new ProductService(csvEditor);
+
             assertThatThrownBy(() -> productService.insert(null))
                     .isInstanceOf(ProductIllegalNameException.class);
         }
 
         @Test
         @DisplayName("a product with invalid Name should throw an exception")
-        void invalidName() {
+        void invalidName() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(PRODUCT_1));
+            ProductService productService = new ProductService(csvEditor);
+
             assertThatThrownBy(() -> productService.insert("Test!!§$%&/()=Test"))
                     .isInstanceOf(ProductIllegalNameException.class);
+        }
+
+        @Test
+        @DisplayName("a product but cannot save CSV File")
+        void corruptedCsvFile() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(PRODUCT_1));
+            Mockito.doThrow(new IOException())
+                    .when(csvEditor).saveToFile(argumentCaptor.capture());
+            ProductService productService = new ProductService(csvEditor);
+
+            productService.insert("test2");
+
+            assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrderElementsOf(List.of(PRODUCT_1, PRODUCT_2));
         }
     }
 
@@ -75,18 +188,17 @@ class ProductServiceTest implements WithAssertions {
         ProductService productService;
 
         @BeforeEach
-        void init() {
-            productService = new ProductService();
-
-            productService.insert(new String("test1"));
-            productService.insert(new String("test2"));
+        void init() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(PRODUCT_1, PRODUCT_2));
+            productService = new ProductService(csvEditor);
         }
 
         @Test
         @DisplayName("existing one")
         void existingID() {
-            assertThat(productService.search(100_000_000)).isEqualTo(
-                    Optional.of(new Product(100_000_000, "test1"))
+            assertThat(productService.search(PRODUCT_NUMBER_1)).isEqualTo(
+                    Optional.of(PRODUCT_1)
             );
         }
 
@@ -110,17 +222,16 @@ class ProductServiceTest implements WithAssertions {
         ProductService productService;
 
         @BeforeEach
-        void init() {
-            productService = new ProductService();
-
-            productService.insert(new String("test1"));
-            productService.insert(new String("test2"));
+        void init() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(PRODUCT_1, PRODUCT_2));
+            productService = new ProductService(csvEditor);
         }
 
         @Test
         @DisplayName("existing one")
         void existingID() {
-            assertThat(productService.validatePresence(100_000_000)).isTrue();
+            assertThat(productService.validatePresence(PRODUCT_NUMBER_1)).isTrue();
         }
 
         @Test
@@ -139,49 +250,43 @@ class ProductServiceTest implements WithAssertions {
     }
 
     @Nested
-    @DisplayName("when tries to remove")
+    @DisplayName("when removes")
     class RemoveProductServiceTest {
 
         ProductService productService;
 
         @BeforeEach
-        void init() {
-            productService = new ProductService();
-
-            productService.insert(new String("test1"));
-            productService.insert(new String("test2"));
+        void init() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(PRODUCT_1, PRODUCT_2));
+            productService = new ProductService(csvEditor);
         }
 
         @Test
         @DisplayName("existing one")
-        void existingID() {
-            productService.remove(100_000_000);
+        void existingID() throws IOException {
+            productService.remove(PRODUCT_NUMBER_1);
 
-            assertThat(productService.getAll()).containsExactlyInAnyOrder(
-                    new Product(100_000_001, "test2")
-            );
+            Mockito.verify(csvEditor).saveToFile(argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrderElementsOf(List.of(PRODUCT_2));
         }
 
         @Test
         @DisplayName("non-existing one")
-        void nonExistingID() {
+        void nonExistingID() throws IOException {
             productService.remove(999_999_999);
 
-            assertThat(productService.getAll()).containsExactlyInAnyOrder(
-                    new Product(100_000_000, "test1"),
-                    new Product(100_000_001, "test2")
-            );
+            Mockito.verify(csvEditor).saveToFile(argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrderElementsOf(List.of(PRODUCT_1, PRODUCT_2));
         }
 
         @Test
         @DisplayName("invalid ID")
-        void invalidID() {
+        void invalidID() throws IOException {
             productService.remove(1);
 
-            assertThat(productService.getAll()).containsExactlyInAnyOrder(
-                    new Product(100_000_000, "test1"),
-                    new Product(100_000_001, "test2")
-            );
+            Mockito.verify(csvEditor).saveToFile(argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrderElementsOf(List.of(PRODUCT_1, PRODUCT_2));
         }
     }
 
@@ -192,41 +297,40 @@ class ProductServiceTest implements WithAssertions {
         ProductService productService;
 
         @BeforeEach
-        void init() {
-            productService = new ProductService();
-
-            productService.insert(new String("test1"));
-            productService.insert(new String("test2"));
+        void init() throws IOException {
+            Mockito.when(csvEditor.loadFromFile())
+                    .thenReturn(List.of(new Product(PRODUCT_NUMBER_1, "oldName"), PRODUCT_2));
+            productService = new ProductService(csvEditor);
         }
 
         @Test
         @DisplayName("existing one with a new proper name")
-        void existingID() {
-            productService.rename(100_000_000, "new test1");
+        void existingID() throws IOException {
+            productService.rename(PRODUCT_NUMBER_1, "newName");
 
-            assertThat(productService.getAll()).containsExactlyInAnyOrder(
-                    new Product(100_000_000, "new test1"),
-                    new Product(100_000_001, "test2"));
+            Mockito.verify(csvEditor).saveToFile(argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrderElementsOf(List.of(PRODUCT_2, new Product(PRODUCT_NUMBER_1, "newName")));
+
         }
 
         @Test
         @DisplayName("existing one with a new invalid name throws an exception")
         void invalidNameExistingID() {
-            assertThatThrownBy(() -> productService.rename(100_000_000, "new %%&(%$§test1"))
+            assertThatThrownBy(() -> productService.rename(PRODUCT_NUMBER_1, "new §$%&/( Name"))
                     .isInstanceOf(ProductIllegalNameException.class);
         }
 
         @Test
         @DisplayName("non-existing one throws an exception")
         void nonExistingID() {
-            assertThatThrownBy(() -> productService.rename(999_999_999, "some"))
+            assertThatThrownBy(() -> productService.rename(999_999_999, "newName"))
                     .isInstanceOf(NoSuchProductException.class);
         }
 
         @Test
         @DisplayName("invalid ID throws an exception")
         void invalidID() {
-            assertThatThrownBy(() -> productService.rename(1, "some"))
+            assertThatThrownBy(() -> productService.rename(1, "newName"))
                     .isInstanceOf(NoSuchProductException.class);
         }
     }
