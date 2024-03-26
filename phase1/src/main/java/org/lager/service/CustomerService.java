@@ -71,9 +71,15 @@ public class CustomerService {
     private void loadFromFile() {
         try {
             csvEditor.loadFromFile().forEach(customer -> customers.put(customer.getNumber(), customer));
+            setNewCustomerNumber();
             logger.info("CustomerService loaded its state from CSV File");
         } catch (IOException e) {
             logger.warn("CustomerService was not able to load CSV File");
         }
+    }
+
+    private void setNewCustomerNumber() {
+        newCustomerNumber = customers.keySet().stream().max(Long::compareTo).orElse(newCustomerNumber - 1);
+        newCustomerNumber++;
     }
 }

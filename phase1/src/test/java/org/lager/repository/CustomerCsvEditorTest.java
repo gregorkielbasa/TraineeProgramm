@@ -73,15 +73,4 @@ class CustomerCsvEditorTest implements WithAssertions {
             assertThat(csvEditor.loadFromFile()).containsExactlyInAnyOrderElementsOf(List.of(CUSTOMER_1, CUSTOMER_2));
         }
     }
-
-    @Test
-    void loadFromFile() throws IOException {
-        CustomerCsvEditor csvEditor = new CustomerCsvEditor("test.csv", "header");
-
-        Customer customer1 = new Customer(123_123_123, "properName");
-        Customer customer2 = new Customer(123_456_789, "otherNme");
-        Customer customer3 = new Customer(123_000_000, "bestName");
-
-        csvEditor.saveToFile(List.of(customer1, customer2, customer3));
-    }
 }
