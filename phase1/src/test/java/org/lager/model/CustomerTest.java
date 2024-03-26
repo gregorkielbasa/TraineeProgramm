@@ -180,7 +180,7 @@ class CustomerTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("returns an empty Optional when umber is incorrect")
+        @DisplayName("returns an empty Optional when number is incorrect")
         void csvRecordIncorrectNumber() {
             String csvRecord = "123,customerName";
 
