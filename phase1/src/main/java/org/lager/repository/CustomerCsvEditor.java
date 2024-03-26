@@ -1,5 +1,6 @@
 package org.lager.repository;
 
+import org.lager.exception.CustomerCsvNullException;
 import org.lager.model.Customer;
 
 import java.io.*;
@@ -29,6 +30,9 @@ public class CustomerCsvEditor {
     }
 
     public void saveToFile(List<Customer> customers) throws IOException {
+        if (customers == null)
+            throw new CustomerCsvNullException();
+
         BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
         writer.write(fileHeader);
 
