@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.NoSuchProductException;
 import org.lager.model.Basket;
+import org.lager.repository.BasketXmlEditor;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -22,12 +23,14 @@ class BasketServiceTest implements WithAssertions {
     BasketService basketService;
     CustomerService customerService;
     ProductService productService;
+    BasketXmlEditor xmlEditor;
 
     @BeforeEach
     void init() {
         customerService = Mockito.mock(CustomerService.class);
         productService = Mockito.mock(ProductService.class);
-        basketService = new BasketService(customerService, productService);
+        xmlEditor = Mockito.mock(BasketXmlEditor.class);
+        basketService = new BasketService(customerService, productService, xmlEditor);
     }
 
     @Test
