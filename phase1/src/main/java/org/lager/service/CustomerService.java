@@ -70,6 +70,7 @@ public class CustomerService {
 
     private void loadFromFile() {
         try {
+            customers.clear();
             csvEditor.loadFromFile().forEach(customer -> customers.put(customer.getNumber(), customer));
             setNewCustomerNumber();
             logger.info("CustomerService loaded its state from CSV File");
