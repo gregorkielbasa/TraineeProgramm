@@ -1,9 +1,11 @@
 package org.lager.service;
 
 import org.lager.model.Basket;
+import org.lager.repository.BasketXmlEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,13 +15,16 @@ public class BasketService {
 
     private final ProductService productService;
     private final CustomerService customerService;
+    private final BasketXmlEditor xmlEditor;
     private final Map<Long, Basket> baskets;
     private final Logger logger = LoggerFactory.getLogger(BasketService.class);
 
-    public BasketService(CustomerService customerService, ProductService productService) {
+    public BasketService(CustomerService customerService, ProductService productService, BasketXmlEditor xmlEditor) {
         this.customerService = customerService;
         this.productService = productService;
+        this.xmlEditor = xmlEditor;
         this.baskets = new HashMap<>();
+        loadFromFile();
     }
 
     private Optional<Basket> getBasket(long customerNumber) {
@@ -29,12 +34,14 @@ public class BasketService {
     public void emptyBasket(long customerNumber) {
         logger.info("BasketService empties {} Basket", customerNumber);
         baskets.remove(customerNumber);
+        saveToFile();
     }
 
     public void removeFromBasket(long customerNumber, long productNumber) {
         logger.debug("BasketService remove {} Product from {} Basket", productNumber, customerNumber);
         getBasket(customerNumber)
                 .ifPresent((basket) -> basket.remove(productNumber));
+        saveToFile();
     }
 
     public Map<Long, Integer> getContentOfBasket(long customerNumber) {
@@ -49,6 +56,7 @@ public class BasketService {
         Basket basket = getBasket(customerNumber)
                 .orElseGet(() -> createBasket(customerNumber));
         basket.insert(productNumber, amount);
+        saveToFile();
         logger.debug("BasketService finished to add {} Product to {} Basket", productNumber, customerNumber);
     }
 
@@ -56,7 +64,27 @@ public class BasketService {
         customerService.validatePresence(customerNumber);
         Basket newBasket = new Basket(customerNumber);
         baskets.put(customerNumber, newBasket);
+        saveToFile();
         logger.info("BasketService created new Basket with ID {}", customerNumber);
         return newBasket;
+    }
+
+    private void saveToFile() {
+        try {
+            xmlEditor.saveToFile(baskets.values().stream().toList());
+            logger.info("BasketService saved its state to XML File");
+        } catch (IOException e) {
+            logger.error("BasketService was not able to save XML File");
+        }
+    }
+
+    private void loadFromFile() {
+        try {
+            baskets.clear();
+            xmlEditor.loadFromFile().forEach(basket -> baskets.put(basket.getCustomerNumber(), basket));
+            logger.info("BasketService loaded its state from XML File");
+        } catch (IOException e) {
+            logger.warn("BasketService was not able to load XML File");
+        }
     }
 }
