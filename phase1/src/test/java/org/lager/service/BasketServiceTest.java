@@ -71,8 +71,8 @@ class BasketServiceTest implements WithAssertions {
         @Test
         @DisplayName("non-exisitng Customer")
         void nonExistingCustomer() {
-            Mockito.when(customerService.validatePresence(100_100_100))
-                    .thenThrow(NoSuchCustomerException.class);
+            Mockito.doThrow(NoSuchCustomerException.class)
+                    .when(customerService).validatePresence(100_100_100);
 
             assertThatThrownBy(() -> basketService.addToBasket(100_100_100, 200_200_200, 1))
                     .isInstanceOf(NoSuchCustomerException.class);

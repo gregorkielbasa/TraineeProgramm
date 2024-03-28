@@ -63,6 +63,7 @@ class CustomerTest implements WithAssertions {
             }
 
         }
+
         @Nested
         @DisplayName("number")
         class CustomerNumberTestException {
@@ -83,6 +84,7 @@ class CustomerTest implements WithAssertions {
 
         }
     }
+
     @Test
     @DisplayName("with a proper name and number")
     void getNameAndNumber() {
@@ -123,6 +125,7 @@ class CustomerTest implements WithAssertions {
             assertThatThrownBy(() -> customer.setName("name.name"))
                     .isInstanceOf(CustomerIllegalNameException.class);
         }
+    }
 
     @Nested
     @DisplayName("is equal")
@@ -140,11 +143,12 @@ class CustomerTest implements WithAssertions {
         @Test
         @DisplayName("when has the same properties")
         void testEquals() {
-            Customer customer2 = new Customer(123_123_123L,"Test");
+            Customer customer2 = new Customer(123_123_123L, "Test");
 
             assertTrue(customer1.equals(customer2));
         }
     }
+
     @Nested
     @DisplayName("is NOT equal when comparing")
     class CustomerTestNotEquals {
@@ -176,6 +180,7 @@ class CustomerTest implements WithAssertions {
             assertFalse(customer1.equals(customer2));
         }
     }
+
     @Nested
     @DisplayName("compares its HashCode to")
     class HashCodeTest {
