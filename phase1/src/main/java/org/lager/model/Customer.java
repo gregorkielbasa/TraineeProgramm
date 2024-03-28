@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
-import java.util.Optional;
 
 public class Customer {
     private static final String NAME_REGEX = "^[a-zA-Z]{3,16}$";
@@ -49,30 +48,6 @@ public class Customer {
 
     public long getNumber() {
         return number;
-    }
-
-    public String toCsvRecord() {
-        return number + "," + name;
-    }
-
-    public static Optional<Customer> getFromCsvRecord(String csvRecord) {
-        Optional<Customer> result = Optional.empty();
-        try {
-            String[] values = csvRecord.split(",");
-            long number = Long.parseLong(values[0]);
-            String name = values[1];
-            Customer newCustomer = new Customer(number, name);
-            result = Optional.of(newCustomer);
-        } catch (NullPointerException e) {
-            logger.warn("Customer CSV Record is NULL");
-        } catch (NumberFormatException e) {
-            logger.warn("Customer CSV Record contains incorrect Customer Number");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            logger.warn("Customer CSV Record is incomplete");
-        } catch (CustomerIllegalNumberException | CustomerIllegalNameException e) {
-            logger.warn("Customer CSV Record is invalid: " + e);
-        }
-        return result;
     }
 
     @Override
