@@ -1,4 +1,4 @@
-package org.lager.repository;
+package org.lager.repository.xml;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.NoSuchProductException;
 import org.lager.model.Basket;
-import org.lager.repository.BasketXmlEditor;
+import org.lager.repository.xml.BasketXmlEditor;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 

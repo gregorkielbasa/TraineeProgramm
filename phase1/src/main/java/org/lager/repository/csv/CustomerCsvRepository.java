@@ -6,32 +6,35 @@ import org.lager.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.lang.module.ResolutionException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.lager.repository.csv.CustomerCsvMapper.*;
+import java.io.IOException;
+import java.util.*;
 
 public class CustomerCsvRepository implements CustomerRepository {
-    private final String filePath;
-    private final String fileHeader;
+    private final CsvEditor csvEditor;
 
     private long newCustomerNumber = 100_000_000;
     private final Map<Long, Customer> customers;
     private final Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
 
-    public CustomerCsvRepository(String filePath, String header) {
-        this.filePath = filePath;
-        this.fileHeader = header;
+    public CustomerCsvRepository(CsvEditor csvEditor) {
+        this.csvEditor = csvEditor;
         customers = new HashMap<>();
-        try {
-            loadCustomersFromFile();
-            logger.info("Customer Repository has loaded CSV File from path: " + filePath);
-        } catch (IOException e) {
-            logger.error("Customer Repository was not able to load CSV File from path: " + filePath);
-        }
+        loadCustomersFromFile();
+        updateNewCustomerNumber();
+    }
+
+    private void updateNewCustomerNumber() {
+        customers.keySet().stream()
+                .max(Long::compareTo)
+                .orElseGet(() -> newCustomerNumber - 1);
+        newCustomerNumber++;
+    }
+
+    @Override
+    public Optional<Customer> read(Long number) {
+        if (number == null)
+            return Optional.empty();
+        return Optional.ofNullable(customers.get(number));
     }
 
     @Override
@@ -40,12 +43,8 @@ public class CustomerCsvRepository implements CustomerRepository {
         if (read(number).isPresent())
             throw new RepositoryException("Given number is already taken");
         customers.put(number, customer);
-        try {
-            saveCustomersToFile();
-        } catch (IOException e) {
-            logger.error("Customer Repository was not able to save CSV File from path: " + filePath);
-            throw new RepositoryException("CustomerRepository was not able to save changes in CSV File");
-        }
+        updateNewCustomerNumber();
+        saveCustomersToFile();
     }
 
     private static void validateCustomer(Long number, Customer customer) throws RepositoryException {
@@ -58,23 +57,12 @@ public class CustomerCsvRepository implements CustomerRepository {
     }
 
     @Override
-    public Optional<Customer> read(Long number) {
-        if (number == null)
-            throw new ResolutionException("Given number is NULL");
-        return Optional.ofNullable(customers.get(number));
-    }
-
-    @Override
     public void update(Long number, Customer customer) throws RepositoryException {
         validateCustomer(number, customer);
-        read(number).orElseThrow(() -> new RepositoryException("Given number doesn't exist"));
+        if (read(number).isEmpty())
+            throw new RepositoryException("Given number doesn't exist");
         customers.put(number, customer);
-        try {
-            saveCustomersToFile();
-        } catch (IOException e) {
-            logger.error("Customer Repository was not able to save CSV File from path: " + filePath);
-            throw new RepositoryException("CustomerRepository was not able to save changes in CSV File");
-        }
+        saveCustomersToFile();
     }
 
     @Override
@@ -82,12 +70,8 @@ public class CustomerCsvRepository implements CustomerRepository {
         if (number == null)
             throw new RepositoryException("Given number is NULL");
         customers.remove(number);
-        try {
-            saveCustomersToFile();
-        } catch (IOException e) {
-            logger.error("Customer Repository was not able to save CSV File from path: " + filePath);
-            throw new RepositoryException("CustomerRepository was not able to save changes in CSV File");
-        }
+        updateNewCustomerNumber();
+        saveCustomersToFile();
     }
 
     @Override
@@ -95,34 +79,35 @@ public class CustomerCsvRepository implements CustomerRepository {
         return newCustomerNumber;
     }
 
-    private void saveCustomersToFile() throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
-        writer.write(fileHeader);
-        for (Customer customer : customers.values()) {
-            Optional<String> csvRecord = customerToCsvRecord(customer);
-            if (csvRecord.isEmpty()) continue;
-            writer.newLine();
-            writer.write(csvRecord.get());
+    private void saveCustomersToFile() {
+        List<String> csvRecords = customers.values().stream()
+                .map(CustomerCsvMapper::customerToCsvRecord)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        try {
+            csvEditor.saveToFile(csvRecords);
+        } catch (IOException e) {
+            logger.error("Customer Repository was not able to save CSV File");
+            throw new RepositoryException("CustomerRepository was not able to save changes in CSV File");
         }
-        writer.close();
     }
 
-    private void loadCustomersFromFile() throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(filePath));
-        reader.lines()
-                .skip(1)
+    private void loadCustomersFromFile() {
+        List<String> csvRecords = new ArrayList<>();
+
+        try {
+            csvRecords = csvEditor.loadFromFile();
+            logger.info("Customer Repository has loaded CSV File");
+        } catch (IOException e) {
+            logger.error("Customer Repository was not able to load CSV File");
+        }
+
+        csvRecords.stream()
                 .map(CustomerCsvMapper::csvRecordToCustomer)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .forEach(customer -> customers.put(customer.getNumber(), customer));
-        reader.close();
-        updateNewCustomerNumber();
-    }
-
-    private void updateNewCustomerNumber() {
-        customers.keySet().stream()
-                .max(Long::compareTo)
-                .orElseGet(() -> newCustomerNumber--);
-        newCustomerNumber++;
     }
 }

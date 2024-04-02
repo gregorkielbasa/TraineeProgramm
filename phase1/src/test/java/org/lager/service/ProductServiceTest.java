@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.ProductIllegalNameException;
 import org.lager.exception.NoSuchProductException;
 import org.lager.model.Product;
-import org.lager.repository.ProductCsvEditor;
+import org.lager.repository.csv.ProductCsvEditor;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;

@@ -2,7 +2,7 @@ package org.lager.service;
 
 import org.lager.exception.NoSuchProductException;
 import org.lager.model.Product;
-import org.lager.repository.ProductCsvEditor;
+import org.lager.repository.csv.ProductCsvEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

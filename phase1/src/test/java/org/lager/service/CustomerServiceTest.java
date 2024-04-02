@@ -7,25 +7,23 @@ import org.lager.exception.CustomerIllegalNameException;
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.RepositoryException;
 import org.lager.model.Customer;
-import org.lager.repository.csv.CustomerCsvRepository;
+import org.lager.repository.CustomerRepository;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
-import static org.lager.service.CustomerFixtures.*;
+import static org.lager.CustomerFixtures.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("customerService")
 class CustomerServiceTest implements WithAssertions {
 
     @Mock
-    private CustomerCsvRepository repository;
+    private CustomerRepository repository;
     @Captor
     private ArgumentCaptor<Customer> argumentCaptor;
 

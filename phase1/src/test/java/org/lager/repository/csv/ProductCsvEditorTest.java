@@ -1,4 +1,4 @@
-package org.lager.repository;
+package org.lager.repository.csv;
 
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.lager.exception.ProductCsvNullException;
 import org.lager.model.Product;
+import org.lager.repository.csv.ProductCsvEditor;
 
 import java.io.IOException;
 import java.util.ArrayList;

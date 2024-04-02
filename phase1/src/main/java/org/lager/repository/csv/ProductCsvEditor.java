@@ -1,4 +1,4 @@
-package org.lager.repository;
+package org.lager.repository.csv;
 
 import org.lager.exception.ProductCsvNullException;
 import org.lager.model.Product;

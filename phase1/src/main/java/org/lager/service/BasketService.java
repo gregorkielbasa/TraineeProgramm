@@ -1,7 +1,7 @@
 package org.lager.service;
 
 import org.lager.model.Basket;
-import org.lager.repository.BasketXmlEditor;
+import org.lager.repository.xml.BasketXmlEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

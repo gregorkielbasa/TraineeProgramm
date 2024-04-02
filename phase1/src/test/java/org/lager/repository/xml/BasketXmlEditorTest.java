@@ -1,17 +1,14 @@
-package org.lager.repository;
+package org.lager.repository.xml;
 
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperties;
 import org.lager.exception.BasketXmlNullException;
-import org.lager.exception.CustomerCsvNullException;
 import org.lager.model.Basket;
+import org.lager.repository.xml.BasketXmlEditor;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Basket XML Editor")
 class BasketXmlEditorTest implements WithAssertions {
