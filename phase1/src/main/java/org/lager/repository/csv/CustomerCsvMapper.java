@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 public class CustomerCsvMapper {
-    private static final Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
+    private final Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
 
-    public static Optional<Customer> csvRecordToCustomer(String csvRecord) {
+    public Optional<Customer> csvRecordToCustomer(String csvRecord) {
         Optional<Customer> result = Optional.empty();
         try {
             String[] values = csvRecord.split(",");
@@ -31,7 +31,7 @@ public class CustomerCsvMapper {
         return result;
     }
 
-    public static Optional<String> customerToCsvRecord(Customer customer) {
+    public Optional<String> customerToCsvRecord(Customer customer) {
         if (customer == null) {
             logger.warn("Customer is NULL");
             return Optional.empty();

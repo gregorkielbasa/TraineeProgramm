@@ -20,6 +20,10 @@ public class CustomerFixtures {
         return 1;
     }
 
+    public static long nonExistingNumber() {
+        return 999_999_999L;
+    }
+
     public static String incorrectName() {
         return "incorect!§$%&//(";
     }

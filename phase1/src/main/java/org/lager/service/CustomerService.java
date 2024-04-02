@@ -20,7 +20,7 @@ public class CustomerService {
         long newCustomerNumber = repository.getNextAvailableNumber();
         logger.debug("CustomerService starts to insert new Customer with {} ID and {} name", newCustomerNumber, newCustomerName);
         Customer newCustomer = new Customer(newCustomerNumber, newCustomerName);
-        repository.create(newCustomerNumber, newCustomer);
+        repository.save(newCustomer);
         logger.debug("CustomerService finished to insert new {} Customer", newCustomerNumber);
         return newCustomer;
     }
@@ -44,6 +44,6 @@ public class CustomerService {
         Customer customer = search(customerNumber)
                 .orElseThrow(() -> new NoSuchCustomerException(customerNumber));
         customer.setName(customerNewName);
-        repository.update(customerNumber, customer);
+        repository.save(customer);
     }
 }

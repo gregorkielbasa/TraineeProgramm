@@ -11,13 +11,15 @@ import java.util.*;
 
 public class CustomerCsvRepository implements CustomerRepository {
     private final CsvEditor csvEditor;
+    private final CustomerCsvMapper csvMapper;
 
     private long newCustomerNumber = 100_000_000;
     private final Map<Long, Customer> customers;
     private final Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
 
-    public CustomerCsvRepository(CsvEditor csvEditor) {
+    public CustomerCsvRepository(CsvEditor csvEditor, CustomerCsvMapper csvMapper) {
         this.csvEditor = csvEditor;
+        this.csvMapper = csvMapper;
         customers = new HashMap<>();
         loadCustomersFromFile();
         updateNewCustomerNumber();
@@ -32,46 +34,34 @@ public class CustomerCsvRepository implements CustomerRepository {
 
     @Override
     public Optional<Customer> read(Long number) {
-        if (number == null)
-            return Optional.empty();
+        validateNumber(number);
         return Optional.ofNullable(customers.get(number));
     }
 
-    @Override
-    public void create(Long number, Customer customer) throws RepositoryException {
-        validateCustomer(number, customer);
-        if (read(number).isPresent())
-            throw new RepositoryException("Given number is already taken");
-        customers.put(number, customer);
-        updateNewCustomerNumber();
-        saveCustomersToFile();
+    private void validateNumber(Long number) throws RepositoryException {
+        if (number == null)
+            throw new RepositoryException("Given Number is NULL");
     }
 
-    private static void validateCustomer(Long number, Customer customer) throws RepositoryException {
-        if (number == null)
-            throw new RepositoryException("Given number is NULL");
+    @Override
+    public void save(Customer customer) throws RepositoryException {
+        validateCustomer(customer);
+        customers.put(customer.getNumber(), customer);
+        saveCustomersToFile();
+        updateNewCustomerNumber();
+    }
+
+    private void validateCustomer(Customer customer) throws RepositoryException {
         if (customer == null)
             throw new RepositoryException("Given Customer is NULL");
-        if (number != customer.getNumber())
-            throw new RepositoryException("Given Customer doesn't match given Number");
-    }
-
-    @Override
-    public void update(Long number, Customer customer) throws RepositoryException {
-        validateCustomer(number, customer);
-        if (read(number).isEmpty())
-            throw new RepositoryException("Given number doesn't exist");
-        customers.put(number, customer);
-        saveCustomersToFile();
     }
 
     @Override
     public void delete(Long number) throws RepositoryException {
-        if (number == null)
-            throw new RepositoryException("Given number is NULL");
+        validateNumber(number);
         customers.remove(number);
-        updateNewCustomerNumber();
         saveCustomersToFile();
+        updateNewCustomerNumber();
     }
 
     @Override
@@ -81,7 +71,7 @@ public class CustomerCsvRepository implements CustomerRepository {
 
     private void saveCustomersToFile() {
         List<String> csvRecords = customers.values().stream()
-                .map(CustomerCsvMapper::customerToCsvRecord)
+                .map(csvMapper::customerToCsvRecord)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
@@ -105,7 +95,7 @@ public class CustomerCsvRepository implements CustomerRepository {
         }
 
         csvRecords.stream()
-                .map(CustomerCsvMapper::csvRecordToCustomer)
+                .map(csvMapper::csvRecordToCustomer)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .forEach(customer -> customers.put(customer.getNumber(), customer));
