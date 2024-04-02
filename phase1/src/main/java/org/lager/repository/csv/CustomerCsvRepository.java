@@ -26,9 +26,9 @@ public class CustomerCsvRepository implements CustomerRepository {
     }
 
     private void updateNewCustomerNumber() {
-        customers.keySet().stream()
+        newCustomerNumber = customers.keySet().stream()
                 .max(Long::compareTo)
-                .orElseGet(() -> newCustomerNumber - 1);
+                .orElseGet(() -> --newCustomerNumber);
         newCustomerNumber++;
     }
 
