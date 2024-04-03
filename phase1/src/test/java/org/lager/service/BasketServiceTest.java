@@ -1,20 +1,9 @@
 package org.lager.service;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.lager.exception.NoSuchCustomerException;
-import org.lager.exception.NoSuchProductException;
-import org.lager.model.Basket;
-import org.lager.repository.xml.BasketXmlEditor;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BasketService")
@@ -23,7 +12,7 @@ class BasketServiceTest implements WithAssertions {
     BasketService basketService;
     CustomerService customerService;
     ProductService productService;
-    BasketXmlEditor xmlEditor;
+//    BasketXmlEditor xmlEditor;
 //
 //    @BeforeEach
 //    void init() {
