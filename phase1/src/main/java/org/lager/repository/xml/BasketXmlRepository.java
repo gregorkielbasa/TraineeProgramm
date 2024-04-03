@@ -55,34 +55,34 @@ public class BasketXmlRepository implements BasketRepository {
     }
 
     private void saveBasketsToFile() {
-        List<XmlBasket> xmlRecords = baskets.values().stream()
-                .map(xmlMapper::basketToXmlRecord)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
+//        List<XmlBasket> xmlRecords = baskets.values().stream()
+//                .map(xmlMapper::basketToXmlRecord)
+//                .filter(Optional::isPresent)
+//                .map(Optional::get)
+//                .toList();
 
-        try {
-            xmlEditor.saveToFile(xmlRecords);
-        } catch (IOException e) {
-            logger.error("Basket Repository was not able to save XML File");
-            throw new RepositoryException("BasketRepository was not able to save changes in XML File");
-        }
+//        try {
+//            xmlEditor.saveToFile(xmlRecords);
+//        } catch (IOException e) {
+//            logger.error("Basket Repository was not able to save XML File");
+//            throw new RepositoryException("BasketRepository was not able to save changes in XML File");
+//        }
     }
 
     private void loadBasketsFromFile() {
-        List<XmlBasket> xmlRecords = new ArrayList<>();
-
-        try {
-            xmlRecords = xmlEditor.loadFromFile();
-            logger.info("Basket Repository has loaded XML File");
-        } catch (IOException e) {
-            logger.error("Basket Repository was not able to load CSV File");
-        }
-
-        xmlRecords.stream()
-                .map(xmlMapper::xmlRecordToBasket)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(basket -> baskets.put(basket.getCustomerNumber(), basket));
+//        List<XmlBasket> xmlRecords = new ArrayList<>();
+//
+////        try {
+////            xmlRecords = xmlEditor.loadFromFile();
+////            logger.info("Basket Repository has loaded XML File");
+////        } catch (IOException e) {
+////            logger.error("Basket Repository was not able to load CSV File");
+////        }
+//
+//        xmlRecords.stream()
+//                .map(xmlMapper::xmlRecordToBasket)
+//                .filter(Optional::isPresent)
+//                .map(Optional::get)
+//                .forEach(basket -> baskets.put(basket.getCustomerNumber(), basket));
     }
 }

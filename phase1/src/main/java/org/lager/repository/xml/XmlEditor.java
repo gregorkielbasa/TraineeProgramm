@@ -7,7 +7,6 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class XmlEditor {
@@ -19,27 +18,31 @@ public class XmlEditor {
         this.xmlMapper = new XmlMapper();
     }
 
-    @JacksonXmlRootElement(localName = "Baskets")
-    private static class BasketList {
-        @JacksonXmlElementWrapper(useWrapping = false)
-        @JacksonXmlProperty(localName = "Basket")
-        public List<XmlBasket> baskets;
-
-        public BasketList(List<XmlBasket> baskets) {
-            this.baskets = baskets;
-        }
-
-        public BasketList() {
-            baskets = new ArrayList<>();
-        }
+    public record BasketsList(@JacksonXmlElementWrapper(useWrapping = false)
+                              @JacksonXmlProperty(localName = "Basket")
+                              List<XmlBasket> baskets) {
     }
 
-    public void saveToFile(List<XmlBasket> records) throws IOException {
-        xmlMapper.writeValue(new File(filePath), new BasketList(records));
+    public record XmlBasket(@JacksonXmlProperty(localName = "Number")
+                         Long number,
+                         @JacksonXmlElementWrapper(useWrapping = false)
+                         @JacksonXmlProperty(localName = "Product")
+                         List<XmlProduct> products) {
     }
 
-    public List<XmlBasket> loadFromFile() throws IOException {
-        return xmlMapper.readValue(new File(filePath), BasketList.class).baskets;
+    public record XmlProduct(@JacksonXmlProperty(isAttribute = true, localName = "Number")
+                          Long number,
+                             @JacksonXmlProperty(isAttribute = true, localName = "Amount")
+                          Integer amount) {
+    }
+
+
+    public void saveToFile(BasketsList baskets) throws IOException {
+        xmlMapper.writeValue(new File(filePath), baskets);
+    }
+
+    public BasketsList loadFromFile() throws IOException {
+        return xmlMapper.readValue(new File(filePath), BasketsList.class);
     }
 }
 

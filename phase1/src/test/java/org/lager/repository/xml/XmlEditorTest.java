@@ -4,9 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class XmlEditorTest {
 
@@ -16,20 +14,20 @@ class XmlEditorTest {
     void first() throws IOException {
         xmlEditor = new XmlEditor("xmlEditorTest.xml");
 
-        Map<Long, Integer> products = new HashMap<>();
-        products.put(223L, 1);
-        products.put(200L, 5);
-        products.put(220L, 5);
-        products.put(250L, 5);
+        XmlEditor.XmlBasket basket1 = new XmlEditor.XmlBasket(123L,
+                List.of(new XmlEditor.XmlProduct(111L, 1),
+                        new XmlEditor.XmlProduct(222L, 3)));
+        XmlEditor.XmlBasket basket2 = new XmlEditor.XmlBasket(200L,
+                List.of(new XmlEditor.XmlProduct(444L, 1),
+                        new XmlEditor.XmlProduct(555L, 5),
+                        new XmlEditor.XmlProduct(666L, 9)));
 
-        XmlBasket basket1 = new XmlBasket(123_123_123, products);
+        XmlEditor.BasketsList basketsList = new XmlEditor.BasketsList(List.of(basket1, basket2));
 
-        products.put(300L, 9);
-        XmlBasket basket2 = new XmlBasket(123_000_000, products);
-
-        xmlEditor.saveToFile(List.of(basket1, basket2));
+        xmlEditor.saveToFile(basketsList);
 
         xmlEditor.loadFromFile()
+                .baskets()
                 .forEach(System.out::println);
     }
 }
