@@ -1,15 +1,15 @@
 package org.lager.service;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.CustomerIllegalNameException;
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.RepositoryException;
 import org.lager.model.Customer;
 import org.lager.repository.CustomerRepository;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,11 +19,9 @@ import java.util.Optional;
 import static org.lager.CustomerFixtures.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("customerService")
+@DisplayName("Customer Service")
 class CustomerServiceTest implements WithAssertions {
 
-    @Captor
-    private ArgumentCaptor<Customer> argumentCaptor;
     @Mock
     private CustomerRepository repository;
 
@@ -41,11 +39,10 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.doNothing().when(repository).save(Mockito.any());
 
             customerService = new CustomerService(repository);
-            customerService.create(defaultName());
+            Customer newCustomer = customerService.create(defaultName());
 
-            Mockito.verify(repository).save(argumentCaptor.capture());
-            assertThat(argumentCaptor.getValue()).isEqualTo(defaultCustomer());
-
+            assertThat(newCustomer).isEqualTo(defaultCustomer());
+            Mockito.verify(repository).save(defaultCustomer());
         }
 
 
@@ -137,6 +134,8 @@ class CustomerServiceTest implements WithAssertions {
 
             customerService = new CustomerService(repository);
             customerService.validatePresence(defaultNumber());
+
+            Mockito.verify(repository).read(defaultNumber());
         }
 
         @Test
@@ -198,13 +197,12 @@ class CustomerServiceTest implements WithAssertions {
         @DisplayName("existing one with a new proper name")
         void existingID() {
             Mockito.when(repository.read(defaultNumber())).thenReturn(Optional.of(defaultCustomer()));
-            Mockito.doNothing().when(repository).save(customerWithName("newName"));
+            Mockito.doNothing().when(repository).save(Mockito.any());
 
             customerService = new CustomerService(repository);
             customerService.rename(defaultNumber(), "newName");
 
-            Mockito.verify(repository).save(argumentCaptor.capture());
-            assertThat(argumentCaptor.getValue()).isEqualTo(customerWithName("newName"));
+            Mockito.verify(repository).save(customerWithName("newName"));
         }
 
         @Test

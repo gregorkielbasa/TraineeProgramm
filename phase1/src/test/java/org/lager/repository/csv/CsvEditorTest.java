@@ -7,9 +7,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.lager.CustomerFixtures.*;
-
 @DisplayName("CSV Editor")
 class CsvEditorTest implements WithAssertions {
 
@@ -36,7 +33,7 @@ class CsvEditorTest implements WithAssertions {
     void notEmptyList() throws IOException {
         CsvEditor csvEditor = new CsvEditor("csvEditorTest.csv", "number,name");
 
-        csvEditor.saveToFile(List.of(defaultCustomerAsCsvRecord(), anotherCustomerAsCsvRecord()));
-        assertThat(csvEditor.loadFromFile()).containsExactlyInAnyOrder(defaultCustomerAsCsvRecord(), anotherCustomerAsCsvRecord());
+        csvEditor.saveToFile(List.of("100,Object One", "123,Object Two"));
+        assertThat(csvEditor.loadFromFile()).containsExactlyInAnyOrder("100,Object One", "123,Object Two");
     }
 }

@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.lager.CustomerFixtures.defaultCustomer;
-import static org.lager.CustomerFixtures.defaultCustomerAsCsvRecord;
+import static org.lager.CustomerFixtures.*;
 
 @DisplayName("Customer CSV Mapper")
 class CustomerCsvMapperTest implements WithAssertions {

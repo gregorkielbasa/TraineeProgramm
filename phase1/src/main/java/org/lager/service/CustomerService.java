@@ -29,9 +29,9 @@ public class CustomerService {
         return repository.read(customerNumber);
     }
 
-    public void validatePresence(long CustomerNumber) {
-        search(CustomerNumber)
-                .orElseThrow(() -> new NoSuchCustomerException(CustomerNumber));
+    public void validatePresence(long customerNumber) {
+        search(customerNumber)
+                .orElseThrow(() -> new NoSuchCustomerException(customerNumber));
     }
 
     public void remove(long customerNumber) {

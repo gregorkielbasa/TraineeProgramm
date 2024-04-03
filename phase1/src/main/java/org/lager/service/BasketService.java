@@ -52,7 +52,7 @@ public class BasketService {
 
     public void addToBasket(long customerNumber, long productNumber, int amount) {
         logger.debug("BasketService starts to add {} Product to {} Basket", productNumber, customerNumber);
-        productService.validatePresence(productNumber);
+//        productService.validatePresence(productNumber);
         Basket basket = getBasket(customerNumber)
                 .orElseGet(() -> createBasket(customerNumber));
         basket.insert(productNumber, amount);

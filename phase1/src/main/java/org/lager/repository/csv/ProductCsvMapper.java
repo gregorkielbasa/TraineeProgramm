@@ -22,7 +22,7 @@ public class ProductCsvMapper {
         } catch (NullPointerException e) {
             logger.warn("Product CSV Record is NULL");
         } catch (NumberFormatException e) {
-            logger.warn("Product CSV Record contains incorrect Customer Number");
+            logger.warn("Product CSV Record contains incorrect Product Number");
         } catch (ArrayIndexOutOfBoundsException e) {
             logger.warn("Product CSV Record is incomplete");
         } catch (ProductIllegalNumberException | ProductIllegalNameException e) {
