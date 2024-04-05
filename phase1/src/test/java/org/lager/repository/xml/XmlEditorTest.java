@@ -14,17 +14,19 @@ class XmlEditorTest {
     void first() throws IOException {
         xmlEditor = new XmlEditor("xmlEditorTest.xml");
 
-        XmlEditor.XmlBasket basket1 = new XmlEditor.XmlBasket(123L,
-                List.of(new XmlEditor.XmlProduct(111L, 1),
-                        new XmlEditor.XmlProduct(222L, 3)));
-        XmlEditor.XmlBasket basket2 = new XmlEditor.XmlBasket(200L,
-                List.of(new XmlEditor.XmlProduct(444L, 1),
-                        new XmlEditor.XmlProduct(555L, 5),
-                        new XmlEditor.XmlProduct(666L, 9)));
+        XmlBasket basket1 = new XmlBasket(123_123_123L, List.of(
+                new XmlBasketItem(123L, 3),
+                new XmlBasketItem(234L, 4)
+        ));
+        XmlBasket basket2 = new XmlBasket(123_123_123L, List.of(
+                new XmlBasketItem(123L, 13),
+                new XmlBasketItem(234L, 17),
+                new XmlBasketItem(345L, 19)
+        ));
 
-        XmlEditor.BasketsList basketsList = new XmlEditor.BasketsList(List.of(basket1, basket2));
+        XmlBasketsList baskets = new XmlBasketsList(List.of(basket1, basket2));
 
-        xmlEditor.saveToFile(basketsList);
+        xmlEditor.saveToFile(baskets);
 
         xmlEditor.loadFromFile()
                 .baskets()

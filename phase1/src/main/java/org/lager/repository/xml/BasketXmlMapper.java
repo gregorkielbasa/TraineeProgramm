@@ -5,6 +5,7 @@ import org.lager.model.Basket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BasketXmlMapper {
@@ -14,14 +15,14 @@ public class BasketXmlMapper {
     public BasketXmlMapper() {
     }
 
-    public List<Basket> xmlToBaskets(XmlEditor.BasketsList xmlBaskets) {
-        if (xmlBaskets == null || xmlBaskets.baskets() == null)
-            return List.of();
-
-
-
+    public List<Basket> xmlToBaskets(XmlBasketsList baskets) {
         return List.of();
     }
+
+    public XmlBasketsList basketsToXml(List<Basket> baskets) {
+        return new XmlBasketsList(new ArrayList<>());
+    }
+
 //    public Optional<Basket> xmlRecordToBasket (XmlBasket xmlRecord) {
 //        Optional<Basket> result = Optional.empty();
 //        try {
@@ -37,9 +38,9 @@ public class BasketXmlMapper {
 //    }
 //
 
-    public XmlEditor.BasketsList basketsToXml(List<Basket> baskets) {
-        return new XmlEditor.BasketsList(List.of());
-    }
+//    public XmlEditor.BasketsList basketsToXml(List<Basket> baskets) {
+//        return new XmlEditor.BasketsList(List.of());
+//    }
 //    public Optional<XmlBasket> basketToXmlRecord (Basket basket) {
 //        if (basket == null) {
 //            logger.warn("Basket is NULL");
@@ -49,8 +50,4 @@ public class BasketXmlMapper {
 //        XmlBasket result = new XmlBasket(basket.getCustomerNumber(), basket.getContent());
 //        return Optional.of(result);
 //    }
-
-    xmlBasket to Basket
-
-    xmlProduct to Product
 }
