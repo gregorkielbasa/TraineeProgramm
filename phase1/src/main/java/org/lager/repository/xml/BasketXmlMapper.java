@@ -4,11 +4,13 @@ import org.lager.model.Basket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-
-import static com.fasterxml.jackson.databind.type.LogicalType.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class BasketXmlMapper {
 
@@ -18,7 +20,7 @@ public class BasketXmlMapper {
     }
 
     public List<Basket> xmlToBasketsList(XmlBasketsList xmlBaskets) {
-        if (xmlBaskets == null || xmlBaskets.baskets() == null) {
+        if (xmlBaskets == null || xmlBaskets.baskets() == null || xmlBaskets.baskets().isEmpty()) {
             return List.of();
         }
 
@@ -30,28 +32,23 @@ public class BasketXmlMapper {
     }
 
     private Optional<Basket> xmlToBasket(XmlBasket xmlBasket) {
-        if (xmlBasket == null || xmlBasket.customerNumber() == null || xmlBasket.items() == null)
+        if (xmlBasket == null || xmlBasket.customerNumber() == null || xmlBasket.items() == null || xmlBasket.items().isEmpty())
             return Optional.empty();
 
         Basket result = new Basket(xmlBasket.customerNumber());
 
         xmlBasket.items().stream()
-                .map(this::xmlItemToOptional)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .filter(validateXmlBasketItem())
                 .forEach(item -> result.insert(item.number(), item.amount()));
         return Optional.of(result);
     }
 
-    private Optional<XmlBasketItem> xmlItemToOptional(XmlBasketItem xmlProduct) {
-        if (xmlProduct == null || xmlProduct.number() == null || xmlProduct.amount() == null)
-            return Optional.empty();
-
-        return Optional.of(xmlProduct);
+    private Predicate<XmlBasketItem> validateXmlBasketItem() {
+        return basketItem -> basketItem != null && basketItem.number() != null && basketItem.amount() != null;
     }
 
     public XmlBasketsList basketsListToXml(List<Basket> baskets) {
-        if (baskets == null)
+        if (baskets == null || baskets.isEmpty())
             return new XmlBasketsList(List.of());
 
         List<XmlBasket> result = baskets.stream()
@@ -64,23 +61,18 @@ public class BasketXmlMapper {
     }
 
     private Optional<XmlBasket> basketToXml(Basket basket) {
-        if (basket == null || basket.getContent() == null)
+        if (basket == null || basket.getContent() == null || basket.getContent().isEmpty())
             return Optional.empty();
 
         List<XmlBasketItem> result = basket.getContent().entrySet().stream()
-                .map(x -> basketItemToXml(x.getKey(), x.getValue()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .map(basketItemToXml())
+                .sorted(Comparator.comparingLong(XmlBasketItem::number))                                                //is it really needed?
                 .toList();
 
         return Optional.of(new XmlBasket(basket.getCustomerNumber(), result));
     }
 
-    private Optional<XmlBasketItem> basketItemToXml (Long number, Integer amount) {
-        if (number == null || amount == null)
-            return Optional.empty();
-
-        XmlBasketItem result = new XmlBasketItem(number, amount);
-        return Optional.of(result);
+    private Function<Map.Entry<Long, Integer>, XmlBasketItem> basketItemToXml() {
+        return entry -> new XmlBasketItem(entry.getKey(), entry.getValue());
     }
 }

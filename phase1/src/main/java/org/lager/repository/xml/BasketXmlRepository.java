@@ -67,19 +67,15 @@ public class BasketXmlRepository implements BasketRepository {
     }
 
     private void loadBasketsFromFile() {
-//        List<XmlBasket> xmlRecords = new ArrayList<>();
-//
-////        try {
-////            xmlRecords = xmlEditor.loadFromFile();
-////            logger.info("Basket Repository has loaded XML File");
-////        } catch (IOException e) {
-////            logger.error("Basket Repository was not able to load CSV File");
-////        }
-//
-//        xmlRecords.stream()
-//                .map(xmlMapper::xmlRecordToBasket)
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .forEach(basket -> baskets.put(basket.getCustomerNumber(), basket));
+        XmlBasketsList xmlRecords = new XmlBasketsList(List.of());
+
+        try {
+            xmlRecords = xmlEditor.loadFromFile();
+            logger.info("Basket Repository has loaded XML File");
+        } catch (IOException e) {
+            logger.error("Basket Repository was not able to load CSV File");
+        }
+
+        xmlMapper.xmlToBasketsList(xmlRecords).forEach(basket -> baskets.put(basket.getCustomerNumber(), basket));
     }
 }

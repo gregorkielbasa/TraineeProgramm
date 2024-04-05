@@ -9,7 +9,7 @@ public class Basket {
 
     private final Map<Long, Integer> products; //ProductNumber, Amount
     private final long customerNumber;
-    private final Logger logger = LoggerFactory.getLogger(Basket.class);
+    private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
     public Basket(long customerNumber) {
         this.products = new HashMap<>();
@@ -55,5 +55,18 @@ public class Basket {
 
     public long getCustomerNumber() {
         return customerNumber;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Basket basket = (Basket) o;
+        return customerNumber == basket.customerNumber && Objects.equals(products, basket.products);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(products, customerNumber);
     }
 }
