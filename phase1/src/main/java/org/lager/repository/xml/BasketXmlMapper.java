@@ -1,12 +1,14 @@
 package org.lager.repository.xml;
 
-import com.fasterxml.jackson.databind.cfg.BaseSettings;
 import org.lager.model.Basket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 public class BasketXmlMapper {
 
@@ -15,39 +17,70 @@ public class BasketXmlMapper {
     public BasketXmlMapper() {
     }
 
-    public List<Basket> xmlToBaskets(XmlBasketsList baskets) {
-        return List.of();
+    public List<Basket> xmlToBasketsList(XmlBasketsList xmlBaskets) {
+        if (xmlBaskets == null || xmlBaskets.baskets() == null) {
+            return List.of();
+        }
+
+        return xmlBaskets.baskets().stream()
+                .map(this::xmlToBasket)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 
-    public XmlBasketsList basketsToXml(List<Basket> baskets) {
-        return new XmlBasketsList(new ArrayList<>());
+    private Optional<Basket> xmlToBasket(XmlBasket xmlBasket) {
+        if (xmlBasket == null || xmlBasket.customerNumber() == null || xmlBasket.items() == null)
+            return Optional.empty();
+
+        Basket result = new Basket(xmlBasket.customerNumber());
+
+        xmlBasket.items().stream()
+                .map(this::xmlItemToOptional)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(item -> result.insert(item.number(), item.amount()));
+        return Optional.of(result);
     }
 
-//    public Optional<Basket> xmlRecordToBasket (XmlBasket xmlRecord) {
-//        Optional<Basket> result = Optional.empty();
-//        try {
-//            long number = xmlRecord.number;
-//            Map<Long, Integer> products = xmlRecord.products;
-//            Basket newBasket = new Basket(number);
-//            for (Map.Entry<Long, Integer> entry : products.entrySet())
-//                newBasket.insert(entry.getKey(), entry.getValue());
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//        return result;
-//    }
-//
+    private Optional<XmlBasketItem> xmlItemToOptional(XmlBasketItem xmlProduct) {
+        if (xmlProduct == null || xmlProduct.number() == null || xmlProduct.amount() == null)
+            return Optional.empty();
 
-//    public XmlEditor.BasketsList basketsToXml(List<Basket> baskets) {
-//        return new XmlEditor.BasketsList(List.of());
-//    }
-//    public Optional<XmlBasket> basketToXmlRecord (Basket basket) {
-//        if (basket == null) {
-//            logger.warn("Basket is NULL");
-//            return Optional.empty();
-//        }
-//
-//        XmlBasket result = new XmlBasket(basket.getCustomerNumber(), basket.getContent());
-//        return Optional.of(result);
-//    }
+        return Optional.of(xmlProduct);
+    }
+
+    public XmlBasketsList basketsListToXml(List<Basket> baskets) {
+        if (baskets == null)
+            return new XmlBasketsList(List.of());
+
+        List<XmlBasket> result = baskets.stream()
+                .map(this::basketToXml)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        return new XmlBasketsList(result);
+    }
+
+    private Optional<XmlBasket> basketToXml(Basket basket) {
+        if (basket == null || basket.getContent() == null)
+            return Optional.empty();
+
+        List<XmlBasketItem> result = basket.getContent().entrySet().stream()
+                .map(x -> basketItemToXml(x.getKey(), x.getValue()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        return Optional.of(new XmlBasket(basket.getCustomerNumber(), result));
+    }
+
+    private Optional<XmlBasketItem> basketItemToXml (Long number, Integer amount) {
+        if (number == null || amount == null)
+            return Optional.empty();
+
+        XmlBasketItem result = new XmlBasketItem(number, amount);
+        return Optional.of(result);
+    }
 }

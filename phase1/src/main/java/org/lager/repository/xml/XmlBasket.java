@@ -9,5 +9,5 @@ public record XmlBasket(@JacksonXmlProperty(localName = "Number")
                         Long customerNumber,
                         @JacksonXmlElementWrapper(useWrapping = false)
                         @JacksonXmlProperty(localName = "Product")
-                        List<XmlBasketItem> products) {
+                        List<XmlBasketItem> items) {
 }

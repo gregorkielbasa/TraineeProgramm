@@ -29,8 +29,8 @@ class CsvEditorTest implements WithAssertions {
     }
 
     @Test
-    @DisplayName("writes and loads not empty list")
-    void notEmptyList() throws IOException {
+    @DisplayName("writes and loads non-empty list")
+    void nonEmptyList() throws IOException {
         CsvEditor csvEditor = new CsvEditor("csvEditorTest.csv", "number,name");
 
         csvEditor.saveToFile(List.of("100,Object One", "123,Object Two"));

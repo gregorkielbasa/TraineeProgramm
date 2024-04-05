@@ -55,18 +55,15 @@ public class BasketXmlRepository implements BasketRepository {
     }
 
     private void saveBasketsToFile() {
-//        List<XmlBasket> xmlRecords = baskets.values().stream()
-//                .map(xmlMapper::basketToXmlRecord)
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .toList();
 
-//        try {
-//            xmlEditor.saveToFile(xmlRecords);
-//        } catch (IOException e) {
-//            logger.error("Basket Repository was not able to save XML File");
-//            throw new RepositoryException("BasketRepository was not able to save changes in XML File");
-//        }
+        XmlBasketsList xmlRecords = xmlMapper.basketsListToXml(baskets.values().stream().toList());
+
+        try {
+            xmlEditor.saveToFile(xmlRecords);
+        } catch (IOException e) {
+            logger.error("Basket Repository was not able to save XML File");
+            throw new RepositoryException("BasketRepository was not able to save changes in XML File");
+        }
     }
 
     private void loadBasketsFromFile() {
