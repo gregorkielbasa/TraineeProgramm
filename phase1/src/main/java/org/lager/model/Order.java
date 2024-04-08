@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class Order {
     private static final long ID_MIN = 1000;
@@ -19,10 +20,14 @@ public class Order {
     private final Logger logger = LoggerFactory.getLogger(Order.class);
 
     public Order(long id, long customerNumber, List<OrderItem> items) {
+        this(id, customerNumber, items, LocalDateTime.now());
+    }
+
+    public Order(long id, long customerNumber, List<OrderItem> items, LocalDateTime dateTime) {
         validateId(id);
         this.id = id;
         this.customerNumber = customerNumber;
-        this.dateTime = LocalDateTime.now();
+        this.dateTime = dateTime;
         validateItems(items);
         this.items = items;
 
@@ -53,5 +58,18 @@ public class Order {
 
     public List<OrderItem> getItems() {
         return List.copyOf(items);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, customerNumber, dateTime, items);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Order order = (Order) o;
+        return id == order.id && customerNumber == order.customerNumber && Objects.equals(dateTime, order.dateTime) && Objects.equals(items, order.items);
     }
 }

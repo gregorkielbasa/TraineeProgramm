@@ -33,7 +33,7 @@ public class BasketService {
                 .orElse(Collections.emptyMap());
     }
 
-    public void emptyBasket(long customerNumber) {
+    public void dropBasket(long customerNumber) {
         logger.info("BasketService empties {} Basket", customerNumber);
         repository.delete(customerNumber);
     }

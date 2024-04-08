@@ -35,7 +35,9 @@ public class ProductFixtures {
     public static String defaultProductAsCsvRecord() {
         return PRODUCT_1_NUMBER + "," + PRODUCT_1_NAME;
 
-    }    public static long anotherNumber() {
+    }
+
+    public static long anotherNumber() {
         return PRODUCT_2_NUMBER;
     }
 

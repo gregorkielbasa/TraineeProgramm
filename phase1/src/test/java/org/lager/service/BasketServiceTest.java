@@ -72,13 +72,13 @@ class BasketServiceTest implements WithAssertions {
     }
 
     @Test
-    @DisplayName("empties (deletes) a Basket")
+    @DisplayName("drop (deletes) a Basket")
     void NotEmptyBasket() {
         Mockito.doNothing().when(repository).delete(defaultCustomerNumber());
 
         basketService = new BasketService(repository, customerService, productService);
 
-        basketService.emptyBasket(defaultCustomerNumber());
+        basketService.dropBasket(defaultCustomerNumber());
     }
 
     @Nested
