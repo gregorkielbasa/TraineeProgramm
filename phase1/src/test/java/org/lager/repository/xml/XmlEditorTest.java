@@ -29,8 +29,8 @@ class XmlEditorTest implements WithAssertions {
     }
 
     @Test
-    @DisplayName("writes and load non-empty List")
-    void first() throws IOException {
+    @DisplayName("writes and loads non-empty List")
+    void nonEmptyList() throws IOException {
         XmlEditor xmlEditor = new XmlEditor("xmlEditorTest.xml");
 
         XmlBasket basket1 = new XmlBasket(123_123_123L, List.of(

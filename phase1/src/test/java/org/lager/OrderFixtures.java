@@ -2,6 +2,7 @@ package org.lager;
 
 import org.lager.model.Order;
 import org.lager.model.OrderItem;
+import org.lager.repository.json.JsonOrder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +32,14 @@ public class OrderFixtures {
 
     public static Order anotherOrder() {
         return new Order(ORDER_1_NUMBER, CustomerFixtures.defaultNumber(), List.of(ITEM_1, ITEM_2), orderDate());
+    }
+
+    public static JsonOrder defaultOrderAsJson() {
+        return new JsonOrder(ORDER_1_NUMBER, CustomerFixtures.defaultNumber(), List.of(ITEM_1), orderDate());
+    }
+
+    public static JsonOrder anotherOrderAsJson() {
+        return new JsonOrder(ORDER_1_NUMBER, CustomerFixtures.defaultNumber(), List.of(ITEM_1, ITEM_2), orderDate());
     }
 
     public static LocalDateTime orderDate() {
