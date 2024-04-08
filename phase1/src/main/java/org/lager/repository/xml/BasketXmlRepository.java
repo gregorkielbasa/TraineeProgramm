@@ -55,7 +55,6 @@ public class BasketXmlRepository implements BasketRepository {
     }
 
     private void saveBasketsToFile() {
-
         XmlBasketsList xmlRecords = xmlMapper.basketsListToXml(baskets.values().stream().toList());
 
         try {

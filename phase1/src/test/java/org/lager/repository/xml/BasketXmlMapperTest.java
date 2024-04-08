@@ -8,7 +8,7 @@ import org.lager.model.Basket;
 
 import java.util.List;
 
-import static org.lager.repository.xml.BasketFixtures.*;
+import static org.lager.BasketFixtures.*;
 
 @DisplayName("Basket XML Mapper")
 class BasketXmlMapperTest implements WithAssertions {

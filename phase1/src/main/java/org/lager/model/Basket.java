@@ -7,13 +7,13 @@ import java.util.*;
 
 public class Basket {
 
-    private final Map<Long, Integer> products; //ProductNumber, Amount
     private final long customerNumber;
+    private final Map<Long, Integer> products; //ProductNumber, Amount
     private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
     public Basket(long customerNumber) {
-        this.products = new HashMap<>();
         this.customerNumber = customerNumber;
+        this.products = new HashMap<>();
         logger.info("New Basket {} has been created.", customerNumber);
     }
 
