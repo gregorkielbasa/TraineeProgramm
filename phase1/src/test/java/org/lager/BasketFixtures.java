@@ -3,6 +3,7 @@ package org.lager;
 import org.lager.model.Basket;
 import org.lager.repository.xml.XmlBasket;
 import org.lager.repository.xml.XmlBasketItem;
+import org.lager.repository.xml.XmlBasketsList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,10 @@ public class BasketFixtures {
 
     public static long defaultCustomerNumber() {
         return CUSTOMER_1_NUMBER;
+    }
+
+    public static long anotherCustomerNumber() {
+        return CUSTOMER_2_NUMBER;
     }
 
     public static long defaultProductNumber() {
@@ -73,5 +78,13 @@ public class BasketFixtures {
         items.add(new XmlBasketItem(PRODUCT_2_NUMBER, 3));
 
         return new XmlBasket(CUSTOMER_2_NUMBER, items);
+    }
+
+    public static XmlBasketsList defaultXmlList() {
+        return new XmlBasketsList(List.of(defaultXmlBasket()));
+    }
+
+    public static XmlBasketsList anotherXmlList() {
+        return new XmlBasketsList(List.of(anotherXmlBasket(), defaultXmlBasket()));
     }
 }

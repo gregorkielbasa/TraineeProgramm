@@ -44,7 +44,7 @@ public class BasketXmlRepository implements BasketRepository {
 
     private void validateBasket(Basket basket) throws RepositoryException {
         if (basket == null)
-            throw new RuntimeException("Given Basket is NULL");
+            throw new RepositoryException("Given Basket is NULL");
     }
 
     @Override
