@@ -21,7 +21,7 @@ public class OrderFixtures {
         return CUSTOMER_NUMBER;
     }
 
-    public static long incorrectNumber() {
+    public static long incorrectId() {
         return 1;
     }
 
@@ -35,6 +35,10 @@ public class OrderFixtures {
 
     public static Order defaultOrder() {
         return new Order(ORDER_NUMBER, CUSTOMER_NUMBER, orderDate(), List.of(ITEM_1));
+    }
+
+    public static Order anotherOrder() {
+        return new Order(ORDER_NUMBER+1, CUSTOMER_NUMBER+1, orderDate(), List.of(ITEM_1, ITEM_2));
     }
 
     public static JsonOrder defaultOrderAsJson() {

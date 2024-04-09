@@ -206,7 +206,7 @@ class CustomerCsvRepositoryTest implements WithAssertions {
             Mockito.when(csvEditor.loadFromFile())
                     .thenReturn(List.of(defaultCustomerAsCsvRecord()));
             Mockito.doNothing()
-                    .when(csvEditor).saveToFile(argumentCaptor.capture());
+                    .when(csvEditor).saveToFile(Mockito.anyList());
 
             CustomerCsvRepository customerCsvRepository = new CustomerCsvRepository(csvEditor, csvMapper);
             customerCsvRepository.delete(incorrectNumber());
@@ -220,6 +220,8 @@ class CustomerCsvRepositoryTest implements WithAssertions {
         void exisitng() throws IOException {
             Mockito.when(csvEditor.loadFromFile())
                     .thenReturn(List.of(anotherCustomerAsCsvRecord(), defaultCustomerAsCsvRecord()));
+            Mockito.doNothing()
+                    .when(csvEditor).saveToFile(Mockito.anyList());
 
             CustomerCsvRepository customerCsvRepository = new CustomerCsvRepository(csvEditor, csvMapper);
             customerCsvRepository.delete(defaultNumber());
