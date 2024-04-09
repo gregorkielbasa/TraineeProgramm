@@ -20,7 +20,7 @@ public class BasketXmlMapper {
     }
 
     public List<Basket> xmlToBasketsList(XmlBasketsList xmlBaskets) {
-        if (xmlBaskets == null || xmlBaskets.baskets() == null || xmlBaskets.baskets().isEmpty())
+        if (xmlBaskets == null || xmlBaskets.baskets() == null)
             return List.of();
 
         return xmlBaskets.baskets().stream()
@@ -47,7 +47,7 @@ public class BasketXmlMapper {
     }
 
     public XmlBasketsList basketsListToXml(List<Basket> baskets) {
-        if (baskets == null || baskets.isEmpty())
+        if (baskets == null)
             return new XmlBasketsList(List.of());
 
         List<XmlBasket> result = baskets.stream()
@@ -60,7 +60,7 @@ public class BasketXmlMapper {
     }
 
     private Optional<XmlBasket> basketToXml(Basket basket) {
-        if (basket == null || basket.getContent() == null || basket.getContent().isEmpty())
+        if (basket == null || basket.getContent().isEmpty())
             return Optional.empty();
 
         List<XmlBasketItem> result = basket.getContent().entrySet().stream()

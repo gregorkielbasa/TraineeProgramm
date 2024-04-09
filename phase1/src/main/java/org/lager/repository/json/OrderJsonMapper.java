@@ -2,6 +2,7 @@ package org.lager.repository.json;
 
 import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemListNotPresentException;
+import org.lager.exception.OrderTimeNullException;
 import org.lager.model.Order;
 import org.lager.model.OrderItem;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ public class OrderJsonMapper {
             result = Optional.of(extractOrder(jsonRecord));
         } catch (NullPointerException e) {
             logger.warn("Order JSON Record is or contains NULL fields: {}", e.getMessage());
-        } catch (OrderIllegalIdException | OrderItemListNotPresentException e) {
+        } catch (OrderIllegalIdException | OrderTimeNullException | OrderItemListNotPresentException e) {
             logger.warn("Order JSON Record is invalid: {}", e.getMessage());
         }
 
@@ -31,8 +32,6 @@ public class OrderJsonMapper {
     private Order extractOrder(JsonOrder jsonRecord) {
         if (jsonRecord == null)
             throw new NullPointerException("Order JSON Record is NULL");
-        if (jsonRecord.dateTime() == null)
-            throw new NullPointerException("Order JSON Record TimeStamp is NULL");
 
         long id = jsonRecord.id();
         long customerNumber = jsonRecord.customerNumber();
@@ -57,10 +56,6 @@ public class OrderJsonMapper {
     private static JsonOrder extractJson(Order order) {
         if (order == null)
             throw new NullPointerException("Order is NULL");
-        if (order.getDateTime() == null)
-            throw new NullPointerException("Order TimeStamp is NULL");;
-        if (order.getItems() == null || order.getItems().isEmpty())
-            throw new NullPointerException("Order Item List is NULL/Empty");
 
         long id = order.getId();
         long customerNumber = order.getCustomerNumber();

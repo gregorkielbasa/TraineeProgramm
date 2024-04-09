@@ -2,10 +2,12 @@ package org.lager.model;
 
 import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemListNotPresentException;
+import org.lager.exception.OrderTimeNullException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,6 +21,7 @@ public class Order {
     private final List<OrderItem> items;
     private final static Logger logger = LoggerFactory.getLogger(Order.class);
 
+
     public Order(long id, long customerNumber, List<OrderItem> items) {
         this(id, customerNumber, LocalDateTime.now(), items);
     }
@@ -27,11 +30,17 @@ public class Order {
         validateId(id);
         this.id = id;
         this.customerNumber = customerNumber;
-        this.dateTime = dateTime;
+        validateTime(dateTime);
+        this.dateTime = dateTime.truncatedTo(ChronoUnit.SECONDS);
         validateItems(items);
         this.items = items;
 
         logger.info("New Order {} has been created.", id);
+    }
+
+    private void validateTime(LocalDateTime dateTime) {
+        if (dateTime == null)
+            throw new OrderTimeNullException(id);
     }
 
     private void validateId(long id) {

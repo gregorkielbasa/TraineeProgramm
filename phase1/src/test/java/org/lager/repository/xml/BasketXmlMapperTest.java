@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.lager.model.Basket;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.lager.BasketFixtures.*;
@@ -32,6 +33,26 @@ class BasketXmlMapperTest implements WithAssertions {
         @DisplayName("empty basket list")
         void emptyBasketsList() {
             XmlBasketsList input = new XmlBasketsList(List.of());
+            List<Basket> output = xmlMapper.xmlToBasketsList(input);
+
+            assertThat(output).isEmpty();
+        }
+
+        @Test
+        @DisplayName("empty basket list")
+        void BasketsWithNullList() {
+            XmlBasketsList input = new XmlBasketsList(null);
+            List<Basket> output = xmlMapper.xmlToBasketsList(input);
+
+            assertThat(output).isEmpty();
+        }
+
+        @Test
+        @DisplayName("empty basket list")
+        void BasketsListWithNull() {
+            List<XmlBasket> baskets = new ArrayList<>();
+            baskets.add(null);
+            XmlBasketsList input = new XmlBasketsList(baskets);
             List<Basket> output = xmlMapper.xmlToBasketsList(input);
 
             assertThat(output).isEmpty();

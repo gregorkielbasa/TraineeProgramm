@@ -84,15 +84,6 @@ class OrderJsonMapperTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("a record with NULL Date")
-        void nullDate() {
-            Order input = new Order(defaultId(), defaultCustomerNumber(), null, defaultItems());
-            Optional<JsonOrder> output = jsonMapper.orderToJsonRecord(input);
-
-            assertThat(output).isEmpty();
-        }
-
-        @Test
         @DisplayName("a proper Order")
         void properCase() {
             Order input = defaultOrder();
