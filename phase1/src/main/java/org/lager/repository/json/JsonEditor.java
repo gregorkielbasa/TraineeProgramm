@@ -2,6 +2,7 @@ package org.lager.repository.json;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.File;
@@ -16,6 +17,7 @@ public class JsonEditor {
     public JsonEditor(String filePath) {
         this.filePath = filePath;
         this.objectMapper = new ObjectMapper();
+        this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         this.objectMapper.registerModule(new JavaTimeModule());
     }
 

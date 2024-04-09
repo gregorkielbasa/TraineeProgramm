@@ -1,27 +1,19 @@
 package org.lager.service;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.lager.BasketFixtures;
 import org.lager.exception.OrderItemListNotPresentException;
-import org.lager.model.Order;
-import org.lager.model.OrderItem;
 import org.lager.repository.OrderRepository;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.lager.BasketFixtures.defaultBasket;
 import static org.lager.BasketFixtures.defaultCustomerNumber;
 import static org.lager.OrderFixtures.*;
@@ -44,24 +36,24 @@ class OrderServiceTest implements WithAssertions {
         @Test
         @DisplayName("non existing Order")
         void nonExisting() {
-            Mockito.when(repository.read(defaultNumber()))
+            Mockito.when(repository.read(defaultId()))
                     .thenReturn(Optional.empty());
 
             orderService = new OrderService(repository, basketService);
 
-            assertThat(orderService.getOrder(defaultNumber()))
+            assertThat(orderService.getOrder(defaultId()))
                     .isEmpty();
         }
 
         @Test
         @DisplayName("existing Order")
         void properCase() {
-            Mockito.when(repository.read(defaultNumber()))
+            Mockito.when(repository.read(defaultId()))
                     .thenReturn(Optional.of(defaultOrder()));
 
             orderService = new OrderService(repository, basketService);
 
-            assertThat(orderService.getOrder(defaultNumber()))
+            assertThat(orderService.getOrder(defaultId()))
                     .isEqualTo(Optional.of(defaultOrder()));
         }
     }
@@ -74,13 +66,13 @@ class OrderServiceTest implements WithAssertions {
         @DisplayName("non existing / empty Basket")
         void nonExisting() {
             Mockito.when(repository.getNextAvailableNumber())
-                    .thenReturn(defaultNumber());
-            Mockito.when(basketService.getContentOfBasket(defaultNumber()))
+                    .thenReturn(defaultId());
+            Mockito.when(basketService.getContentOfBasket(defaultId()))
                     .thenReturn(Map.of());
 
             orderService = new OrderService(repository, basketService);
 
-            assertThatThrownBy(() -> orderService.order(defaultNumber()))
+            assertThatThrownBy(() -> orderService.order(defaultId()))
                     .isInstanceOf(OrderItemListNotPresentException.class);
         }
 
@@ -88,13 +80,13 @@ class OrderServiceTest implements WithAssertions {
         @DisplayName("null Basket from BasketService")
         void nullBasketContent() {
             Mockito.when(repository.getNextAvailableNumber())
-                    .thenReturn(defaultNumber());
-            Mockito.when(basketService.getContentOfBasket(defaultNumber()))
+                    .thenReturn(defaultId());
+            Mockito.when(basketService.getContentOfBasket(defaultId()))
                     .thenReturn(null);
 
             orderService = new OrderService(repository, basketService);
 
-            assertThatThrownBy(() -> orderService.order(defaultNumber()))
+            assertThatThrownBy(() -> orderService.order(defaultId()))
                     .isInstanceOf(OrderItemListNotPresentException.class);
         }
 
@@ -102,7 +94,7 @@ class OrderServiceTest implements WithAssertions {
         @DisplayName("simply Basket")
         void simplyBasket() {
             Mockito.when(repository.getNextAvailableNumber())
-                    .thenReturn(defaultNumber());
+                    .thenReturn(defaultId());
             Mockito.when(basketService.getContentOfBasket(defaultCustomerNumber()))
                     .thenReturn(defaultBasket().getContent());
 

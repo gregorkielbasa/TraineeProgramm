@@ -16,7 +16,7 @@ class BasketXmlMapperTest implements WithAssertions {
     BasketXmlMapper xmlMapper = new BasketXmlMapper();
 
     @Nested
-    @DisplayName("reads")
+    @DisplayName("reads XML Record")
     class BasketXmlRead {
 
         @Test
@@ -95,7 +95,7 @@ class BasketXmlMapperTest implements WithAssertions {
         }
 
         @Nested
-        @DisplayName("writes")
+        @DisplayName("writes XML Record")
         class BasketXmlWrite {
 
             @Test

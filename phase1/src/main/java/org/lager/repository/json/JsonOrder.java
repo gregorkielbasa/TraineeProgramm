@@ -8,6 +8,6 @@ import java.util.List;
 
 public record JsonOrder(long id,
                         long customerNumber,
-                        List<OrderItem> items,
-                        LocalDateTime dateTime) {
+                        LocalDateTime dateTime,
+                        List<OrderItem> items) {
 }

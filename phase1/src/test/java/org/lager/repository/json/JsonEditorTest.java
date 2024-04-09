@@ -8,8 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.lager.OrderFixtures.anotherOrderAsJson;
-import static org.lager.OrderFixtures.defaultOrderAsJson;
+import static org.lager.OrderFixtures.*;
 
 @DisplayName("JSON Editor")
 class JsonEditorTest implements WithAssertions {

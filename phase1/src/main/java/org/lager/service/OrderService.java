@@ -36,7 +36,7 @@ public class OrderService {
         long newOrderId = repository.getNextAvailableNumber();
         logger.debug("OrderService starts to order {} Basket", basketId);
         List<OrderItem> items = getOrderItemsFromBasket(basketId);
-        Order newOrder = new Order(newOrderId, basketId, items, dataTime);
+        Order newOrder = new Order(newOrderId, basketId, dataTime, items);
         repository.save(newOrder);
         basketService.dropBasket(basketId);
         logger.debug("OrderService finished to order {} Basket", basketId);

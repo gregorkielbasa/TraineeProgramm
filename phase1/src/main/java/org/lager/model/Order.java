@@ -17,13 +17,13 @@ public class Order {
     private final long customerNumber;
     private final LocalDateTime dateTime;
     private final List<OrderItem> items;
-    private final Logger logger = LoggerFactory.getLogger(Order.class);
+    private final static Logger logger = LoggerFactory.getLogger(Order.class);
 
     public Order(long id, long customerNumber, List<OrderItem> items) {
-        this(id, customerNumber, items, LocalDateTime.now());
+        this(id, customerNumber, LocalDateTime.now(), items);
     }
 
-    public Order(long id, long customerNumber, List<OrderItem> items, LocalDateTime dateTime) {
+    public Order(long id, long customerNumber, LocalDateTime dateTime, List<OrderItem> items) {
         validateId(id);
         this.id = id;
         this.customerNumber = customerNumber;

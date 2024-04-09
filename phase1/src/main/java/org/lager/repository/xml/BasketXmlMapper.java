@@ -20,9 +20,8 @@ public class BasketXmlMapper {
     }
 
     public List<Basket> xmlToBasketsList(XmlBasketsList xmlBaskets) {
-        if (xmlBaskets == null || xmlBaskets.baskets() == null || xmlBaskets.baskets().isEmpty()) {
+        if (xmlBaskets == null || xmlBaskets.baskets() == null || xmlBaskets.baskets().isEmpty())
             return List.of();
-        }
 
         return xmlBaskets.baskets().stream()
                 .map(this::xmlToBasket)

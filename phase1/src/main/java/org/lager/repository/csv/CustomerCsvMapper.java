@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 public class CustomerCsvMapper {
-    private final Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
+    private final static Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
 
     public Optional<Customer> csvRecordToCustomer(String csvRecord) {
         Optional<Customer> result = Optional.empty();
@@ -26,7 +26,7 @@ public class CustomerCsvMapper {
         } catch (ArrayIndexOutOfBoundsException e) {
             logger.warn("Customer CSV Record is incomplete");
         } catch (CustomerIllegalNumberException | CustomerIllegalNameException e) {
-            logger.warn("Customer CSV Record is invalid: " + e);
+            logger.warn("Customer CSV Record is invalid: {}", e.getMessage());
         }
         return result;
     }
