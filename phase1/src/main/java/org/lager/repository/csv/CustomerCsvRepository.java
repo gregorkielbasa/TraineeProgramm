@@ -15,7 +15,7 @@ public class CustomerCsvRepository implements CustomerRepository {
 
     private long newCustomerNumber = 100_000_000;
     private final Map<Long, Customer> customers;
-    private final Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
+    private final static Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
 
     public CustomerCsvRepository(CsvEditor csvEditor, CustomerCsvMapper csvMapper) {
         this.csvEditor = csvEditor;
@@ -85,7 +85,7 @@ public class CustomerCsvRepository implements CustomerRepository {
     }
 
     private void loadCustomersFromFile() {
-        List<String> csvRecords = new ArrayList<>();
+        List<String> csvRecords = List.of();
 
         try {
             csvRecords = csvEditor.loadFromFile();

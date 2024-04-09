@@ -22,7 +22,6 @@ import static org.lager.CustomerFixtures.*;
 @DisplayName("Customer CSV Repository")
 class CustomerCsvRepositoryTest implements WithAssertions {
 
-
     @Captor
     private ArgumentCaptor<List<String>> argumentCaptor;
     @Mock
