@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemListNotPresentException;
+import org.lager.exception.OrderTimeNullException;
+import org.mockito.internal.matchers.Or;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,6 +35,13 @@ class OrderTest implements WithAssertions {
         }
 
         @Test
+        @DisplayName("created with 0 ID")
+        void zeroID() {
+            assertThatThrownBy(() -> new Order(0, CUSTOMER_NUMBER, VALID_ITEM_LIST))
+                    .isInstanceOf(OrderIllegalIdException.class);
+        }
+
+        @Test
         @DisplayName("created with NULL items list")
         void nullItemsList() {
             assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_NUMBER, null))
@@ -44,6 +53,13 @@ class OrderTest implements WithAssertions {
         void emptyItemList() {
             assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_NUMBER, new ArrayList<>()))
                     .isInstanceOf(OrderItemListNotPresentException.class);
+        }
+
+        @Test
+        @DisplayName("created with null Time")
+        void nullTime() {
+            assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_NUMBER, null, VALID_ITEM_LIST))
+                    .isInstanceOf(OrderTimeNullException.class);
         }
     }
 
@@ -57,6 +73,7 @@ class OrderTest implements WithAssertions {
             Order order = new Order(VALID_ID, 123_123_123L, VALID_ITEM_LIST);
 
             assertThat(order.getCustomerNumber()).isEqualTo(123_123_123L);
+            assertThat(order.getId()).isEqualTo(VALID_ID);
             assertThat(order.getDateTime()).isEqualToIgnoringNanos(LocalDateTime.now());
             assertThat(order.getItems()).containsExactlyInAnyOrderElementsOf(VALID_ITEM_LIST);
         }
@@ -78,11 +95,127 @@ class OrderTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("too negative CustomerNumber")
+        @DisplayName("negative CustomerNumber")
         void negative() {
             Order order = new Order(VALID_ID, -123, VALID_ITEM_LIST);
 
             assertThat(order.getCustomerNumber()).isEqualTo(-123);
         }
     }
+
+    @Nested
+    @DisplayName("tests equality")
+    class EqualityBasket {
+
+        @Test
+        @DisplayName("of the same")
+        void theSame() {
+            Order order = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+
+            assertThat(order.equals(order)).isTrue();
+        }
+
+        @Test
+        @DisplayName("of NULL")
+        void nullOrder() {
+            Order order = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+
+            assertThat(order.equals(null)).isFalse();
+        }
+
+        @Test
+        @DisplayName("of different Classes")
+        void differentClasses() {
+            Order order = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+
+            assertThat(order.equals("any")).isFalse();
+        }
+
+        @Test
+        @DisplayName("os the same object")
+        void similarOrder() {
+            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+
+            assertThat(order1.equals(order2)).isTrue();
+        }
+
+        @Test
+        @DisplayName("os the same object")
+        void similarOrderWithDifferentId() {
+            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID + 1, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+
+            assertThat(order1.equals(order2)).isFalse();
+        }
+
+        @Test
+        @DisplayName("os the same object")
+        void similarOrderWithDifferentCustomer() {
+            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER + 1, VALID_ITEM_LIST);
+
+            assertThat(order1.equals(order2)).isFalse();
+        }
+
+        @Test
+        @DisplayName("os the same object")
+        void similarOrderWithDifferentItems() {
+            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER, List.of(ITEM_1));
+
+            assertThat(order1.equals(order2)).isFalse();
+        }
+
+        @Test
+        @DisplayName("os the same object")
+        void similarOrderWithDifferentTime() {
+            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER, LocalDateTime.now().minusDays(1), VALID_ITEM_LIST);
+
+            assertThat(order1.equals(order2)).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("tests its hashCode")
+    class HashCodeBasket {
+
+        @Test
+        @DisplayName("and they should be the same")
+        void similarOrder() {
+            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+
+            assertThat(order1.hashCode()).isEqualTo(order2.hashCode());
+        }
+
+        @Test
+        @DisplayName("with different ID")
+        void differentId() {
+            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID + 1, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+
+            assertThat(order1.hashCode()).isNotEqualTo(order2.hashCode());
+        }
+
+        @Test
+        @DisplayName("with different Customers")
+        void differentCustomer() {
+            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER + 1, VALID_ITEM_LIST);
+
+            assertThat(order1.hashCode()).isNotEqualTo(order2.hashCode());
+        }
+
+        @Test
+        @DisplayName("with different items")
+        void differentItems() {
+            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER, List.of(ITEM_1));
+
+            assertThat(order1.hashCode()).isNotEqualTo(order2.hashCode());
+        }
+    }
+
 }

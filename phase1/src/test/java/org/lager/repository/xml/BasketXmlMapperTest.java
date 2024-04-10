@@ -86,6 +86,17 @@ class BasketXmlMapperTest implements WithAssertions {
         }
 
         @Test
+        @DisplayName("basket with empty items list")
+        void nullBasketItem() {
+            List<XmlBasketItem> items = new ArrayList<>();
+            items.add(null);
+            XmlBasketsList input = new XmlBasketsList(List.of(new XmlBasket(100_000_000L, items)));
+            List<Basket> output = xmlMapper.xmlToBasketsList(input);
+
+            assertThat(output).isEmpty();
+        }
+
+        @Test
         @DisplayName("simple basket list")
         void oneElement() {
             XmlBasketsList input = new XmlBasketsList(List.of(defaultXmlBasket()));
@@ -96,14 +107,26 @@ class BasketXmlMapperTest implements WithAssertions {
 
         @Test
         @DisplayName("item with null number")
-        void emptyBasket() {
+        void itemWithNullNumber() {
             List<XmlBasketItem> items = List.of(new XmlBasketItem(null, 1));
             XmlBasket basket = new XmlBasket(100_000_000L, items);
 
             XmlBasketsList input = new XmlBasketsList(List.of(basket));
             List<Basket> output = xmlMapper.xmlToBasketsList(input);
 
-            assertThat(output).containsExactly(defaultEmptyBasket());
+            assertThat(output).isEmpty();
+        }
+
+        @Test
+        @DisplayName("item with null number")
+        void itemWithNullAmount() {
+            List<XmlBasketItem> items = List.of(new XmlBasketItem(defaultProductNumber(), null));
+            XmlBasket basket = new XmlBasket(100_000_000L, items);
+
+            XmlBasketsList input = new XmlBasketsList(List.of(basket));
+            List<Basket> output = xmlMapper.xmlToBasketsList(input);
+
+            assertThat(output).isEmpty();
         }
 
         @Test

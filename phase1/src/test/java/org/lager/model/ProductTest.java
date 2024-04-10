@@ -233,9 +233,17 @@ class ProductTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("when comparing to an object with a different properties")
-        void testEquals() {
+        @DisplayName("when comparing to an object with a different name")
+        void testEqualsName() {
             Product product2 = new Product(123_123_123L, new String("product different name"));
+
+            assertFalse(product1.equals(product2));
+        }
+
+        @Test
+        @DisplayName("when comparing to an object with a different number")
+        void testEqualsNumber() {
+            Product product2 = new Product(123_000_000L, new String("product name"));
 
             assertFalse(product1.equals(product2));
         }

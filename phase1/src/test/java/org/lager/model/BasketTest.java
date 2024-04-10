@@ -168,4 +168,111 @@ class BasketTest implements WithAssertions {
                     Map.entry(123_000_001L, 1));
         }
     }
+
+    @Nested
+    @DisplayName("tests equality")
+    class EqualityBasket {
+
+        @Test
+        @DisplayName("of the same Basket")
+        void theSameObject() {
+            Basket basket = new Basket(123_456_789L);
+            basket.insert(100_000_000, 1);
+
+            assertThat(basket.equals(basket)).isTrue();
+        }
+
+        @Test
+        @DisplayName("of NULL")
+        void nullBasket() {
+            Basket basket = new Basket(123_456_789L);
+            basket.insert(100_000_000, 1);
+
+            assertThat(basket.equals(null)).isFalse();
+        }
+
+        @Test
+        @DisplayName("of different Classes")
+        void differentClasses() {
+            Basket basket = new Basket(123_456_789L);
+            basket.insert(100_000_000, 1);
+
+            assertThat(basket.equals("any")).isFalse();
+        }
+
+        @Test
+        @DisplayName("of two the same Baskets")
+        void similarBasket() {
+            Basket basket1 = new Basket(123_456_789L);
+            basket1.insert(100_000_000, 1);
+
+            Basket basket2 = new Basket(123_456_789L);
+            basket2.insert(100_000_000, 1);
+
+            assertThat(basket1.equals(basket2)).isTrue();
+        }
+
+        @Test
+        @DisplayName("of two different Baskets")
+        void differentNumberBasket() {
+            Basket basket1 = new Basket(123_456_789L);
+            basket1.insert(100_000_000, 1);
+
+            Basket basket2 = new Basket(123_123_123L);
+            basket2.insert(100_000_000, 1);
+
+            assertThat(basket1.equals(basket2)).isFalse();
+        }
+
+        @Test
+        @DisplayName("of two the same Baskets with different Items")
+        void differentItems() {
+            Basket basket1 = new Basket(123_456_789L);
+            basket1.insert(123_123_123, 1);
+
+            Basket basket2 = new Basket(123_456_789L);
+            basket2.insert(100_000_000, 1);
+
+            assertThat(basket1.equals(basket2)).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("tests its hashCode")
+    class HashCodeBasket {
+
+        Basket basket1 = new Basket(123_123_123L);
+        Basket basket2 = new Basket(123_123_123L);
+        Basket basket3 = new Basket(123_456_789L);
+
+        @Test
+        @DisplayName("and they should be the same")
+        void similarBasket() {
+            basket1.insert(100_000_000L, 1);
+            basket2.insert(100_000_000L, 1);
+
+            assertThat(basket1.hashCode())
+                    .isEqualTo(basket2.hashCode());
+        }
+
+        @Test
+        @DisplayName("with different names")
+        void differentNameBasket() {
+            basket1.insert(100_000_000L, 1);
+            basket3.insert(100_000_000L, 1);
+
+            assertThat(basket1.hashCode())
+                    .isNotEqualTo(basket3.hashCode());
+        }
+
+        @Test
+        @DisplayName("with different items")
+        void sameNameDifferentItems() {
+            basket1.insert(100_000_000L, 1);
+            basket2.insert(123_123_123, 1);
+
+            assertThat(basket1.hashCode())
+                    .isNotEqualTo(basket3.hashCode());
+        }
+    }
 }

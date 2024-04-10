@@ -39,7 +39,10 @@ public class BasketXmlMapper {
         xmlBasket.items().stream()
                 .filter(validateXmlBasketItem())
                 .forEach(item -> result.insert(item.number(), item.amount()));
-        return Optional.of(result);
+
+        return result.getContent().isEmpty()
+                ? Optional.empty()
+                : Optional.of(result);
     }
 
     private Predicate<XmlBasketItem> validateXmlBasketItem() {
@@ -60,7 +63,7 @@ public class BasketXmlMapper {
     }
 
     private Optional<XmlBasket> basketToXml(Basket basket) {
-        if (basket == null || basket.getContent().isEmpty())
+        if (basket.getContent().isEmpty())
             return Optional.empty();
 
         List<XmlBasketItem> result = basket.getContent().entrySet().stream()
