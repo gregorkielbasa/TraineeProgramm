@@ -4,11 +4,9 @@ import org.lager.model.Basket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -37,7 +35,7 @@ public class BasketXmlMapper {
         Basket result = new Basket(xmlBasket.customerNumber());
 
         xmlBasket.items().stream()
-                .filter(validateXmlBasketItem())
+                .filter(isXmlBasketValidPredicate())
                 .forEach(item -> result.insert(item.number(), item.amount()));
 
         return result.getContent().isEmpty()
@@ -45,7 +43,7 @@ public class BasketXmlMapper {
                 : Optional.of(result);
     }
 
-    private Predicate<XmlBasketItem> validateXmlBasketItem() {
+    private Predicate<XmlBasketItem> isXmlBasketValidPredicate() {
         return basketItem -> basketItem != null && basketItem.number() != null && basketItem.amount() != null;
     }
 
@@ -67,8 +65,7 @@ public class BasketXmlMapper {
             return Optional.empty();
 
         List<XmlBasketItem> result = basket.getContent().entrySet().stream()
-                .map(basketItemToXml())
-                .sorted(Comparator.comparingLong(XmlBasketItem::number))                                                //is it really needed?
+                .map(basketItemToXml())                                        //is it really needed?
                 .toList();
 
         return Optional.of(new XmlBasket(basket.getCustomerNumber(), result));
