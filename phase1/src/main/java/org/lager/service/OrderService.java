@@ -3,55 +3,56 @@ package org.lager.service;
 import org.lager.exception.OrderItemListNotPresentException;
 import org.lager.model.Order;
 import org.lager.model.OrderItem;
+import org.lager.repository.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class OrderService {
 
-    private long newOrderID = 1000;
-    private List<Order> orders;
+    private final OrderRepository repository;
     private final BasketService basketService;
-    private final Logger logger = LoggerFactory.getLogger(OrderService.class);
+    private final static Logger logger = LoggerFactory.getLogger(OrderService.class);
 
-    public OrderService(BasketService basketService) {
+    public OrderService(OrderRepository repository, BasketService basketService) {
+        this.repository = repository;
         this.basketService = basketService;
-        orders = new LinkedList<>();
-    }
-
-    public long order(long customerNumber) {
-        logger.debug("OrderService starts to order {} Basket", customerNumber);
-        List<OrderItem> items = getOrderItemsFromBasket(customerNumber);
-        Order newOrder = new Order(newOrderID, customerNumber, items);
-        orders.add(newOrder);
-        basketService.emptyBasket(customerNumber);
-        logger.debug("OrderService finished to order {} Basket", customerNumber);
-        return newOrderID++;
-    }
-
-    private List<OrderItem> getOrderItemsFromBasket(long customerNumber) {
-        Map<Long, Integer> basketContent = getContentOfBasket(customerNumber);
-        return basketContent.entrySet().stream()
-                .map((entry) -> new OrderItem(entry.getKey(), entry.getValue()))
-                .toList();
-    }
-
-    private Map<Long, Integer> getContentOfBasket(long customerNumber) {
-        Map<Long, Integer> contentOfBasket = basketService.getContentOfBasket(customerNumber);
-        if (contentOfBasket == null)
-            throw new OrderItemListNotPresentException(customerNumber);
-        return contentOfBasket;
     }
 
     public Optional<Order> getOrder(long orderID) {
-        for (Order record : orders) {
-            if (record.getId() == orderID)
-                return Optional.of(record);
-        }
-        return Optional.empty();
+        return repository.read(orderID);
+    }
+
+    public Order order(long basketId) {
+        return order(basketId, LocalDateTime.now());
+    }
+
+    public Order order(long basketId, LocalDateTime dataTime) {
+        long newOrderId = repository.getNextAvailableNumber();
+        logger.debug("OrderService starts to order {} Basket", basketId);
+        List<OrderItem> items = getOrderItemsFromBasket(basketId);
+        Order newOrder = new Order(newOrderId, basketId, dataTime, items);
+        repository.save(newOrder);
+        basketService.dropBasket(basketId);
+        logger.debug("OrderService finished to order {} Basket", basketId);
+        return newOrder;
+    }
+
+    private List<OrderItem> getOrderItemsFromBasket(long basketId) {
+        List<OrderItem> result = new ArrayList<>();
+        getContentOfBasket(basketId).forEach((productNumber, amount) -> result.add(new OrderItem(productNumber, amount)));
+        return result;
+    }
+
+    private Map<Long, Integer> getContentOfBasket(long basketId) {
+        Map<Long, Integer> contentOfBasket = basketService.getContentOfBasket(basketId);
+        if (contentOfBasket == null)
+            throw new OrderItemListNotPresentException(basketId);
+        return contentOfBasket;
     }
 }

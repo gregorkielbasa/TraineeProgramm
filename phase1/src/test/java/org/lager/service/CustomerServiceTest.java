@@ -1,61 +1,59 @@
 package org.lager.service;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.CustomerIllegalNameException;
 import org.lager.exception.NoSuchCustomerException;
+import org.lager.exception.RepositoryException;
 import org.lager.model.Customer;
+import org.lager.repository.CustomerRepository;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-@DisplayName("customerService")
+import static org.lager.CustomerFixtures.*;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("Customer Service")
 class CustomerServiceTest implements WithAssertions {
 
-    @Test
-    @DisplayName("when is empty returns an empty list")
-    void getAllEmpty() {
-        CustomerService customerService = new CustomerService();
-        assertThat(customerService.getAll()).isEmpty();
-    }
+    @Mock
+    private CustomerRepository repository;
+
+    CustomerService customerService;
 
     @Nested
-    @DisplayName("when tries to create")
-    class InsertCustomerServiceTest {
-
-        CustomerService customerService;
-
-        @BeforeEach
-        void init() {
-            customerService = new CustomerService();
-
-            customerService.create(new String("testOne"));
-        }
+    @DisplayName("tests create() method and")
+    class CreateTest {
 
         @Test
-        @DisplayName("a new customer should have 2 customers")
-        void newOne() {
-            customerService.create("testTwo");
+        @DisplayName("adds one Customer")
+        void properOne() {
+            Mockito.when(repository.getNextAvailableNumber())
+                    .thenReturn(defaultNumber());
+            Mockito.doNothing().when(repository).save(Mockito.any());
 
-            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
-                    new Customer(100_000_000, "testOne"),
-                    new Customer(100_000_001, "testTwo")
-            );
+            customerService = new CustomerService(repository);
+            Customer newCustomer = customerService.create(defaultName());
+
+            assertThat(newCustomer).isEqualTo(defaultCustomer());
+            Mockito.verify(repository).save(defaultCustomer());
         }
 
-        @Test
-        @DisplayName("a customer with existing name should have 2 customers")
-        void sameName() {
-            customerService.create("testOne");
-
-            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
-                    new Customer(100_000_000, "testOne"),
-                    new Customer(100_000_001, "testOne")
-            );
-        }
 
         @Test
         @DisplayName("a customer with null Name should throw an exception")
         void nullName() {
+            Mockito.when(repository.getNextAvailableNumber())
+                    .thenReturn(defaultNumber());
+
+            customerService = new CustomerService(repository);
+
             assertThatThrownBy(() -> customerService.create(null))
                     .isInstanceOf(CustomerIllegalNameException.class);
         }
@@ -63,8 +61,27 @@ class CustomerServiceTest implements WithAssertions {
         @Test
         @DisplayName("a customer with invalid Name should throw an exception")
         void invalidName() {
-            assertThatThrownBy(() -> customerService.create("Test!!§$%&/()=Test"))
+            Mockito.when(repository.getNextAvailableNumber())
+                    .thenReturn(defaultNumber());
+
+            customerService = new CustomerService(repository);
+
+            assertThatThrownBy(() -> customerService.create(incorrectName()))
                     .isInstanceOf(CustomerIllegalNameException.class);
+        }
+
+        @Test
+        @DisplayName("a customer but repository cannot save")
+        void repositoryException() {
+            Mockito.when(repository.getNextAvailableNumber())
+                    .thenReturn(defaultNumber());
+            Mockito.doThrow(new RepositoryException("any"))
+                    .when(repository).save(Mockito.any());
+
+            customerService = new CustomerService(repository);
+
+            assertThatThrownBy(() -> customerService.create(defaultName()))
+                    .isInstanceOf(RepositoryException.class);
         }
     }
 
@@ -72,34 +89,36 @@ class CustomerServiceTest implements WithAssertions {
     @DisplayName("when searches for")
     class SearchCustomerServiceTest {
 
-        CustomerService customerService;
-
-        @BeforeEach
-        void init() {
-            customerService = new CustomerService();
-
-            customerService.create(new String("testOne"));
-            customerService.create(new String("testTwo"));
-        }
-
         @Test
         @DisplayName("existing one")
         void existingID() {
-            assertThat(customerService.search(100_000_000)).isEqualTo(
-                    Optional.of(new Customer(100_000_000, "testOne"))
+            Mockito.when(repository.read(defaultNumber()))
+                    .thenReturn(Optional.of(defaultCustomer()));
+
+            customerService = new CustomerService(repository);
+            assertThat(customerService.search(defaultNumber())).isEqualTo(
+                    Optional.of(defaultCustomer())
             );
         }
 
         @Test
         @DisplayName("non-existing one")
         void nonExistingID() {
-            assertThat(customerService.search(999_999_999)).isEmpty();
+            Mockito.when(repository.read(defaultNumber()))
+                    .thenReturn(Optional.empty());
+
+            customerService = new CustomerService(repository);
+            assertThat(customerService.search(defaultNumber())).isEmpty();
         }
 
         @Test
         @DisplayName("invalid ID")
         void invalidID() {
-            assertThat(customerService.search(1)).isEmpty();
+            Mockito.when(repository.read(incorrectNumber()))
+                    .thenReturn(Optional.empty());
+
+            customerService = new CustomerService(repository);
+            assertThat(customerService.search(incorrectNumber())).isEmpty();
         }
     }
 
@@ -107,126 +126,112 @@ class CustomerServiceTest implements WithAssertions {
     @DisplayName("when check Presence")
     class ValidatePresenceCustomerServiceTest {
 
-        CustomerService customerService;
-
-        @BeforeEach
-        void init() {
-            customerService = new CustomerService();
-
-            customerService.create(new String("testOne"));
-            customerService.create(new String("testTwo"));
-        }
-
         @Test
         @DisplayName("existing one")
         void existingID() {
-            assertThat(customerService.validatePresence(100_000_000)).isTrue();
+            Mockito.when(repository.read(defaultNumber()))
+                    .thenReturn(Optional.of(defaultCustomer()));
+
+            customerService = new CustomerService(repository);
+            customerService.validatePresence(defaultNumber());
+
+            Mockito.verify(repository).read(defaultNumber());
         }
 
         @Test
         @DisplayName("non-existing one")
         void nonExistingID() {
-            assertThatThrownBy(() -> customerService.validatePresence(999_999_999))
+            Mockito.when(repository.read(defaultNumber()))
+                    .thenReturn(Optional.empty());
+
+            customerService = new CustomerService(repository);
+            assertThatThrownBy(() -> customerService.validatePresence(defaultNumber()))
                     .isInstanceOf(NoSuchCustomerException.class);
         }
 
         @Test
         @DisplayName("invalid ID")
         void invalidID() {
-            assertThatThrownBy(() -> customerService.validatePresence(1))
+            Mockito.when(repository.read(incorrectNumber()))
+                    .thenReturn(Optional.empty());
+
+            customerService = new CustomerService(repository);
+            assertThatThrownBy(() -> customerService.validatePresence(incorrectNumber()))
                     .isInstanceOf(NoSuchCustomerException.class);
         }
     }
 
     @Nested
-    @DisplayName("when tries to remove")
+    @DisplayName("when deletes")
     class RemoveCustomerServiceTest {
 
-        CustomerService customerService;
-
-        @BeforeEach
-        void init() {
-            customerService = new CustomerService();
-
-            customerService.create(new String("testOne"));
-            customerService.create(new String("testTwo"));
-        }
-
         @Test
         @DisplayName("existing one")
         void existingID() {
-            customerService.remove(100_000_000);
+            Mockito.doNothing().when(repository).delete(defaultNumber());
 
-            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
-                    new Customer(100_000_001, "testTwo")
-            );
+            customerService = new CustomerService(repository);
+            customerService.delete(defaultNumber());
+
+            Mockito.verify(repository).delete(defaultNumber());
         }
 
-        @Test
-        @DisplayName("non-existing one")
-        void nonExistingID() {
-            customerService.remove(999_999_999);
-
-            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
-                    new Customer(100_000_000, "testOne"),
-                    new Customer(100_000_001, "testTwo")
-            );
-        }
 
         @Test
         @DisplayName("invalid ID")
         void invalidID() {
-            customerService.remove(1);
+            Mockito.doNothing().when(repository).delete(incorrectNumber());
 
-            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
-                    new Customer(100_000_000, "testOne"),
-                    new Customer(100_000_001, "testTwo")
-            );
+            customerService = new CustomerService(repository);
+            customerService.delete(incorrectNumber());
+
+            Mockito.verify(repository).delete(incorrectNumber());
         }
     }
 
     @Nested
-    @DisplayName("when tries to rename")
+    @DisplayName("when renames")
     class RenameCustomerServiceTest {
-
-        CustomerService customerService;
-
-        @BeforeEach
-        void init() {
-            customerService = new CustomerService();
-
-            customerService.create(new String("testOne"));
-            customerService.create(new String("testTwo"));
-        }
 
         @Test
         @DisplayName("existing one with a new proper name")
         void existingID() {
-            customerService.rename(100_000_000, "newName");
+            Mockito.when(repository.read(defaultNumber())).thenReturn(Optional.of(defaultCustomer()));
+            Mockito.doNothing().when(repository).save(Mockito.any());
 
-            assertThat(customerService.getAll()).containsExactlyInAnyOrder(
-                    new Customer(100_000_000, "newName"),
-                    new Customer(100_000_001, "testTwo"));
+            customerService = new CustomerService(repository);
+            customerService.rename(defaultNumber(), "newName");
+
+            Mockito.verify(repository).save(customerWithName("newName"));
         }
 
         @Test
         @DisplayName("existing one with a new invalid name throws an exception")
         void invalidNameExistingID() {
-            assertThatThrownBy(() -> customerService.rename(100_000_000, "new . Name"))
+            Mockito.when(repository.read(defaultNumber())).thenReturn(Optional.of(defaultCustomer()));
+
+            customerService = new CustomerService(repository);
+            assertThatThrownBy(() -> customerService.rename(defaultNumber(), "new . Name"))
                     .isInstanceOf(CustomerIllegalNameException.class);
         }
 
         @Test
         @DisplayName("non-existing one throws an exception")
         void nonExistingID() {
-            assertThatThrownBy(() -> customerService.rename(999_999_999, "newName"))
+            Mockito.when(repository.read(nonExistingNumber())).thenReturn(Optional.empty());
+
+            customerService = new CustomerService(repository);
+            assertThatThrownBy(() -> customerService.rename(nonExistingNumber(), "newName"))
                     .isInstanceOf(NoSuchCustomerException.class);
         }
 
         @Test
         @DisplayName("invalid ID throws an exception")
         void invalidID() {
-            assertThatThrownBy(() -> customerService.rename(1, "newName"))
+            Mockito.when(repository.read(incorrectNumber())).thenReturn(Optional.empty());
+
+            customerService = new CustomerService(repository);
+            assertThatThrownBy(() -> customerService.rename(incorrectNumber(), "newName"))
                     .isInstanceOf(NoSuchCustomerException.class);
         }
     }

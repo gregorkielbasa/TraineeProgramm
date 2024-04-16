@@ -1,94 +1,107 @@
 package org.lager.service;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.OrderItemListNotPresentException;
-import org.lager.model.Order;
-import org.lager.model.OrderItem;
+import org.lager.repository.OrderRepository;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.lager.BasketFixtures.defaultBasket;
+import static org.lager.BasketFixtures.defaultCustomerNumber;
+import static org.lager.OrderFixtures.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("OrderService")
+@DisplayName("Order Service")
 class OrderServiceTest implements WithAssertions {
-    OrderItem ITEM_1 = new OrderItem(123_123_123, 3);
-    OrderItem ITEM_2 = new OrderItem(123_456_789, 5);
-    long ANY_CUSTOMER_NUMBER = 999_999_999L;
-    long CUSTOMER_1 = 123_123_123L;
-    long CUSTOMER_2 = 222_222_222L;
-    Map<Long, Integer> VALID_CONTENT_OF_BASKET_1 = Map.of(123_123_123L, 3, 123_456_789L, 5);
-    Map<Long, Integer> VALID_CONTENT_OF_BASKET_2 = Map.of(222_222_222L, 7, 333_333_333L, 9);
 
+    @Mock
+    OrderRepository repository;
+    @Mock
     BasketService basketService;
+
     OrderService orderService;
 
-    @BeforeEach
-    void init() {
-        basketService = Mockito.mock(BasketService.class);
-        orderService = new OrderService(basketService);
+    @Nested
+    @DisplayName("gives")
+    class GetOrderOrderServiceTest {
+
+        @Test
+        @DisplayName("non existing Order")
+        void nonExisting() {
+            Mockito.when(repository.read(defaultId()))
+                    .thenReturn(Optional.empty());
+
+            orderService = new OrderService(repository, basketService);
+
+            assertThat(orderService.getOrder(defaultId()))
+                    .isEmpty();
+        }
+
+        @Test
+        @DisplayName("existing Order")
+        void properCase() {
+            Mockito.when(repository.read(defaultId()))
+                    .thenReturn(Optional.of(defaultOrder()));
+
+            orderService = new OrderService(repository, basketService);
+
+            assertThat(orderService.getOrder(defaultId()))
+                    .isEqualTo(Optional.of(defaultOrder()));
+        }
     }
 
     @Nested
-    @DisplayName("throws an Exception when ")
-    class OrderThrows {
+    @DisplayName("orders")
+    class OrderOrderServiceTest {
 
         @Test
-        @DisplayName("throws an Exception when ordered with NULL Basket")
-        void orderNull() {
-            Mockito.when(basketService.getContentOfBasket(ANY_CUSTOMER_NUMBER)).thenReturn(Mockito.any());
+        @DisplayName("non existing / empty Basket")
+        void nonExisting() {
+            Mockito.when(repository.getNextAvailableNumber())
+                    .thenReturn(defaultId());
+            Mockito.when(basketService.getContentOfBasket(defaultId()))
+                    .thenReturn(Map.of());
 
-            assertThatThrownBy(() -> orderService.order(ANY_CUSTOMER_NUMBER))
+            orderService = new OrderService(repository, basketService);
+
+            assertThatThrownBy(() -> orderService.order(defaultId()))
                     .isInstanceOf(OrderItemListNotPresentException.class);
         }
 
         @Test
-        @DisplayName("throws an Exception when ordered with NULL Basket")
-        void orderEmpty() {
-            Mockito.when(basketService.getContentOfBasket(ANY_CUSTOMER_NUMBER)).thenReturn(new HashMap<>());
+        @DisplayName("null Basket from BasketService")
+        void nullBasketContent() {
+            Mockito.when(repository.getNextAvailableNumber())
+                    .thenReturn(defaultId());
+            Mockito.when(basketService.getContentOfBasket(defaultId()))
+                    .thenReturn(null);
 
-            assertThatThrownBy(() -> orderService.order(ANY_CUSTOMER_NUMBER))
+            orderService = new OrderService(repository, basketService);
+
+            assertThatThrownBy(() -> orderService.order(defaultId()))
                     .isInstanceOf(OrderItemListNotPresentException.class);
         }
-    }
-
-    @Nested
-    @DisplayName("when have more Orders")
-    class OrderWithTwoOrders {
 
         @Test
-        @DisplayName("gives the right one")
-        void orderProperCase() {
-            Mockito.when(basketService.getContentOfBasket(CUSTOMER_1)).thenReturn(VALID_CONTENT_OF_BASKET_1);
-            Mockito.when(basketService.getContentOfBasket(CUSTOMER_2)).thenReturn(VALID_CONTENT_OF_BASKET_2);
+        @DisplayName("simply Basket")
+        void simplyBasket() {
+            Mockito.when(repository.getNextAvailableNumber())
+                    .thenReturn(defaultId());
+            Mockito.when(basketService.getContentOfBasket(defaultCustomerNumber()))
+                    .thenReturn(defaultBasket().getContent());
 
-            orderService.order(CUSTOMER_1);
-            orderService.order(CUSTOMER_2);
+            orderService = new OrderService(repository, basketService);
 
-            assertThat(orderService.getOrder(1000).get().getItems())
-                    .containsExactlyInAnyOrderElementsOf(List.of(ITEM_1, ITEM_2));
-        }
-
-        @Test
-        @DisplayName("gives empty")
-        void orderNotExisting() {
-            Mockito.when(basketService.getContentOfBasket(CUSTOMER_1)).thenReturn(VALID_CONTENT_OF_BASKET_1);
-            Mockito.when(basketService.getContentOfBasket(CUSTOMER_2)).thenReturn(VALID_CONTENT_OF_BASKET_2);
-
-            orderService.order(CUSTOMER_1);
-            orderService.order(CUSTOMER_2);
-
-            assertThat(orderService.getOrder(9999)).isEmpty();
+            assertThat(orderService.order(defaultCustomerNumber(), orderDate()))
+                    .isEqualTo(defaultOrder());
         }
     }
 }

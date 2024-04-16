@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 import java.util.Optional;
 
-public class Customer {
+public class  Customer {
     private static final String NAME_REGEX = "^[a-zA-Z]{3,16}$";
     private static final long NUMBER_MIN = 100_000_000;
     private static final long NUMBER_MAX = 999_999_999;

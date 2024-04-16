@@ -63,6 +63,8 @@ class CustomerTest implements WithAssertions {
             }
 
         }
+
+        }
         @Nested
         @DisplayName("number")
         class CustomerNumberTestException {
@@ -212,7 +214,7 @@ class CustomerTest implements WithAssertions {
         @Test
         @DisplayName("when has the same properties")
         void testEquals() {
-            Customer customer2 = new Customer(123_123_123L,"Test");
+            Customer customer2 = new Customer(123_123_123L, "Test");
 
             assertTrue(customer1.equals(customer2));
         }
@@ -241,9 +243,17 @@ class CustomerTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("to an object with a different properties")
+        @DisplayName("to an object with a different name")
         void testEqualsName() {
             Customer customer2 = new Customer(123_123_123L, "DifferentTest");
+
+            assertFalse(customer1.equals(customer2));
+        }
+
+        @Test
+        @DisplayName("to an object with a different number")
+        void testDifferentNumber() {
+            Customer customer2 = new Customer(123_000_000L, "DifferentTest");
 
             assertFalse(customer1.equals(customer2));
         }

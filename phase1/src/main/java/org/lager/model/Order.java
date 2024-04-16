@@ -2,11 +2,14 @@ package org.lager.model;
 
 import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemListNotPresentException;
+import org.lager.exception.OrderTimeNullException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 
 public class Order {
     private static final long ID_MIN = 1000;
@@ -16,17 +19,28 @@ public class Order {
     private final long customerNumber;
     private final LocalDateTime dateTime;
     private final List<OrderItem> items;
-    private final Logger logger = LoggerFactory.getLogger(Order.class);
+    private final static Logger logger = LoggerFactory.getLogger(Order.class);
+
 
     public Order(long id, long customerNumber, List<OrderItem> items) {
+        this(id, customerNumber, LocalDateTime.now(), items);
+    }
+
+    public Order(long id, long customerNumber, LocalDateTime dateTime, List<OrderItem> items) {
         validateId(id);
         this.id = id;
         this.customerNumber = customerNumber;
-        this.dateTime = LocalDateTime.now();
+        validateTime(dateTime);
+        this.dateTime = dateTime.truncatedTo(ChronoUnit.SECONDS);
         validateItems(items);
         this.items = items;
 
         logger.info("New Order {} has been created.", id);
+    }
+
+    private void validateTime(LocalDateTime dateTime) {
+        if (dateTime == null)
+            throw new OrderTimeNullException(id);
     }
 
     private void validateId(long id) {
@@ -53,5 +67,18 @@ public class Order {
 
     public List<OrderItem> getItems() {
         return List.copyOf(items);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, customerNumber, dateTime, items);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Order order = (Order) o;
+        return id == order.id && customerNumber == order.customerNumber && Objects.equals(dateTime, order.dateTime) && Objects.equals(items, order.items);
     }
 }
