@@ -10,7 +10,7 @@ import java.util.*;
 
 public class ProductService {
     private final ProductRepository repository;
-    private final Logger logger = LoggerFactory.getLogger(ProductService.class);
+    private final static Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     public ProductService(ProductRepository repository) {
         this.repository = repository;

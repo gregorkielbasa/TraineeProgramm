@@ -10,7 +10,7 @@ import java.util.*;
 
 public class CustomerService {
     private final CustomerRepository repository;
-    private final Logger logger = LoggerFactory.getLogger(CustomerService.class);
+    private final static Logger logger = LoggerFactory.getLogger(CustomerService.class);
 
     public CustomerService(CustomerRepository repository) {
         this.repository = repository;

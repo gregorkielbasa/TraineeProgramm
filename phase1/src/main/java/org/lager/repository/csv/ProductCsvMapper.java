@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 public class ProductCsvMapper {
-    private final Logger logger = LoggerFactory.getLogger(ProductCsvMapper.class);
+    private final static Logger logger = LoggerFactory.getLogger(ProductCsvMapper.class);
 
     public Optional<Product> csvRecordToProduct(String csvRecord) {
         Optional<Product> result = Optional.empty();

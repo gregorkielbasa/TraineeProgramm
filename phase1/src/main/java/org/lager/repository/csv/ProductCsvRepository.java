@@ -15,7 +15,7 @@ public class ProductCsvRepository implements ProductRepository {
 
     private long newProductNumber = 100_000_000;
     private final Map<Long, Product> products;
-    private final Logger logger = LoggerFactory.getLogger(ProductCsvMapper.class);
+    private final static Logger logger = LoggerFactory.getLogger(ProductCsvMapper.class);
 
     public ProductCsvRepository(CsvEditor csvEditor, ProductCsvMapper csvMapper) {
         this.csvEditor = csvEditor;

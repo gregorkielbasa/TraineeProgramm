@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 
 public class BasketXmlMapper {
 
-    private final Logger logger = LoggerFactory.getLogger(BasketXmlMapper.class);
+    private final static Logger logger = LoggerFactory.getLogger(BasketXmlMapper.class);
 
     public BasketXmlMapper() {
     }

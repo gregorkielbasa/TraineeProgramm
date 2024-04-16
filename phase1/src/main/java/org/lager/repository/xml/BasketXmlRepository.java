@@ -15,7 +15,7 @@ public class BasketXmlRepository implements BasketRepository {
     private final BasketXmlMapper xmlMapper;
 
     private final Map<Long, Basket> baskets;
-    private final Logger logger = LoggerFactory.getLogger(BasketXmlRepository.class);
+    private final static Logger logger = LoggerFactory.getLogger(BasketXmlRepository.class);
 
     public BasketXmlRepository(XmlEditor xmlEditor, BasketXmlMapper xmlMapper) {
         this.xmlEditor = xmlEditor;
