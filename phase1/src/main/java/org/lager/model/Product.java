@@ -49,30 +49,6 @@ public class Product {
         return number;
     }
 
-    public String toCsvRecord() {
-        return number + "," + name;
-    }
-
-    public static Optional<Product> getFromCsvRecord(String csvRecord) {
-        Optional<Product> result = Optional.empty();
-        try {
-            String[] values = csvRecord.split(",");
-            long number = Long.parseLong(values[0]);
-            String name = values[1];
-            Product newProduct = new Product(number, name);
-            result = Optional.of(newProduct);
-        } catch (NullPointerException e) {
-            logger.warn("Product CSV Record is NULL");
-        } catch (NumberFormatException e) {
-            logger.warn("Product CSV Record contains incorrect Product Number");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            logger.warn("Product CSV Record is incomplete");
-        } catch (ProductIllegalNumberException | ProductIllegalNameException e) {
-            logger.warn("Product CSV Record is invalid: " + e);
-        }
-        return result;
-    }
-
     @Override
     public String toString() {
         return "Product{" +
