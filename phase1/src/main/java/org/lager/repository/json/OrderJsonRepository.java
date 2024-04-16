@@ -12,24 +12,16 @@ import java.util.*;
 public class OrderJsonRepository implements OrderRepository {
     private final JsonEditor jsonEditor;
     private final OrderJsonMapper jsonMapper;
-
-    private long newOrderID = 1000L;
-    private final Map<Long, Order> orders;
+    private final long defaultOrderID = 1000L;
     private final static Logger logger = LoggerFactory.getLogger(OrderJsonRepository.class);
+
+    private final Map<Long, Order> orders;
 
     public OrderJsonRepository(JsonEditor jsonEditor, OrderJsonMapper jsonMapper) {
         this.jsonEditor = jsonEditor;
         this.jsonMapper = jsonMapper;
         orders = new HashMap<>();
         loadOrderFromFile();
-        updateNewOrderId();
-    }
-
-    private void updateNewOrderId() {
-        newOrderID = orders.keySet().stream()
-                .max(Long::compareTo)
-                .orElseGet(() -> --newOrderID);
-        newOrderID++;
     }
 
     @Override
@@ -48,7 +40,6 @@ public class OrderJsonRepository implements OrderRepository {
         validateOrder(order);
         orders.put(order.getId(), order);
         saveOrdersToFile();
-        updateNewOrderId();
     }
 
     private void validateOrder(Order order) {
@@ -61,12 +52,13 @@ public class OrderJsonRepository implements OrderRepository {
         validateId(id);
         orders.remove(id);
         saveOrdersToFile();
-        updateNewOrderId();
     }
 
     @Override
     public long getNextAvailableNumber() {
-        return newOrderID;
+        return 1 + orders.keySet().stream()
+                .max(Long::compareTo)
+                .orElse(defaultOrderID - 1);
     }
 
     private void saveOrdersToFile() {
@@ -85,19 +77,17 @@ public class OrderJsonRepository implements OrderRepository {
     }
 
     private void loadOrderFromFile() {
-        List<JsonOrder> jsonRecord = List.of();
-
         try {
-            jsonRecord = jsonEditor.loadFromFile();
+            List<JsonOrder> jsonRecord = jsonEditor.loadFromFile();
             logger.info("Order Repository has loaded JSON File");
+
+            jsonRecord.stream()
+                    .map(jsonMapper::jsonRecordToOrder)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .forEach(order -> orders.put(order.getId(), order));
         } catch (IOException e) {
             logger.error("Order Repository was not able to load JSON File");
         }
-
-        jsonRecord.stream()
-                .map(jsonMapper::jsonRecordToOrder)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(order -> orders.put(order.getId(), order));
     }
 }

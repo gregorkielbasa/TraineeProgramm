@@ -13,9 +13,9 @@ public class BasketXmlRepository implements BasketRepository {
 
     private final XmlEditor xmlEditor;
     private final BasketXmlMapper xmlMapper;
+    private final static Logger logger = LoggerFactory.getLogger(BasketXmlRepository.class);
 
     private final Map<Long, Basket> baskets;
-    private final static Logger logger = LoggerFactory.getLogger(BasketXmlRepository.class);
 
     public BasketXmlRepository(XmlEditor xmlEditor, BasketXmlMapper xmlMapper) {
         this.xmlEditor = xmlEditor;
@@ -66,15 +66,15 @@ public class BasketXmlRepository implements BasketRepository {
     }
 
     private void loadBasketsFromFile() {
-        XmlBasketsList xmlRecords = new XmlBasketsList(List.of());
-
         try {
-            xmlRecords = xmlEditor.loadFromFile();
+            XmlBasketsList xmlRecords = xmlEditor.loadFromFile();
             logger.info("Basket Repository has loaded XML File");
+
+            xmlMapper.xmlToBasketsList(xmlRecords)
+                    .forEach(basket -> baskets.put(basket.getCustomerNumber(), basket));
         } catch (IOException e) {
             logger.error("Basket Repository was not able to load CSV File");
         }
 
-        xmlMapper.xmlToBasketsList(xmlRecords).forEach(basket -> baskets.put(basket.getCustomerNumber(), basket));
     }
 }

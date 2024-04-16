@@ -12,10 +12,10 @@ import java.util.*;
 public class CustomerCsvRepository implements CustomerRepository {
     private final CsvEditor csvEditor;
     private final CustomerCsvMapper csvMapper;
-
     private final long defaultCustomerNumber = 100_000_000;
-    private final Map<Long, Customer> customers;
     private final static Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
+
+    private final Map<Long, Customer> customers;
 
     public CustomerCsvRepository(CsvEditor csvEditor, CustomerCsvMapper csvMapper) {
         this.csvEditor = csvEditor;
@@ -58,7 +58,7 @@ public class CustomerCsvRepository implements CustomerRepository {
     public long getNextAvailableNumber() {
         return 1 + customers.keySet().stream()
                 .max(Long::compareTo)
-                .orElseGet(() -> defaultCustomerNumber - 1);
+                .orElse(defaultCustomerNumber - 1);
     }
 
     private void saveCustomersToFile() {
