@@ -64,6 +64,7 @@ class CustomerTest implements WithAssertions {
 
         }
 
+        }
         @Nested
         @DisplayName("number")
         class CustomerNumberTestException {
@@ -84,7 +85,6 @@ class CustomerTest implements WithAssertions {
 
         }
     }
-
     @Test
     @DisplayName("with a proper name and number")
     void getNameAndNumber() {
@@ -125,6 +125,77 @@ class CustomerTest implements WithAssertions {
             assertThatThrownBy(() -> customer.setName("name.name"))
                     .isInstanceOf(CustomerIllegalNameException.class);
         }
+
+    }
+    @Test
+    @DisplayName("when converts into CSV Record")
+    void toCsvRecord() {
+        Customer customer = new Customer(123_123_123, "properName");
+
+        assertThat(customer.toCsvRecord()).isEqualTo("123123123,properName");
+    }
+
+    @Nested
+    @DisplayName("when converts from CSV Record")
+    class getFromCsvRecord {
+
+        @Test
+        @DisplayName("works with all correct parameters")
+        void properCase() {
+            String csvRecord = "123123123,customerName";
+
+            Optional<Customer> result = Customer.getFromCsvRecord(csvRecord);
+
+            assertThat(result.get()).isEqualTo(new Customer(123_123_123, "customerName"));
+        }
+
+        @Test
+        @DisplayName("returns an empty Optional when CSV Record is NULL")
+        void csvRecordNull() {
+            String csvRecord = null;
+
+            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("returns an empty Optional when CSV Record contains incorrect number")
+        void csvRecordIllegalNumber() {
+            String csvRecord = "123abc123,customerName";
+
+            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("returns an empty Optional when name is empty")
+        void csvRecordEmptyName() {
+            String csvRecord = "123123123,";
+
+            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("returns an empty Optional when theres no name")
+        void csvRecordNoName() {
+            String csvRecord = "123123123";
+
+            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("returns an empty Optional when umber is incorrect")
+        void csvRecordIncorrectNumber() {
+            String csvRecord = "123,customerName";
+
+            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("returns an empty Optional when name is incorrect")
+        void csvRecordIncorrectName() {
+            String csvRecord = "123123123,customer§$%&(Name";
+
+            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
+        }
     }
 
     @Nested
@@ -148,7 +219,6 @@ class CustomerTest implements WithAssertions {
             assertTrue(customer1.equals(customer2));
         }
     }
-
     @Nested
     @DisplayName("is NOT equal when comparing")
     class CustomerTestNotEquals {
@@ -188,7 +258,6 @@ class CustomerTest implements WithAssertions {
             assertFalse(customer1.equals(customer2));
         }
     }
-
     @Nested
     @DisplayName("compares its HashCode to")
     class HashCodeTest {
