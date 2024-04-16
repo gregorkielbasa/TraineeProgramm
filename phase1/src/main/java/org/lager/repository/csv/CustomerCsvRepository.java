@@ -85,19 +85,17 @@ public class CustomerCsvRepository implements CustomerRepository {
     }
 
     private void loadCustomersFromFile() {
-        List<String> csvRecords = List.of();
-
         try {
-            csvRecords = csvEditor.loadFromFile();
+            List<String> csvRecords = csvEditor.loadFromFile();
             logger.info("Customer Repository has loaded CSV File");
+
+            csvRecords.stream()
+                    .map(csvMapper::csvRecordToCustomer)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .forEach(customer -> customers.put(customer.getNumber(), customer));
         } catch (IOException e) {
             logger.error("Customer Repository was not able to load CSV File");
         }
-
-        csvRecords.stream()
-                .map(csvMapper::csvRecordToCustomer)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(customer -> customers.put(customer.getNumber(), customer));
     }
 }

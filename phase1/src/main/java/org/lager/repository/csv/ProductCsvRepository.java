@@ -85,19 +85,17 @@ public class ProductCsvRepository implements ProductRepository {
     }
 
     private void loadProductsFromFile() {
-        List<String> csvRecords = new ArrayList<>();
-
         try {
-            csvRecords = csvEditor.loadFromFile();
+            List<String> csvRecords = csvEditor.loadFromFile();
             logger.info("Product Repository has loaded CSV File");
+
+            csvRecords.stream()
+                    .map(csvMapper::csvRecordToProduct)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .forEach(product -> products.put(product.getNumber(), product));
         } catch (IOException e) {
             logger.error("Product Repository was not able to load CSV File");
         }
-
-        csvRecords.stream()
-                .map(csvMapper::csvRecordToProduct)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(product -> products.put(product.getNumber(), product));
     }
 }
