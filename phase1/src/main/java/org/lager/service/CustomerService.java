@@ -34,8 +34,8 @@ public class CustomerService {
                 .orElseThrow(() -> new NoSuchCustomerException(customerNumber));
     }
 
-    public void remove(long customerNumber) {
-        logger.info("CustomerService removes {} Customer", customerNumber);
+    public void delete(long customerNumber) {
+        logger.info("CustomerService deletes {} Customer", customerNumber);
         repository.delete(customerNumber);
     }
 

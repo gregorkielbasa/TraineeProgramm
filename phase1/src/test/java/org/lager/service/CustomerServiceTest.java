@@ -162,7 +162,7 @@ class CustomerServiceTest implements WithAssertions {
     }
 
     @Nested
-    @DisplayName("when removes")
+    @DisplayName("when deletes")
     class RemoveCustomerServiceTest {
 
         @Test
@@ -171,7 +171,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.doNothing().when(repository).delete(defaultNumber());
 
             customerService = new CustomerService(repository);
-            customerService.remove(defaultNumber());
+            customerService.delete(defaultNumber());
 
             Mockito.verify(repository).delete(defaultNumber());
         }
@@ -183,7 +183,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.doNothing().when(repository).delete(incorrectNumber());
 
             customerService = new CustomerService(repository);
-            customerService.remove(incorrectNumber());
+            customerService.delete(incorrectNumber());
 
             Mockito.verify(repository).delete(incorrectNumber());
         }

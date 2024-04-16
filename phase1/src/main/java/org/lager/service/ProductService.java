@@ -34,8 +34,8 @@ public class ProductService {
                 .orElseThrow(() -> new NoSuchProductException(productNumber));
     }
 
-    public void remove(long productNumber) {
-        logger.info("ProductService removes {} Product", productNumber);
+    public void delete(long productNumber) {
+        logger.info("ProductService deletes {} Product", productNumber);
         repository.delete(productNumber);
     }
 
