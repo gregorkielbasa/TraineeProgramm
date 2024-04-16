@@ -13,7 +13,7 @@ public class CustomerCsvRepository implements CustomerRepository {
     private final CsvEditor csvEditor;
     private final CustomerCsvMapper csvMapper;
 
-    private long newCustomerNumber = 100_000_000;
+    private final long defaultCustomerNumber = 100_000_000;
     private final Map<Long, Customer> customers;
     private final static Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
 
@@ -22,14 +22,6 @@ public class CustomerCsvRepository implements CustomerRepository {
         this.csvMapper = csvMapper;
         customers = new HashMap<>();
         loadCustomersFromFile();
-        updateNewCustomerNumber();
-    }
-
-    private void updateNewCustomerNumber() {
-        newCustomerNumber = customers.keySet().stream()
-                .max(Long::compareTo)
-                .orElseGet(() -> --newCustomerNumber);
-        newCustomerNumber++;
     }
 
     @Override
@@ -48,7 +40,6 @@ public class CustomerCsvRepository implements CustomerRepository {
         validateCustomer(customer);
         customers.put(customer.getNumber(), customer);
         saveCustomersToFile();
-        updateNewCustomerNumber();
     }
 
     private void validateCustomer(Customer customer) throws RepositoryException {
@@ -61,12 +52,13 @@ public class CustomerCsvRepository implements CustomerRepository {
         validateNumber(number);
         customers.remove(number);
         saveCustomersToFile();
-        updateNewCustomerNumber();
     }
 
     @Override
     public long getNextAvailableNumber() {
-        return newCustomerNumber;
+        return 1 + customers.keySet().stream()
+                .max(Long::compareTo)
+                .orElseGet(() -> defaultCustomerNumber - 1);
     }
 
     private void saveCustomersToFile() {

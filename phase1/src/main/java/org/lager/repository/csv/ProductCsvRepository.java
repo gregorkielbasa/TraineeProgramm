@@ -13,7 +13,7 @@ public class ProductCsvRepository implements ProductRepository {
     private final CsvEditor csvEditor;
     private final ProductCsvMapper csvMapper;
 
-    private long newProductNumber = 100_000_000;
+    private final long defaultProductNumber = 100_000_000;
     private final Map<Long, Product> products;
     private final static Logger logger = LoggerFactory.getLogger(ProductCsvMapper.class);
 
@@ -22,14 +22,6 @@ public class ProductCsvRepository implements ProductRepository {
         this.csvMapper = csvMapper;
         products = new HashMap<>();
         loadProductsFromFile();
-        updateNewProductNumber();
-    }
-
-    private void updateNewProductNumber() {
-        newProductNumber = products.keySet().stream()
-                .max(Long::compareTo)
-                .orElseGet(() -> --newProductNumber);
-        newProductNumber++;
     }
 
     @Override
@@ -48,7 +40,6 @@ public class ProductCsvRepository implements ProductRepository {
         validateProduct(product);
         products.put(product.getNumber(), product);
         saveProductsToFile();
-        updateNewProductNumber();
     }
 
     private void validateProduct(Product product) throws RepositoryException {
@@ -61,12 +52,13 @@ public class ProductCsvRepository implements ProductRepository {
         validateNumber(number);
         products.remove(number);
         saveProductsToFile();
-        updateNewProductNumber();
     }
 
     @Override
     public long getNextAvailableNumber() {
-        return newProductNumber;
+        return 1 + products.keySet().stream()
+                .max(Long::compareTo)
+                .orElseGet(() -> defaultProductNumber - 1);
     }
 
     private void saveProductsToFile() {
