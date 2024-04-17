@@ -2,10 +2,8 @@ package org.lager.model;
 
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.*;
+import org.lager.exception.CustomerIllegalIdException;
 import org.lager.exception.CustomerIllegalNameException;
-import org.lager.exception.CustomerIllegalNumberException;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,36 +59,34 @@ class CustomerTest implements WithAssertions {
                 assertThatThrownBy(() -> new Customer(123_123_123, "abc.abc"))
                         .isInstanceOf(CustomerIllegalNameException.class);
             }
-
         }
 
-        }
         @Nested
-        @DisplayName("number")
-        class CustomerNumberTestException {
+        @DisplayName("ID")
+        class CustomerIdTestException {
 
             @Test
             @DisplayName("too short")
             void shortName() {
                 assertThatThrownBy(() -> new Customer(123_123_12, "name"))
-                        .isInstanceOf(CustomerIllegalNumberException.class);
+                        .isInstanceOf(CustomerIllegalIdException.class);
             }
 
             @Test
             @DisplayName("too long")
             void longName() {
                 assertThatThrownBy(() -> new Customer(123_123_123_1, "name"))
-                        .isInstanceOf(CustomerIllegalNumberException.class);
+                        .isInstanceOf(CustomerIllegalIdException.class);
             }
-
         }
     }
+
     @Test
-    @DisplayName("with a proper name and number")
-    void getNameAndNumber() {
+    @DisplayName("with a proper name and ID")
+    void getNameAndId() {
         Customer customer = new Customer(123_123_123, "properName");
 
-        assertThat(customer.getNumber()).isEqualTo(123_123_123L);
+        assertThat(customer.getId()).isEqualTo(123_123_123L);
         assertThat(customer.getName()).isEqualTo("properName");
     }
 
@@ -127,76 +123,6 @@ class CustomerTest implements WithAssertions {
         }
 
     }
-    @Test
-    @DisplayName("when converts into CSV Record")
-    void toCsvRecord() {
-        Customer customer = new Customer(123_123_123, "properName");
-
-        assertThat(customer.toCsvRecord()).isEqualTo("123123123,properName");
-    }
-
-    @Nested
-    @DisplayName("when converts from CSV Record")
-    class getFromCsvRecord {
-
-        @Test
-        @DisplayName("works with all correct parameters")
-        void properCase() {
-            String csvRecord = "123123123,customerName";
-
-            Optional<Customer> result = Customer.getFromCsvRecord(csvRecord);
-
-            assertThat(result.get()).isEqualTo(new Customer(123_123_123, "customerName"));
-        }
-
-        @Test
-        @DisplayName("returns an empty Optional when CSV Record is NULL")
-        void csvRecordNull() {
-            String csvRecord = null;
-
-            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
-        }
-
-        @Test
-        @DisplayName("returns an empty Optional when CSV Record contains incorrect number")
-        void csvRecordIllegalNumber() {
-            String csvRecord = "123abc123,customerName";
-
-            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
-        }
-
-        @Test
-        @DisplayName("returns an empty Optional when name is empty")
-        void csvRecordEmptyName() {
-            String csvRecord = "123123123,";
-
-            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
-        }
-
-        @Test
-        @DisplayName("returns an empty Optional when theres no name")
-        void csvRecordNoName() {
-            String csvRecord = "123123123";
-
-            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
-        }
-
-        @Test
-        @DisplayName("returns an empty Optional when umber is incorrect")
-        void csvRecordIncorrectNumber() {
-            String csvRecord = "123,customerName";
-
-            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
-        }
-
-        @Test
-        @DisplayName("returns an empty Optional when name is incorrect")
-        void csvRecordIncorrectName() {
-            String csvRecord = "123123123,customer§$%&(Name";
-
-            assertThat(Customer.getFromCsvRecord(csvRecord)).isEmpty();
-        }
-    }
 
     @Nested
     @DisplayName("is equal")
@@ -219,16 +145,16 @@ class CustomerTest implements WithAssertions {
             assertTrue(customer1.equals(customer2));
         }
     }
+
     @Nested
     @DisplayName("is NOT equal when comparing")
     class CustomerTestNotEquals {
-
 
         Customer customer1 = new Customer(123_123_123L, "Test");
 
         @Test
         @DisplayName("to NULL")
-        void testEqualsNumber() {
+        void testEqualsId() {
             Customer customer2 = null;
 
             assertFalse(customer1.equals(customer2));
@@ -251,17 +177,17 @@ class CustomerTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("to an object with a different number")
-        void testDifferentNumber() {
+        @DisplayName("to an object with a different ID")
+        void testDifferentId() {
             Customer customer2 = new Customer(123_000_000L, "DifferentTest");
 
             assertFalse(customer1.equals(customer2));
         }
     }
+
     @Nested
     @DisplayName("compares its HashCode to")
     class HashCodeTest {
-
 
         Customer customer1 = new Customer(123_123_123, new String("Test"));
 
@@ -280,8 +206,8 @@ class CustomerTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("an object with different Numbers")
-        void testHashCodeDifferentNumber() {
+        @DisplayName("an object with different IDs")
+        void testHashCodeDifferentId() {
             Customer customer2 = new Customer(123_000_123, "test");
 
             int expected = customer2.hashCode();
@@ -304,6 +230,6 @@ class CustomerTest implements WithAssertions {
     void testToString() {
         Customer customer = new Customer(123_123_123L, "test");
 
-        assertThat(customer.toString()).isEqualTo("Customer{number=123123123, name='test'}");
+        assertThat(customer.toString()).isEqualTo("Customer{id=123123123, name='test'}");
     }
 }

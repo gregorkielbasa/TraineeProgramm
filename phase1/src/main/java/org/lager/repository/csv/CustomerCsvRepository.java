@@ -12,7 +12,7 @@ import java.util.*;
 public class CustomerCsvRepository implements CustomerRepository {
     private final CsvEditor csvEditor;
     private final CustomerCsvMapper csvMapper;
-    private final long defaultCustomerNumber = 100_000_000;
+    private final long defaultCustomerId = 100_000_000;
     private final static Logger logger = LoggerFactory.getLogger(CustomerCsvMapper.class);
 
     private final Map<Long, Customer> customers;
@@ -25,20 +25,20 @@ public class CustomerCsvRepository implements CustomerRepository {
     }
 
     @Override
-    public Optional<Customer> read(Long number) {
-        validateNumber(number);
-        return Optional.ofNullable(customers.get(number));
+    public Optional<Customer> read(Long id) {
+        validateId(id);
+        return Optional.ofNullable(customers.get(id));
     }
 
-    private void validateNumber(Long number) throws RepositoryException {
-        if (number == null)
-            throw new RepositoryException("Given Number is NULL");
+    private void validateId(Long id) throws RepositoryException {
+        if (id == null)
+            throw new RepositoryException("Given ID is NULL");
     }
 
     @Override
     public void save(Customer customer) throws RepositoryException {
         validateCustomer(customer);
-        customers.put(customer.getNumber(), customer);
+        customers.put(customer.getId(), customer);
         saveCustomersToFile();
     }
 
@@ -48,17 +48,18 @@ public class CustomerCsvRepository implements CustomerRepository {
     }
 
     @Override
-    public void delete(Long number) throws RepositoryException {
-        validateNumber(number);
-        customers.remove(number);
+    public void delete(Long id) throws RepositoryException {
+        validateId(id);
+        customers.remove(id);
         saveCustomersToFile();
     }
 
     @Override
-    public long getNextAvailableNumber() {
-        return 1 + customers.keySet().stream()
+    public long getNextAvailableId() {
+        return customers.keySet().stream()
                 .max(Long::compareTo)
-                .orElse(defaultCustomerNumber - 1);
+                .map(index -> index + 1)
+                .orElse(defaultCustomerId);
     }
 
     private void saveCustomersToFile() {
@@ -85,7 +86,7 @@ public class CustomerCsvRepository implements CustomerRepository {
                     .map(csvMapper::csvRecordToCustomer)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
-                    .forEach(customer -> customers.put(customer.getNumber(), customer));
+                    .forEach(customer -> customers.put(customer.getId(), customer));
         } catch (IOException e) {
             logger.error("Customer Repository was not able to load CSV File");
         }

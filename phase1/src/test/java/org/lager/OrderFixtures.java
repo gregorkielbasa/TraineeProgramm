@@ -9,7 +9,7 @@ import java.util.List;
 
 public class OrderFixtures {
     private final static long ORDER_NUMBER = 1000;
-    private final static long CUSTOMER_NUMBER = CustomerFixtures.defaultNumber();
+    private final static long CUSTOMER_NUMBER = CustomerFixtures.defaultId();
     private final static OrderItem ITEM_1 = new OrderItem(ProductFixtures.defaultNumber(), 1);
     private final static OrderItem ITEM_2 = new OrderItem(ProductFixtures.anotherNumber(), 2);
 
