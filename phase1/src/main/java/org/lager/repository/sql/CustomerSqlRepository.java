@@ -9,19 +9,29 @@ import java.util.Optional;
 public class CustomerSqlRepository implements CustomerRepository {
     private final long defaultCustomerId = 100_000_000;
 
-    private final CustomerSqlMapper sqlMapper;
+    private final CustomerSqlMapper mapper;
     private final SqlConnector connector;
 
-    public CustomerSqlRepository(CustomerSqlMapper sqlMapper, SqlConnector connector) {
-        this.sqlMapper = sqlMapper;
+    public CustomerSqlRepository(CustomerSqlMapper mapper, SqlConnector connector) {
+        this.mapper = mapper;
         this.connector = connector;
+    }
+
+    private void initialTables() {
+        String query = """
+                CREATE TABLE IF NOT EXISTS customers (
+                id bigint PRIMARY KEY,
+                name character varying(24) NOT NULL
+                );""";
+
+        connector.saveToDB(query);
     }
 
     @Override
     public long getNextAvailableId() {
         String query = "SELECT MAX(id) FROM customers;";
 
-        return sqlMapper.sqlToId(connector.loadFromDB(query))
+        return mapper.sqlToId(connector.loadFromDB(query))
                 .orElse(defaultCustomerId);
     }
 
@@ -29,7 +39,7 @@ public class CustomerSqlRepository implements CustomerRepository {
     public void save(Customer customer) throws RepositoryException {
         validateCustomer(customer);
         String query = "INSERT INTO CustomersVALUES (%s);"
-                .formatted(sqlMapper.CustomerToSqlQuery(customer));
+                .formatted(mapper.CustomerToSqlQuery(customer));
 
         connector.saveToDB(query);
     }
@@ -39,7 +49,7 @@ public class CustomerSqlRepository implements CustomerRepository {
         validateId(id);
         String query = "SELECT * FROM Customers WHERE id=%s;".formatted(id);
 
-        return sqlMapper.slqToCustomer(connector.loadFromDB(query));
+        return mapper.slqToCustomer(connector.loadFromDB(query));
     }
 
     @Override

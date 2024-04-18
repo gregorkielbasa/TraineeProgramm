@@ -5,12 +5,20 @@ import org.lager.exception.SqlConnectorException;
 import java.sql.*;
 
 public class SqlConnector {
-    private final String url = "jdbc:postgresql://localhost:5432/shopdb";
-    private final String user = "postgres";
-    private final String password = "pass";
+    private final String url;
+    private final String user;
+    private final String password;
 
     public SqlConnector() {
-        createTablesIfNotExist();
+        this.url = "jdbc:postgresql://localhost:5432/shopdb";
+        this.user = "postgres";
+        this.password = "pass";
+    }
+
+    public SqlConnector(String url, String user, String password) {
+        this.url = url;
+        this.user = user;
+        this.password = password;
     }
 
     public void saveToDB(String query) throws SqlConnectorException {
@@ -31,24 +39,6 @@ public class SqlConnector {
             return resultSet;
         } catch (SQLException e) {
             throw new SqlConnectorException(query, e.getMessage());
-        }
-    }
-
-    private void createTablesIfNotExist() throws SqlConnectorException {
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             Statement statement = connection.createStatement()) {
-            statement.execute("""
-                    CREATE TABLE IF NOT EXISTS customers (
-                    id bigint PRIMARY KEY,
-                    name character varying(24) NOT NULL
-                    );""");
-            statement.execute("""
-                    CREATE TABLE IF NOT EXISTS products (
-                    id bigint PRIMARY KEY,
-                    name character varying(24) NOT NULL
-                    );""");
-        } catch (SQLException e) {
-            throw new SqlConnectorException(e.getMessage());
         }
     }
 }

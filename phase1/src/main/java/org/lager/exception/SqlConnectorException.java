@@ -7,6 +7,6 @@ public class SqlConnectorException extends RuntimeException{
     }
 
     public SqlConnectorException(String query, String message) {
-        super("SQL Connector failed to execute Query:\n&1s\nMessage:\n%2s".formatted(query, message));
+        super("SQL Connector failed to execute Query:\n%s\nMessage:\n%s".formatted(query, message));
     }
 }
