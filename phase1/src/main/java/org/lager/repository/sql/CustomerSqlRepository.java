@@ -28,7 +28,8 @@ public class CustomerSqlRepository implements CustomerRepository {
     @Override
     public void save(Customer customer) throws RepositoryException {
         validateCustomer(customer);
-        String query = sqlMapper.CustomerToSqlQuery(customer);
+        String query = "INSERT INTO CustomersVALUES (%s);"
+                .formatted(sqlMapper.CustomerToSqlQuery(customer));
 
         connector.saveToDB(query);
     }

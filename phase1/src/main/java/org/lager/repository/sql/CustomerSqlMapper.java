@@ -14,7 +14,19 @@ public class CustomerSqlMapper {
     private final static Logger logger = LoggerFactory.getLogger(BasketXmlMapper.class);
 
     public Optional<Customer> slqToCustomer(ResultSet sqlSet) {
-        return Optional.empty();
+        Optional<Customer> result = Optional.empty();
+        try {
+            if (sqlSet != null && sqlSet.next()) {
+                long id = sqlSet.getLong("id");
+                String name = sqlSet.getString("name");
+
+                Customer newCustomer = new Customer(id, name);
+                result = Optional.of(newCustomer);
+            }
+        } catch (SQLException e) {
+            logger.warn("Customer SQL Mapper could not read Customer");
+        }
+        return result;
     }
 
     public String CustomerToSqlQuery(Customer customer) {
@@ -28,11 +40,10 @@ public class CustomerSqlMapper {
                 return value == 0
                         ? Optional.empty()
                         : Optional.of(value);
-            } else {
-                return Optional.empty();
             }
         } catch (SQLException e) {
-            return Optional.empty();
+            logger.warn("Customer SQL Mapper could not read any ID");
         }
+        return Optional.empty();
     }
 }

@@ -36,7 +36,7 @@ public class SqlConnector {
 
     private void createTablesIfNotExist() throws SqlConnectorException {
         try (Connection connection = DriverManager.getConnection(url, user, password);
-            Statement statement = connection.createStatement()) {
+             Statement statement = connection.createStatement()) {
             statement.execute("""
                     CREATE TABLE IF NOT EXISTS customers (
                     id bigint PRIMARY KEY,
