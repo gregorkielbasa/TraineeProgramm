@@ -10,9 +10,9 @@ public class CustomerSqlRepository implements CustomerRepository {
     private final long defaultCustomerId = 100_000_000;
 
     private final CustomerSqlMapper mapper;
-    private final SqlConnector connector;
+    private final SqlConnector<Customer> connector;
 
-    public CustomerSqlRepository(CustomerSqlMapper mapper, SqlConnector connector) {
+    public CustomerSqlRepository(CustomerSqlMapper mapper, SqlConnector<Customer> connector) {
         this.mapper = mapper;
         this.connector = connector;
         initialTables();

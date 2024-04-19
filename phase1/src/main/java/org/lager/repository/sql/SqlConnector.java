@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class SqlConnector {
+public class SqlConnector <T>{
 
     private final Supplier<Connection> connectionSupplier;
 
@@ -18,7 +18,7 @@ public class SqlConnector {
     }
 
     //SELECT
-    public Optional<Customer> receiveFromDB(Function<ResultSet, Optional<Customer>> mapper, String query) throws SqlConnectorException{
+    public Optional<T> receiveFromDB(Function<ResultSet, Optional<T>> mapper, String query) throws SqlConnectorException{
         try (Connection connection = connectionSupplier.get();
              Statement statement = connection.createStatement();
              ResultSet result = statement.executeQuery(query)) {
@@ -30,8 +30,7 @@ public class SqlConnector {
         }
     }
 
-    //INSERT
-    //UPDATE
+    //INSERT //UPDATE
     public void sendToDB(Consumer<Connection> command) throws SqlConnectorException {
         try (Connection connection = connectionSupplier.get()){
 
@@ -41,7 +40,7 @@ public class SqlConnector {
         }
     }
 
-    //EXECUTE
+    //DELETE //CREATE
     public void sendToDB(String... queries) throws SqlConnectorException {
         try (Connection connection = connectionSupplier.get();
              Statement statement = connection.createStatement();
