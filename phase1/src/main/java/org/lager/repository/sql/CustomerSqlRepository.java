@@ -15,6 +15,7 @@ public class CustomerSqlRepository implements CustomerRepository {
     public CustomerSqlRepository(CustomerSqlMapper mapper, SqlConnector connector) {
         this.mapper = mapper;
         this.connector = connector;
+        initialTables();
     }
 
     private void initialTables() {
@@ -37,6 +38,23 @@ public class CustomerSqlRepository implements CustomerRepository {
     }
 
     @Override
+    public Optional<Customer> read(Long id) {
+        validateId(id);
+
+        String query = "SELECT * FROM Customers WHERE id=%d;"
+                .formatted(id);
+        return connector.receiveFromDB(mapper::slqToCustomer, query);
+    }
+
+    @Override
+    public void delete(Long id) throws RepositoryException {
+        if (read(id).isPresent()) {
+            String query = "DELETE FROM customers WHERE id=%d".formatted(id);
+            connector.sendToDB(query);
+        }
+    }
+
+    @Override
     public void save(Customer customer) throws RepositoryException {
         validateCustomer(customer);
 
@@ -54,24 +72,6 @@ public class CustomerSqlRepository implements CustomerRepository {
     private void update(Customer customer) throws RepositoryException {
         String query = "UPDATE Customers SET (?, ?);";
         connector.sendToDB(mapper.customerToSqlQuery(query, customer));
-    }
-
-
-    @Override
-    public Optional<Customer> read(Long id) {
-        validateId(id);
-
-        String query = "SELECT * FROM Customers WHERE id=%d;"
-                .formatted(id);
-        return connector.receiveFromDB(mapper::slqToCustomer, query);
-    }
-
-    @Override
-    public void delete(Long id) throws RepositoryException {
-        if (read(id).isPresent()) {
-            String query = "DELETE FROM customers WHERE id=%d".formatted(id);
-            connector.sendToDB(query);
-        }
     }
 
     private void validateCustomer(Customer customer) {
