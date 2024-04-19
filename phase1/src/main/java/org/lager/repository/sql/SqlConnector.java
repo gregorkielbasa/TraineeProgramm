@@ -1,44 +1,61 @@
 package org.lager.repository.sql;
 
 import org.lager.exception.SqlConnectorException;
+import org.lager.model.Customer;
 
 import java.sql.*;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class SqlConnector {
-    private final String url;
-    private final String user;
-    private final String password;
 
-    public SqlConnector() {
-        this.url = "jdbc:postgresql://localhost:5432/shopdb";
-        this.user = "postgres";
-        this.password = "pass";
+    private final Supplier<Connection> connectionSupplier;
+
+    public SqlConnector(Supplier<Connection> connectionSupplier) {
+        this.connectionSupplier = connectionSupplier;
     }
 
-    public SqlConnector(String url, String user, String password) {
-        this.url = url;
-        this.user = user;
-        this.password = password;
-    }
+    //SELECT
+    public Optional<Customer> receiveFromDB(Function<ResultSet, Optional<Customer>> mapper, String query) throws SqlConnectorException{
+        try (Connection connection = connectionSupplier.get();
+             Statement statement = connection.createStatement();
+             ResultSet result = statement.executeQuery(query)) {
 
-    public void saveToDB(String query) throws SqlConnectorException {
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             Statement statement = connection.createStatement()) {
+            return mapper.apply(result);
 
-            statement.executeUpdate(query);
-        } catch (SQLException e) {
-            throw new SqlConnectorException(query, e.getMessage());
+        } catch (Exception e) {
+            throw new SqlConnectorException(e.getMessage(), query);
         }
     }
 
-    public ResultSet loadFromDB(String query) throws SqlConnectorException {
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
+    //INSERT
+    //UPDATE
+    public void sendToDB(Consumer<Connection> command) throws SqlConnectorException {
+        try (Connection connection = connectionSupplier.get()){
 
-            return resultSet;
-        } catch (SQLException e) {
-            throw new SqlConnectorException(query, e.getMessage());
+            command.accept(connection);
+        } catch (Exception e) {
+            throw new SqlConnectorException(e.getMessage());
+        }
+    }
+
+    //EXECUTE
+    public void sendToDB(String... queries) throws SqlConnectorException {
+        try (Connection connection = connectionSupplier.get();
+             Statement statement = connection.createStatement();
+             AutoCloseable finish = connection::rollback) {
+
+            connection.setAutoCommit(false);
+
+            for (String query : queries)
+                statement.execute(query);
+
+            connection.commit();
+            //finish.close();
+        } catch (Exception e) {
+            throw new SqlConnectorException(e.getMessage(), queries);
         }
     }
 }

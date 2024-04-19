@@ -24,40 +24,54 @@ public class CustomerSqlRepository implements CustomerRepository {
                 name character varying(24) NOT NULL
                 );""";
 
-        connector.saveToDB(query);
+        connector.sendToDB(query);
     }
 
     @Override
     public long getNextAvailableId() {
-        String query = "SELECT MAX(id) FROM customers;";
-
-        return mapper.sqlToId(connector.loadFromDB(query))
+        String query = "SELECT * FROM test ORDER BY id DESC LIMIT 1;";
+        Optional<Customer> topCustomer = connector.receiveFromDB(mapper::slqToCustomer, query);
+        return topCustomer
+                .map(customer -> customer.getId() + 1)
                 .orElse(defaultCustomerId);
     }
 
     @Override
     public void save(Customer customer) throws RepositoryException {
         validateCustomer(customer);
-        String query = "INSERT INTO CustomersVALUES (%s);"
-                .formatted(mapper.CustomerToSqlQuery(customer));
 
-        connector.saveToDB(query);
+        if (read(customer.getId()).isPresent())
+            update(customer);
+        else
+            insert(customer);
     }
+
+    private void insert(Customer customer) throws RepositoryException {
+        String query = "INSERT INTO Customers VALUES (?, ?);";
+        connector.sendToDB(mapper.customerToSqlQuery(query, customer));
+    }
+
+    private void update(Customer customer) throws RepositoryException {
+        String query = "UPDATE Customers SET (?, ?);";
+        connector.sendToDB(mapper.customerToSqlQuery(query, customer));
+    }
+
 
     @Override
     public Optional<Customer> read(Long id) {
         validateId(id);
-        String query = "SELECT * FROM Customers WHERE id=%s;".formatted(id);
 
-        return mapper.slqToCustomer(connector.loadFromDB(query));
+        String query = "SELECT * FROM Customers WHERE id=%d;"
+                .formatted(id);
+        return connector.receiveFromDB(mapper::slqToCustomer, query);
     }
 
     @Override
     public void delete(Long id) throws RepositoryException {
-        validateId(id);
-        String query = "DELETE FROM customers WHERE id=%s".formatted(id);
-
-        connector.saveToDB(query);
+        if (read(id).isPresent()) {
+            String query = "DELETE FROM customers WHERE id=%d".formatted(id);
+            connector.sendToDB(query);
+        }
     }
 
     private void validateCustomer(Customer customer) {
