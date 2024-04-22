@@ -16,11 +16,11 @@ public class CustomerSqlMapper {
     private final static Logger logger = LoggerFactory.getLogger(BasketXmlMapper.class);
 
     public ResultSetDecoder<Optional<Customer>> getResultSetDecoder() {
-        return sqlSet -> {
+        return resultSet -> {
             try {
-                if (sqlSet.next()) {
-                    long id = sqlSet.getLong("id");
-                    String name = sqlSet.getString("name");
+                if (resultSet.next()) {
+                    long id = resultSet.getLong("id");
+                    String name = resultSet.getString("name");
 
                     Customer newCustomer = new Customer(id, name);
                     return Optional.of(newCustomer);
