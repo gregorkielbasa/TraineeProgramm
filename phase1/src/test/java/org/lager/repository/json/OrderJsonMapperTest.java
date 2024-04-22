@@ -15,7 +15,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.lager.OrderFixtures.*;
 
-@DisplayName("Order JSON Mapper")
+@DisplayName("Order JSON ObjectMapper")
 class OrderJsonMapperTest implements WithAssertions {
 
     OrderJsonMapper jsonMapper = new OrderJsonMapper();

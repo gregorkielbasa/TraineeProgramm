@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.lager.BasketFixtures.*;
 
-@DisplayName("Basket XML Mapper")
+@DisplayName("Basket XML ObjectMapper")
 class BasketXmlMapperTest implements WithAssertions {
 
     BasketXmlMapper xmlMapper = new BasketXmlMapper();

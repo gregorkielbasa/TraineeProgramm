@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import static org.lager.CustomerFixtures.*;
 
-@DisplayName("Customer CSV Mapper")
+@DisplayName("Customer CSV ObjectMapper")
 class CustomerCsvMapperTest implements WithAssertions {
 
     CustomerCsvMapper csvMapper;

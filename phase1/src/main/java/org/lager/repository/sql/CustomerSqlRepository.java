@@ -3,11 +3,14 @@ package org.lager.repository.sql;
 import org.lager.exception.RepositoryException;
 import org.lager.model.Customer;
 import org.lager.repository.CustomerRepository;
+import org.lager.repository.sql.functionalInterface.CommandUpdate;
+import org.lager.repository.sql.functionalInterface.CommandQuery;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Optional;
 
 public class CustomerSqlRepository implements CustomerRepository {
-    private final long defaultCustomerId = 100_000_000;
 
     private final CustomerSqlMapper mapper;
     private final SqlConnector<Customer> connector;
@@ -19,19 +22,30 @@ public class CustomerSqlRepository implements CustomerRepository {
     }
 
     private void initialTables() {
-        String query = """
-                CREATE TABLE IF NOT EXISTS customers (
-                id bigint PRIMARY KEY,
-                name character varying(24) NOT NULL
-                );""";
+        CommandUpdate command = connection -> {
+            try (Statement statement = connection.createStatement()) {
+                statement.execute("""
+                        CREATE TABLE IF NOT EXISTS customers (
+                        id bigint PRIMARY KEY,
+                        name character varying(24) NOT NULL
+                        );""");
+            }
+        };
 
-        connector.sendToDB(query);
+        connector.sendToDB(command);
     }
 
     @Override
     public long getNextAvailableId() {
-        String query = "SELECT * FROM test ORDER BY id DESC LIMIT 1;";
-        Optional<Customer> topCustomer = connector.receiveFromDB(mapper::slqToCustomer, query);
+        long defaultCustomerId = 100_000_000;
+        CommandQuery command = connection -> {
+            try (PreparedStatement statement = connection
+                    .prepareStatement("SELECT * FROM test ORDER BY id DESC LIMIT 1;")) {
+                return statement.executeQuery();
+            }
+        };
+
+        Optional<Customer> topCustomer = connector.receiveFromDB(command, mapper::slqToCustomer);
         return topCustomer
                 .map(customer -> customer.getId() + 1)
                 .orElse(defaultCustomerId);
@@ -39,19 +53,30 @@ public class CustomerSqlRepository implements CustomerRepository {
 
     @Override
     public Optional<Customer> read(Long id) {
-        validateId(id);
+        CommandQuery command = connection -> {
+            try (PreparedStatement statement = connection
+                    .prepareStatement("SELECT * FROM Customers WHERE id=?;")) {
+                statement.setLong(1, id);
+                return statement.executeQuery();
+            }
+        };
 
-        String query = "SELECT * FROM Customers WHERE id=%d;"
-                .formatted(id);
-        return connector.receiveFromDB(mapper::slqToCustomer, query);
+        validateId(id);
+        return connector.receiveFromDB(command, mapper::slqToCustomer);
     }
 
     @Override
     public void delete(Long id) throws RepositoryException {
-        if (read(id).isPresent()) {
-            String query = "DELETE FROM customers WHERE id=%d".formatted(id);
-            connector.sendToDB(query);
-        }
+        CommandUpdate command = connection -> {
+            try (PreparedStatement statement = connection
+                    .prepareStatement("DELETE FROM customers WHERE id=?;")) {
+                statement.setLong(1, id);
+                statement.executeUpdate();
+            }
+        };
+
+        if (read(id).isPresent())
+            connector.sendToDB(command);
     }
 
     @Override
@@ -59,19 +84,35 @@ public class CustomerSqlRepository implements CustomerRepository {
         validateCustomer(customer);
 
         if (read(customer.getId()).isPresent())
-            update(customer);
+            updateName(customer);
         else
             insert(customer);
     }
 
     private void insert(Customer customer) throws RepositoryException {
-        String query = "INSERT INTO Customers VALUES (?, ?);";
-        connector.sendToDB(mapper.customerToSqlQuery(query, customer));
+        CommandUpdate command = connection -> {
+            try (PreparedStatement statement = connection
+                    .prepareStatement("INSERT INTO Customers VALUES (?, ?);")) {
+                statement.setLong(1, customer.getId());
+                statement.setString(2, customer.getName());
+                statement.executeUpdate();
+            }
+        };
+
+        connector.sendToDB(command);
     }
 
-    private void update(Customer customer) throws RepositoryException {
-        String query = "UPDATE Customers SET (?, ?);";
-        connector.sendToDB(mapper.customerToSqlQuery(query, customer));
+    private void updateName(Customer customer) throws RepositoryException {
+        CommandUpdate command = connection -> {
+            try (PreparedStatement statement = connection
+                    .prepareStatement("UPDATE Customers SET name=? WHERE id=?;")) {
+                statement.setString(1, customer.getName());
+                statement.setLong(2, customer.getId());
+                statement.executeUpdate();
+            }
+        };
+
+        connector.sendToDB(command);
     }
 
     private void validateCustomer(Customer customer) {
