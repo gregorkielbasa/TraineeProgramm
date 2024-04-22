@@ -21,10 +21,10 @@ public class SqlConnector<T> {
     }
 
     //SELECT
-    public Optional<T> receiveFromDB(CommandQuery command, ResultSetDecoder<Optional<T>> mapper) {
+    public Optional<T> receiveFromDB(CommandQuery command, ResultSetDecoder<Optional<T>> decoder) {
         try (Connection connection = connectionSupplier.get()) {
             try (ResultSet result = command.execute(connection)) {
-                return mapper.decode(result);
+                return decoder.decode(result);
             } catch (SQLException e) {
                 logger.error("SQL Connector could not execute CommandQuery!\n{}", e.getMessage());
                 throw new SqlConnectorException("CommandQuery was not able to be executed", e.getMessage());
