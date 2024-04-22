@@ -137,55 +137,55 @@ class BasketXmlMapperTest implements WithAssertions {
 
             assertThat(output).containsExactly(defaultBasket(), anotherBasket());
         }
+    }
 
-        @Nested
-        @DisplayName("writes XML Record")
-        class BasketXmlWrite {
+    @Nested
+    @DisplayName("writes XML Record")
+    class BasketXmlWrite {
 
-            @Test
-            @DisplayName("null basket list")
-            void nullBasketsList() {
-                List<Basket> input = null;
-                XmlBasketsList output = xmlMapper.basketsListToXml(input);
+        @Test
+        @DisplayName("null basket list")
+        void nullBasketsList() {
+            List<Basket> input = null;
+            XmlBasketsList output = xmlMapper.basketsListToXml(input);
 
-                assertThat(output.baskets()).isEmpty();
-            }
+            assertThat(output.baskets()).isEmpty();
+        }
 
-            @Test
-            @DisplayName("empty basket list")
-            void emptyBasketsList() {
-                List<Basket> input = List.of();
-                XmlBasketsList output = xmlMapper.basketsListToXml(input);
+        @Test
+        @DisplayName("empty basket list")
+        void emptyBasketsList() {
+            List<Basket> input = List.of();
+            XmlBasketsList output = xmlMapper.basketsListToXml(input);
 
-                assertThat(output.baskets()).isEmpty();
-            }
+            assertThat(output.baskets()).isEmpty();
+        }
 
-            @Test
-            @DisplayName("empty basket item list")
-            void emptyBasketItemList() {
-                List<Basket> input = List.of(defaultEmptyBasket());
-                XmlBasketsList output = xmlMapper.basketsListToXml(input);
+        @Test
+        @DisplayName("empty basket item list")
+        void emptyBasketItemList() {
+            List<Basket> input = List.of(defaultEmptyBasket());
+            XmlBasketsList output = xmlMapper.basketsListToXml(input);
 
-                assertThat(output.baskets()).isEmpty();
-            }
+            assertThat(output.baskets()).isEmpty();
+        }
 
-            @Test
-            @DisplayName("simple basket list")
-            void oneElement() {
-                List<Basket> input = List.of(defaultBasket());
-                XmlBasketsList output = xmlMapper.basketsListToXml(input);
+        @Test
+        @DisplayName("simple basket list")
+        void oneElement() {
+            List<Basket> input = List.of(defaultBasket());
+            XmlBasketsList output = xmlMapper.basketsListToXml(input);
 
-                assertThat(output.baskets()).containsExactly(defaultXmlBasket());
-            }
+            assertThat(output.baskets()).containsExactly(defaultXmlBasket());
+        }
 
-            @Test
-            @DisplayName("complex basket list")
-            void bigBasketList() {
-                List<Basket> input = List.of(defaultBasket(), defaultEmptyBasket(), anotherBasket());
-                XmlBasketsList output = xmlMapper.basketsListToXml(input);
+        @Test
+        @DisplayName("complex basket list")
+        void bigBasketList() {
+            List<Basket> input = List.of(defaultBasket(), defaultEmptyBasket(), anotherBasket());
+            XmlBasketsList output = xmlMapper.basketsListToXml(input);
 
-                assertThat(output.baskets()).containsExactlyInAnyOrder(defaultXmlBasket(), anotherXmlBasket());
-            }
+            assertThat(output.baskets()).containsExactlyInAnyOrder(defaultXmlBasket(), anotherXmlBasket());
         }
     }
 }
