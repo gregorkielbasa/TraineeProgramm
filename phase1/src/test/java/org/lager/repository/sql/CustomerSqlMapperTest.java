@@ -155,7 +155,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 Mockito.verify(mockStatement).execute("""
                         CREATE TABLE IF NOT EXISTS customers (
                         id bigint PRIMARY KEY,
-                        name character varying(24) NOT NULL
+                        name character varying(16) NOT NULL
                         );""");
             }
 
@@ -214,7 +214,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 ResultSet result = command.execute(mockConnection);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM test ORDER BY id DESC LIMIT 1;");
+                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
                 Mockito.verify(mockStatement).executeQuery();
                 Mockito.verify(mockStatement).close();
                 assertThat(result).isEqualTo(mockResultSet);
@@ -233,7 +233,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                         .isInstanceOf(SQLException.class);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM test ORDER BY id DESC LIMIT 1;");
+                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
                 Mockito.verify(mockStatement).executeQuery();
                 Mockito.verify(mockStatement).close();
             }
@@ -250,7 +250,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                         .isInstanceOf(SQLException.class);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM test ORDER BY id DESC LIMIT 1;");
+                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
             }
         }
 
@@ -275,7 +275,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 ResultSet result = command.execute(mockConnection);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM Customers WHERE id=?;");
+                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers WHERE id=?;");
                 Mockito.verify(mockStatement).setLong(1, 12345L);
                 Mockito.verify(mockStatement).executeQuery();
                 Mockito.verify(mockStatement).close();
@@ -295,7 +295,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                         .isInstanceOf(SQLException.class);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM Customers WHERE id=?;");
+                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers WHERE id=?;");
                 Mockito.verify(mockStatement).executeQuery();
                 Mockito.verify(mockStatement).close();
             }
@@ -312,7 +312,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                         .isInstanceOf(SQLException.class);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM Customers WHERE id=?;");
+                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers WHERE id=?;");
             }
         }
 
@@ -392,7 +392,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 command.execute(mockConnection);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("INSERT INTO Customers VALUES (?, ?);");
+                Mockito.verify(mockConnection).prepareStatement("INSERT INTO customers VALUES (?, ?);");
                 Mockito.verify(mockStatement).setLong(1, defaultId());
                 Mockito.verify(mockStatement).setString(2, defaultName());
                 Mockito.verify(mockStatement).executeUpdate();
@@ -412,7 +412,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                         .isInstanceOf(SQLException.class);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("INSERT INTO Customers VALUES (?, ?);");
+                Mockito.verify(mockConnection).prepareStatement("INSERT INTO customers VALUES (?, ?);");
                 Mockito.verify(mockStatement).setLong(1, defaultId());
                 Mockito.verify(mockStatement).setString(2, defaultName());
                 Mockito.verify(mockStatement).executeUpdate();
@@ -431,7 +431,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                         .isInstanceOf(SQLException.class);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("INSERT INTO Customers VALUES (?, ?);");
+                Mockito.verify(mockConnection).prepareStatement("INSERT INTO customers VALUES (?, ?);");
             }
         }
 
@@ -453,7 +453,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 command.execute(mockConnection);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("UPDATE Customers SET name=? WHERE id=?;");
+                Mockito.verify(mockConnection).prepareStatement("UPDATE customers SET name=? WHERE id=?;");
                 Mockito.verify(mockStatement).setString(1, defaultName());
                 Mockito.verify(mockStatement).setLong(2, defaultId());
                 Mockito.verify(mockStatement).executeUpdate();
@@ -473,7 +473,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                         .isInstanceOf(SQLException.class);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("UPDATE Customers SET name=? WHERE id=?;");
+                Mockito.verify(mockConnection).prepareStatement("UPDATE customers SET name=? WHERE id=?;");
                 Mockito.verify(mockStatement).setString(1, defaultName());
                 Mockito.verify(mockStatement).setLong(2, defaultId());
                 Mockito.verify(mockStatement).executeUpdate();
@@ -492,7 +492,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                         .isInstanceOf(SQLException.class);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("UPDATE Customers SET name=? WHERE id=?;");
+                Mockito.verify(mockConnection).prepareStatement("UPDATE customers SET name=? WHERE id=?;");
             }
         }
     }
