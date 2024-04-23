@@ -56,6 +56,7 @@ class SqlConnectorTest implements WithAssertions {
             Mockito.verify(connectionSupplier).get();
             Mockito.verify(mockCommand).execute(mockConnection);
             Mockito.verify(mockDecoder).decode(mockResultSet);
+            Mockito.verify(mockResultSet).close();
             Mockito.verify(mockConnection).close();
             assertThat(result).isEqualTo(Optional.of("result"));
         }
@@ -76,6 +77,7 @@ class SqlConnectorTest implements WithAssertions {
             Mockito.verify(connectionSupplier).get();
             Mockito.verify(mockCommand).execute(mockConnection);
             Mockito.verify(mockDecoder).decode(mockResultSet);
+            Mockito.verify(mockResultSet).close();
             Mockito.verify(mockConnection).close();
             assertThat(result).isEmpty();
         }
