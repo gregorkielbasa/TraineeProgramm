@@ -50,7 +50,7 @@ public class CustomerSqlMapper {
     public CommandQuery getCustomerWithHighestIdCommand() {
         return connection -> {
             try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM test ORDER BY id DESC LIMIT 1;")) {
+                    .prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;")) {
                 return statement.executeQuery();
             }
         };
@@ -59,7 +59,7 @@ public class CustomerSqlMapper {
     public CommandQuery getReadCommand(Long id) {
         return connection -> {
             try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM Customers WHERE id=?;")) {
+                    .prepareStatement("SELECT * FROM customers WHERE id=?;")) {
                 statement.setLong(1, id);
                 return statement.executeQuery();
             }
@@ -79,7 +79,7 @@ public class CustomerSqlMapper {
     public CommandUpdate getInsertCommand(Customer customer) {
         return connection -> {
             try (PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO Customers VALUES (?, ?);")) {
+                    .prepareStatement("INSERT INTO customers VALUES (?, ?);")) {
                 statement.setLong(1, customer.getId());
                 statement.setString(2, customer.getName());
                 statement.executeUpdate();
@@ -90,7 +90,7 @@ public class CustomerSqlMapper {
     public CommandUpdate getUpdateNameCommand(Customer customer) {
         return connection -> {
             try (PreparedStatement statement = connection
-                    .prepareStatement("UPDATE Customers SET name=? WHERE id=?;")) {
+                    .prepareStatement("UPDATE customers SET name=? WHERE id=?;")) {
                 statement.setString(1, customer.getName());
                 statement.setLong(2, customer.getId());
                 statement.executeUpdate();

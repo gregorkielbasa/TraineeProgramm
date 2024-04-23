@@ -52,7 +52,7 @@ public class ProductSqlMapper {
     public CommandQuery getProductWithHighestIdCommand() {
         return connection -> {
             try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM test ORDER BY id DESC LIMIT 1;")) {
+                    .prepareStatement("SELECT * FROM products ORDER BY id DESC LIMIT 1;")) {
                 return statement.executeQuery();
             }
         };
@@ -61,7 +61,7 @@ public class ProductSqlMapper {
     public CommandQuery getReadCommand(Long id) {
         return connection -> {
             try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM Products WHERE id=?;")) {
+                    .prepareStatement("SELECT * FROM products WHERE id=?;")) {
                 statement.setLong(1, id);
                 return statement.executeQuery();
             }
@@ -81,7 +81,7 @@ public class ProductSqlMapper {
     public CommandUpdate getInsertCommand(Product product) {
         return connection -> {
             try (PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO Products VALUES (?, ?);")) {
+                    .prepareStatement("INSERT INTO products VALUES (?, ?);")) {
                 statement.setLong(1, product.getId());
                 statement.setString(2, product.getName());
                 statement.executeUpdate();
@@ -92,7 +92,7 @@ public class ProductSqlMapper {
     public CommandUpdate getUpdateNameCommand(Product product) {
         return connection -> {
             try (PreparedStatement statement = connection
-                    .prepareStatement("UPDATE Products SET name=? WHERE id=?;")) {
+                    .prepareStatement("UPDATE products SET name=? WHERE id=?;")) {
                 statement.setString(1, product.getName());
                 statement.setLong(2, product.getId());
                 statement.executeUpdate();
