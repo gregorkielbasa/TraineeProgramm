@@ -41,7 +41,7 @@ public class CustomerSqlMapper {
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS customers (
                         id bigint PRIMARY KEY,
-                        name character varying(24) NOT NULL
+                        name character varying(16) NOT NULL
                         );""");
             }
         };

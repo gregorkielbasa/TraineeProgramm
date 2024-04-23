@@ -86,6 +86,6 @@ public class CustomerSqlRepository implements CustomerRepository {
 
     private void validateId(Long id) throws RepositoryException {
         if (id == null)
-            throw new RepositoryException("Given ID is NULL");
+            throw new RepositoryException("Given Customer's ID is NULL");
     }
 }
