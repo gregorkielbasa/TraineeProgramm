@@ -36,7 +36,7 @@ class OrderJsonMapperTest implements WithAssertions {
         @Test
         @DisplayName("a record with NULL Date")
         void nullDate() {
-            JsonOrder input = new JsonOrder(defaultId(), defaultCustomerNumber(), null, defaultItems());
+            JsonOrder input = new JsonOrder(defaultId(), defaultCustomerId(), null, defaultItems());
             Optional<Order> output = jsonMapper.jsonRecordToOrder(input);
 
             assertThat(output).isEmpty();
@@ -45,7 +45,7 @@ class OrderJsonMapperTest implements WithAssertions {
         @Test
         @DisplayName("a record with NULL Order Items List")
         void nullItemsList() {
-            JsonOrder input = new JsonOrder(defaultId(), defaultCustomerNumber(), orderDate(), null);
+            JsonOrder input = new JsonOrder(defaultId(), defaultCustomerId(), orderDate(), null);
             Optional<Order> output = jsonMapper.jsonRecordToOrder(input);
 
             assertThat(output).isEmpty();
@@ -54,7 +54,7 @@ class OrderJsonMapperTest implements WithAssertions {
         @Test
         @DisplayName("a record with empty Order Items List")
         void emptyItemsList() {
-            JsonOrder input = new JsonOrder(defaultId(), defaultCustomerNumber(), orderDate(), List.of());
+            JsonOrder input = new JsonOrder(defaultId(), defaultCustomerId(), orderDate(), List.of());
             Optional<Order> output = jsonMapper.jsonRecordToOrder(input);
 
             assertThat(output).isEmpty();

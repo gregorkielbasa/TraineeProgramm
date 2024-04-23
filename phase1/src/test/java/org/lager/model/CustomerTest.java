@@ -230,6 +230,6 @@ class CustomerTest implements WithAssertions {
     void testToString() {
         Customer customer = new Customer(123_123_123L, "test");
 
-        assertThat(customer.toString()).isEqualTo("Customer{id=123123123, name='test'}");
+        assertThat(customer.toString()).isEqualTo("Customer{ID=123123123, name='test'}");
     }
 }

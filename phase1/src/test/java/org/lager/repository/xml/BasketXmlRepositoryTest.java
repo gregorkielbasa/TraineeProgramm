@@ -111,8 +111,8 @@ class BasketXmlRepositoryTest implements WithAssertions {
     class ReadBasketRepository {
 
         @Test
-        @DisplayName("NULL number")
-        void nullNumber() throws IOException {
+        @DisplayName("NULL ID")
+        void nullId() throws IOException {
             Mockito.when(xmlEditor.loadFromFile())
                     .thenReturn(new XmlBasketsList(List.of()));
 
@@ -123,25 +123,25 @@ class BasketXmlRepositoryTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("non-existing number")
+        @DisplayName("non-existing ID")
         void nonExisting() throws IOException {
             Mockito.when(xmlEditor.loadFromFile())
                     .thenReturn(new XmlBasketsList(List.of()));
 
             repository = new BasketXmlRepository(xmlEditor, xmlMapper);
-            assertThat(repository.read(defaultCustomerNumber()))
+            assertThat(repository.read(defaultCustomerId()))
                     .isEmpty();
             Mockito.verify(xmlEditor).loadFromFile();
         }
 
         @Test
-        @DisplayName("exisitng number")
+        @DisplayName("exisitng ID")
         void existing() throws IOException {
             Mockito.when(xmlEditor.loadFromFile())
                     .thenReturn(defaultXmlList());
 
             repository = new BasketXmlRepository(xmlEditor, xmlMapper);
-            assertThat(repository.read(defaultCustomerNumber()))
+            assertThat(repository.read(defaultCustomerId()))
                     .isEqualTo(Optional.of(defaultBasket()));
         }
     }
@@ -151,8 +151,8 @@ class BasketXmlRepositoryTest implements WithAssertions {
     class DeleteBasketRepository {
 
         @Test
-        @DisplayName("NULL number")
-        void nullNumber() throws IOException {
+        @DisplayName("NULL ID")
+        void nullId() throws IOException {
             Mockito.when(xmlEditor.loadFromFile())
                     .thenReturn(new XmlBasketsList(List.of()));
 
@@ -164,26 +164,26 @@ class BasketXmlRepositoryTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("non-exisitng number")
+        @DisplayName("non-exisitng ID")
         void nonExisting() throws IOException {
             Mockito.when(xmlEditor.loadFromFile())
                     .thenReturn(defaultXmlList());
 
             repository = new BasketXmlRepository(xmlEditor, xmlMapper);
-            repository.delete(anotherCustomerNumber());
+            repository.delete(anotherCustomerId());
 
             Mockito.verify(xmlEditor).loadFromFile();
             Mockito.verify(xmlEditor).saveToFile(defaultXmlList());
         }
 
         @Test
-        @DisplayName("exisitng number")
+        @DisplayName("exisitng ID")
         void existing() throws IOException {
             Mockito.when(xmlEditor.loadFromFile())
                     .thenReturn(anotherXmlList());
 
             repository = new BasketXmlRepository(xmlEditor, xmlMapper);
-            repository.delete(anotherCustomerNumber());
+            repository.delete(anotherCustomerId());
 
             Mockito.verify(xmlEditor).loadFromFile();
             Mockito.verify(xmlEditor).saveToFile(defaultXmlList());

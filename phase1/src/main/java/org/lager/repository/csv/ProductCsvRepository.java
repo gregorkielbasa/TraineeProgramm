@@ -12,7 +12,7 @@ import java.util.*;
 public class ProductCsvRepository implements ProductRepository {
     private final CsvEditor csvEditor;
     private final ProductCsvMapper csvMapper;
-    private final long defaultProductNumber = 100_000_000;
+    private final long defaultProductId = 100_000_000;
     private final static Logger logger = LoggerFactory.getLogger(ProductCsvMapper.class);
 
     private final Map<Long, Product> products;
@@ -25,20 +25,20 @@ public class ProductCsvRepository implements ProductRepository {
     }
 
     @Override
-    public Optional<Product> read(Long number) {
-        validateNumber(number);
-        return Optional.ofNullable(products.get(number));
+    public Optional<Product> read(Long id) {
+        validateId(id);
+        return Optional.ofNullable(products.get(id));
     }
 
-    private void validateNumber(Long number) throws RepositoryException {
-        if (number == null)
-            throw new RepositoryException("Given Number is NULL");
+    private void validateId(Long id) throws RepositoryException {
+        if (id == null)
+            throw new RepositoryException("Given ID is NULL");
     }
 
     @Override
     public void save(Product product) throws RepositoryException {
         validateProduct(product);
-        products.put(product.getNumber(), product);
+        products.put(product.getId(), product);
         saveProductsToFile();
     }
 
@@ -48,17 +48,17 @@ public class ProductCsvRepository implements ProductRepository {
     }
 
     @Override
-    public void delete(Long number) throws RepositoryException {
-        validateNumber(number);
-        products.remove(number);
+    public void delete(Long id) throws RepositoryException {
+        validateId(id);
+        products.remove(id);
         saveProductsToFile();
     }
 
     @Override
-    public long getNextAvailableNumber() {
+    public long getNextAvailableId() {
         return 1 + products.keySet().stream()
                 .max(Long::compareTo)
-                .orElse(defaultProductNumber - 1);
+                .orElse(defaultProductId - 1);
     }
 
     private void saveProductsToFile() {
@@ -85,7 +85,7 @@ public class ProductCsvRepository implements ProductRepository {
                     .map(csvMapper::csvRecordToProduct)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
-                    .forEach(product -> products.put(product.getNumber(), product));
+                    .forEach(product -> products.put(product.getId(), product));
         } catch (IOException e) {
             logger.error("Product Repository was not able to load CSV File");
         }

@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.lager.BasketFixtures.defaultBasket;
-import static org.lager.BasketFixtures.defaultCustomerNumber;
+import static org.lager.BasketFixtures.defaultCustomerId;
 import static org.lager.OrderFixtures.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,7 +65,7 @@ class OrderServiceTest implements WithAssertions {
         @Test
         @DisplayName("non existing / empty Basket")
         void nonExisting() {
-            Mockito.when(repository.getNextAvailableNumber())
+            Mockito.when(repository.getNextAvailableId())
                     .thenReturn(defaultId());
             Mockito.when(basketService.getContentOfBasket(defaultId()))
                     .thenReturn(Map.of());
@@ -79,7 +79,7 @@ class OrderServiceTest implements WithAssertions {
         @Test
         @DisplayName("null Basket from BasketService")
         void nullBasketContent() {
-            Mockito.when(repository.getNextAvailableNumber())
+            Mockito.when(repository.getNextAvailableId())
                     .thenReturn(defaultId());
             Mockito.when(basketService.getContentOfBasket(defaultId()))
                     .thenReturn(null);
@@ -93,14 +93,14 @@ class OrderServiceTest implements WithAssertions {
         @Test
         @DisplayName("simply Basket")
         void simplyBasket() {
-            Mockito.when(repository.getNextAvailableNumber())
+            Mockito.when(repository.getNextAvailableId())
                     .thenReturn(defaultId());
-            Mockito.when(basketService.getContentOfBasket(defaultCustomerNumber()))
+            Mockito.when(basketService.getContentOfBasket(defaultCustomerId()))
                     .thenReturn(defaultBasket().getContent());
 
             orderService = new OrderService(repository, basketService);
 
-            assertThat(orderService.order(defaultCustomerNumber(), orderDate()))
+            assertThat(orderService.order(defaultCustomerId(), orderDate()))
                     .isEqualTo(defaultOrder());
         }
     }

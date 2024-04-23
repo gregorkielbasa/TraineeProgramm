@@ -16,20 +16,20 @@ public class Order {
     private static final long ID_MAX = 9999;
 
     private final long id;
-    private final long customerNumber;
+    private final long customerId;
     private final LocalDateTime dateTime;
     private final List<OrderItem> items;
     private final static Logger logger = LoggerFactory.getLogger(Order.class);
 
 
-    public Order(long id, long customerNumber, List<OrderItem> items) {
-        this(id, customerNumber, LocalDateTime.now(), items);
+    public Order(long id, long customerId, List<OrderItem> items) {
+        this(id, customerId, LocalDateTime.now(), items);
     }
 
-    public Order(long id, long customerNumber, LocalDateTime dateTime, List<OrderItem> items) {
+    public Order(long id, long customerId, LocalDateTime dateTime, List<OrderItem> items) {
         validateId(id);
         this.id = id;
-        this.customerNumber = customerNumber;
+        this.customerId = customerId;
         validateTime(dateTime);
         this.dateTime = dateTime.truncatedTo(ChronoUnit.SECONDS);
         validateItems(items);
@@ -57,8 +57,8 @@ public class Order {
         return id;
     }
 
-    public long getCustomerNumber() {
-        return customerNumber;
+    public long getCustomerId() {
+        return customerId;
     }
 
     public LocalDateTime getDateTime() {
@@ -71,7 +71,7 @@ public class Order {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, customerNumber, dateTime, items);
+        return Objects.hash(id, customerId, dateTime, items);
     }
 
     @Override
@@ -79,6 +79,6 @@ public class Order {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
-        return id == order.id && customerNumber == order.customerNumber && Objects.equals(dateTime, order.dateTime) && Objects.equals(items, order.items);
+        return id == order.id && customerId == order.customerId && Objects.equals(dateTime, order.dateTime) && Objects.equals(items, order.items);
     }
 }

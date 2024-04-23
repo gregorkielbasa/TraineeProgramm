@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record JsonOrder(long id,
-                        long customerNumber,
+                        long customerId,
                         LocalDateTime dateTime,
                         List<OrderItem> items) {
 }

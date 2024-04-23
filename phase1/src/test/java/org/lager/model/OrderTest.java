@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemListNotPresentException;
 import org.lager.exception.OrderTimeNullException;
-import org.mockito.internal.matchers.Or;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ class OrderTest implements WithAssertions {
 
     final long VALID_ID = 1234;
     final long INVALID_ID = 12345;
-    final long CUSTOMER_NUMBER = 123_123_123L;
+    final long CUSTOMER_ID = 123_123_123L;
     final OrderItem ITEM_1 = new OrderItem(123_123_123, 3);
     final OrderItem ITEM_2 = new OrderItem(123_456_789, 5);
     final List<OrderItem> VALID_ITEM_LIST = List.of(ITEM_1, ITEM_2);
@@ -30,76 +29,76 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("created with invalid ID")
         void invalidID() {
-            assertThatThrownBy(() -> new Order(INVALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST))
+            assertThatThrownBy(() -> new Order(INVALID_ID, CUSTOMER_ID, VALID_ITEM_LIST))
                     .isInstanceOf(OrderIllegalIdException.class);
         }
 
         @Test
         @DisplayName("created with 0 ID")
         void zeroID() {
-            assertThatThrownBy(() -> new Order(0, CUSTOMER_NUMBER, VALID_ITEM_LIST))
+            assertThatThrownBy(() -> new Order(0, CUSTOMER_ID, VALID_ITEM_LIST))
                     .isInstanceOf(OrderIllegalIdException.class);
         }
 
         @Test
         @DisplayName("created with NULL items list")
         void nullItemsList() {
-            assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_NUMBER, null))
+            assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, null))
                     .isInstanceOf(OrderItemListNotPresentException.class);
         }
 
         @Test
         @DisplayName("created with invalid items list")
         void emptyItemList() {
-            assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_NUMBER, new ArrayList<>()))
+            assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, new ArrayList<>()))
                     .isInstanceOf(OrderItemListNotPresentException.class);
         }
 
         @Test
         @DisplayName("created with null Time")
         void nullTime() {
-            assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_NUMBER, null, VALID_ITEM_LIST))
+            assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, null, VALID_ITEM_LIST))
                     .isInstanceOf(OrderTimeNullException.class);
         }
     }
 
     @Nested
     @DisplayName("works when created with")
-    class OrderCustomerNumberTest {
+    class OrderCustomerIdTest {
 
         @Test
         @DisplayName("proper all parameters")
         void properCase() {
             Order order = new Order(VALID_ID, 123_123_123L, VALID_ITEM_LIST);
 
-            assertThat(order.getCustomerNumber()).isEqualTo(123_123_123L);
+            assertThat(order.getCustomerId()).isEqualTo(123_123_123L);
             assertThat(order.getId()).isEqualTo(VALID_ID);
             assertThat(order.getDateTime()).isEqualToIgnoringNanos(LocalDateTime.now());
             assertThat(order.getItems()).containsExactlyInAnyOrderElementsOf(VALID_ITEM_LIST);
         }
 
         @Test
-        @DisplayName("too short CustomerNumber")
+        @DisplayName("too short CustomerId")
         void tooShort() {
             Order order = new Order(VALID_ID, 123, VALID_ITEM_LIST);
 
-            assertThat(order.getCustomerNumber()).isEqualTo(123);
+            assertThat(order.getCustomerId()).isEqualTo(123);
         }
 
         @Test
-        @DisplayName("too long CustomerNumber")
+        @DisplayName("too long CustomerId")
         void tooLong() {
             Order order = new Order(VALID_ID, 123_123_123_123L, VALID_ITEM_LIST);
 
-            assertThat(order.getCustomerNumber()).isEqualTo(123_123_123_123L);
+            assertThat(order.getCustomerId()).isEqualTo(123_123_123_123L);
         }
 
         @Test
-        @DisplayName("negative CustomerNumber")
+        @DisplayName("negative CustomerId")
         void negative() {
             Order order = new Order(VALID_ID, -123, VALID_ITEM_LIST);
 
-            assertThat(order.getCustomerNumber()).isEqualTo(-123);
+            assertThat(order.getCustomerId()).isEqualTo(-123);
         }
     }
 
@@ -110,7 +109,7 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("of the same")
         void theSame() {
-            Order order = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
 
             assertThat(order.equals(order)).isTrue();
         }
@@ -118,7 +117,7 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("of NULL")
         void nullOrder() {
-            Order order = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
 
             assertThat(order.equals(null)).isFalse();
         }
@@ -126,7 +125,7 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("of different Classes")
         void differentClasses() {
-            Order order = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
 
             assertThat(order.equals("any")).isFalse();
         }
@@ -134,8 +133,8 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("os the same object")
         void similarOrder() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
 
             assertThat(order1.equals(order2)).isTrue();
         }
@@ -143,8 +142,8 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("os the same object")
         void similarOrderWithDifferentId() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID + 1, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID + 1, CUSTOMER_ID, VALID_ITEM_LIST);
 
             assertThat(order1.equals(order2)).isFalse();
         }
@@ -152,8 +151,8 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("os the same object")
         void similarOrderWithDifferentCustomer() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER + 1, VALID_ITEM_LIST);
+            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_ID + 1, VALID_ITEM_LIST);
 
             assertThat(order1.equals(order2)).isFalse();
         }
@@ -161,8 +160,8 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("os the same object")
         void similarOrderWithDifferentItems() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER, List.of(ITEM_1));
+            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_ID, List.of(ITEM_1));
 
             assertThat(order1.equals(order2)).isFalse();
         }
@@ -170,8 +169,8 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("os the same object")
         void similarOrderWithDifferentTime() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER, LocalDateTime.now().minusDays(1), VALID_ITEM_LIST);
+            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_ID, LocalDateTime.now().minusDays(1), VALID_ITEM_LIST);
 
             assertThat(order1.equals(order2)).isFalse();
         }
@@ -184,8 +183,8 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("and they should be the same")
         void similarOrder() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
 
             assertThat(order1.hashCode()).isEqualTo(order2.hashCode());
         }
@@ -193,8 +192,8 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("with different ID")
         void differentId() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID + 1, CUSTOMER_NUMBER, VALID_ITEM_LIST);
+            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID + 1, CUSTOMER_ID, VALID_ITEM_LIST);
 
             assertThat(order1.hashCode()).isNotEqualTo(order2.hashCode());
         }
@@ -202,8 +201,8 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("with different Customers")
         void differentCustomer() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER + 1, VALID_ITEM_LIST);
+            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_ID + 1, VALID_ITEM_LIST);
 
             assertThat(order1.hashCode()).isNotEqualTo(order2.hashCode());
         }
@@ -211,8 +210,8 @@ class OrderTest implements WithAssertions {
         @Test
         @DisplayName("with different items")
         void differentItems() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_NUMBER, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID, CUSTOMER_NUMBER, List.of(ITEM_1));
+            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
+            Order order2 = new Order(VALID_ID, CUSTOMER_ID, List.of(ITEM_1));
 
             assertThat(order1.hashCode()).isNotEqualTo(order2.hashCode());
         }

@@ -59,8 +59,8 @@ class BasketXmlMapperTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("basket with null number")
-        void nullNumberBasket() {
+        @DisplayName("basket with null ID")
+        void nullIdBasket() {
             XmlBasketsList input = new XmlBasketsList(List.of(new XmlBasket(null, List.of())));
             List<Basket> output = xmlMapper.xmlToBasketsList(input);
 
@@ -106,8 +106,8 @@ class BasketXmlMapperTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("item with null number")
-        void itemWithNullNumber() {
+        @DisplayName("item with null ID")
+        void itemWithNullId() {
             List<XmlBasketItem> items = List.of(new XmlBasketItem(null, 1));
             XmlBasket basket = new XmlBasket(100_000_000L, items);
 
@@ -118,9 +118,9 @@ class BasketXmlMapperTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("item with null number")
+        @DisplayName("item with null ID")
         void itemWithNullAmount() {
-            List<XmlBasketItem> items = List.of(new XmlBasketItem(defaultProductNumber(), null));
+            List<XmlBasketItem> items = List.of(new XmlBasketItem(defaultProductId(), null));
             XmlBasket basket = new XmlBasket(100_000_000L, items);
 
             XmlBasketsList input = new XmlBasketsList(List.of(basket));

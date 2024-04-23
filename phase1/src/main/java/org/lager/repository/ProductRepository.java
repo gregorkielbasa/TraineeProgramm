@@ -4,5 +4,5 @@ import org.lager.model.Product;
 
 public interface ProductRepository extends Repository<Product, Long> {
 
-    long getNextAvailableNumber();
+    long getNextAvailableId();
 }

@@ -57,8 +57,8 @@ class ProductCsvMapperTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("and Product CSV Record contains incorrect Product Number")
-        void incorrectNumber() {
+        @DisplayName("and Product CSV Record contains incorrect Product ID")
+        void incorrectId() {
             assertThat(csvMapper.csvRecordToProduct("123123abc,Name"))
                     .isEmpty();
         }
@@ -71,8 +71,8 @@ class ProductCsvMapperTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("Product CSV Record has illegal number")
-        void illegalNumber() {
+        @DisplayName("Product CSV Record has illegal ID")
+        void illegalId() {
             assertThat(csvMapper.csvRecordToProduct("123,Name"))
                     .isEmpty();
         }

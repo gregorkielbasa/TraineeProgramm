@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Customer SQL Repository")
-class CustomerSqlRepositoryNested implements WithAssertions {
+class CustomerSqlRepositoryTest implements WithAssertions {
 
     CustomerSqlRepository repository;
     @Mock

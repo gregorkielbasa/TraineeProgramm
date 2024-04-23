@@ -7,14 +7,14 @@ import java.util.*;
 
 public class Basket {
 
-    private final long customerNumber;
-    private final Map<Long, Integer> products; //ProductNumber, Amount
+    private final long customerId;
+    private final Map<Long, Integer> products; //ProductId, Amount
     private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
-    public Basket(long customerNumber) {
-        this.customerNumber = customerNumber;
+    public Basket(long customerId) {
+        this.customerId = customerId;
         this.products = new HashMap<>();
-        logger.info("New Basket {} has been created.", customerNumber);
+        logger.info("New Basket {} has been created.", customerId);
     }
 
     public Map<Long, Integer> getContent() {
@@ -22,7 +22,7 @@ public class Basket {
     }
 
     public void insert(long productId, int amount) {
-        logger.debug("Basket {} is changing amount of {} Product about {}", customerNumber, productId, amount);
+        logger.debug("Basket {} is changing amount of {} Product about {}", customerId, productId, amount);
         int newAmount = amount;
         if (isProductPresent(productId))
             newAmount += products.get(productId);
@@ -37,7 +37,7 @@ public class Basket {
     }
 
     public void remove(long productId) {
-        logger.debug("Basket {} is removing {} Product", customerNumber, productId);
+        logger.debug("Basket {} is removing {} Product", customerId, productId);
         products.remove(productId);
     }
 
@@ -53,8 +53,8 @@ public class Basket {
                 this.insert(entry.getKey(), entry.getValue());
     }
 
-    public long getCustomerNumber() {
-        return customerNumber;
+    public long getCustomerId() {
+        return customerId;
     }
 
     @Override
@@ -62,11 +62,11 @@ public class Basket {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Basket basket = (Basket) o;
-        return customerNumber == basket.customerNumber && Objects.equals(products, basket.products);
+        return customerId == basket.customerId && Objects.equals(products, basket.products);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(products, customerNumber);
+        return Objects.hash(products, customerId);
     }
 }
