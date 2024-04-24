@@ -21,7 +21,7 @@ public class OrderSqlMapper {
 
     private final static Logger logger = LoggerFactory.getLogger(OrderSqlMapper.class);
 
-    public ResultSetDecoder<Optional<Order>> getResultSetToOrderDecoder() {
+    public ResultSetDecoder<Optional<Order>> getResultSetDecoder() {
         return resultSet -> {
             try {
                 List<OrderItem> items = new ArrayList<>();
