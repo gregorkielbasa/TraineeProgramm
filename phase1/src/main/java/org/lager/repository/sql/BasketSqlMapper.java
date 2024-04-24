@@ -45,9 +45,10 @@ public class BasketSqlMapper {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS basket_items (
-                        customer_id bigint PRIMARY KEY,
-                        product_id bigint,
-                        amount bigint NOT NULL
+                        customer_id bigint NOT NULL,
+                        product_id bigint NOT NULL,
+                        amount integer NOT NULL,
+                        PRIMARY KEY (customer_id, product_id)
                         );""");
             }
         };
@@ -85,7 +86,7 @@ public class BasketSqlMapper {
                     .prepareStatement("INSERT INTO basket_items VALUES (?, ?, ?);")) {
                 statement.setLong(1, customerId);
                 statement.setLong(2, productId);
-                statement.setInt(2, amount);
+                statement.setInt(3, amount);
                 statement.executeUpdate();
             }
         };

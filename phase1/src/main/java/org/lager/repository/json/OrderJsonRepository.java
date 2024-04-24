@@ -56,9 +56,10 @@ public class OrderJsonRepository implements OrderRepository {
 
     @Override
     public long getNextAvailableId() {
-        return 1 + orders.keySet().stream()
+        return orders.keySet().stream()
                 .max(Long::compareTo)
-                .orElse(defaultOrderId - 1);
+                .map(x -> x + 1)
+                .orElse(defaultOrderId);
     }
 
     private void saveOrdersToFile() {

@@ -33,7 +33,7 @@ public class Order {
         validateTime(dateTime);
         this.dateTime = dateTime.truncatedTo(ChronoUnit.SECONDS);
         validateItems(items);
-        this.items = items;
+        this.items = List.copyOf(items);
 
         logger.info("New Order {} has been created.", id);
     }

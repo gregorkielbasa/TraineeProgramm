@@ -48,6 +48,7 @@ public class BasketSqlRepository implements BasketRepository {
 
     @Override
     public void delete(Long id) throws RepositoryException {
+        validateId(id);
         CommandUpdate command = mapper.getDeleteWholeBasketCommand(id);
 
         if (read(id).isPresent())
