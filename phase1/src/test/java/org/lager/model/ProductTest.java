@@ -3,9 +3,7 @@ package org.lager.model;
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.*;
 import org.lager.exception.ProductIllegalNameException;
-import org.lager.exception.ProductIllegalNumberException;
-
-import java.util.Optional;
+import org.lager.exception.ProductIllegalIdException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,31 +55,31 @@ class ProductTest implements WithAssertions {
         }
 
         @Nested
-        @DisplayName("number")
-        class ProductNumberTestException {
+        @DisplayName("ID")
+        class ProductIDTestException {
 
             @Test
             @DisplayName("too short")
             void shortName() {
                 assertThatThrownBy(() -> new Product(123_123_12, "name"))
-                        .isInstanceOf(ProductIllegalNumberException.class);
+                        .isInstanceOf(ProductIllegalIdException.class);
             }
 
             @Test
             @DisplayName("too long")
             void longName() {
                 assertThatThrownBy(() -> new Product(123_123_123_1, "name"))
-                        .isInstanceOf(ProductIllegalNumberException.class);
+                        .isInstanceOf(ProductIllegalIdException.class);
             }
         }
     }
 
     @Test
-    @DisplayName("with a proper name and number")
-    void getNameAndNumber() {
+    @DisplayName("with a proper name and ID")
+    void getNameAndID() {
         Product product = new Product(123_123_123, "proper name");
 
-        assertThat(product.getNumber()).isEqualTo(123_123_123L);
+        assertThat(product.getId()).isEqualTo(123_123_123L);
         assertThat(product.getName()).isEqualTo("proper name");
     }
 
@@ -170,8 +168,8 @@ class ProductTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("when comparing to an object with a different number")
-        void testEqualsNumber() {
+        @DisplayName("when comparing to an object with a different ID")
+        void testEqualsID() {
             Product product2 = new Product(123_000_000L, new String("product name"));
 
             assertFalse(product1.equals(product2));
@@ -199,7 +197,7 @@ class ProductTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("an object with different Numbers")
+        @DisplayName("an object with different IDs")
         void testHashCodeDifferentID() {
             Product product2 = new Product(123_000_123L, "product name");
 
@@ -219,7 +217,7 @@ class ProductTest implements WithAssertions {
         void testToString() {
             Product product = new Product(123_123_123L, "test");
 
-            assertThat(product.toString()).isEqualTo("Product{number=123123123, name='test'}");
+            assertThat(product.toString()).isEqualTo("Product{ID=123123123, name='test'}");
         }
     }
 }

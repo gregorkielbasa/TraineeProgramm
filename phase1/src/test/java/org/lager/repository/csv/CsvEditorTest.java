@@ -22,7 +22,7 @@ class CsvEditorTest implements WithAssertions {
     @Test
     @DisplayName("writes and loads empty list")
     void emptyList() throws IOException {
-        CsvEditor csvEditor = new CsvEditor("csvEditorTest.csv", "number,name");
+        CsvEditor csvEditor = new CsvEditor("csvEditorTest.csv", "id,name");
 
         csvEditor.saveToFile(List.of());
         assertThat(csvEditor.loadFromFile()).isEmpty();
@@ -31,7 +31,7 @@ class CsvEditorTest implements WithAssertions {
     @Test
     @DisplayName("writes and loads non-empty list")
     void nonEmptyList() throws IOException {
-        CsvEditor csvEditor = new CsvEditor("csvEditorTest.csv", "number,name");
+        CsvEditor csvEditor = new CsvEditor("csvEditorTest.csv", "id,name");
 
         csvEditor.saveToFile(List.of("100,Object One", "123,Object Two"));
         assertThat(csvEditor.loadFromFile()).containsExactlyInAnyOrder("100,Object One", "123,Object Two");

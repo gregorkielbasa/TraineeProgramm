@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.lager.OrderFixtures.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,7 +96,7 @@ class OrderJsonRepositoryTest implements WithAssertions {
             Mockito.verify(jsonEditor, Mockito.times(2)).saveToFile(Mockito.anyList());
 
             assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrder(defaultOrderAsJson(), anotherOrderAsJson());
-            assertThat(repository.getNextAvailableNumber()).isEqualTo(defaultId()+2);
+            assertThat(repository.getNextAvailableId()).isEqualTo(defaultId()+2);
         }
 
         @Test
@@ -125,7 +124,7 @@ class OrderJsonRepositoryTest implements WithAssertions {
                     .when(jsonEditor).loadFromFile();
 
             OrderJsonRepository repository = new OrderJsonRepository(jsonEditor, jsonMapper);
-            assertThat(repository.getNextAvailableNumber())
+            assertThat(repository.getNextAvailableId())
                     .isEqualTo(defaultId());
             Mockito.verify(jsonEditor).loadFromFile();
         }
@@ -137,7 +136,7 @@ class OrderJsonRepositoryTest implements WithAssertions {
                     .thenReturn(List.of(defaultOrderAsJson(), anotherOrderAsJson()));
 
             OrderJsonRepository repository = new OrderJsonRepository(jsonEditor, jsonMapper);
-            assertThat(repository.getNextAvailableNumber())
+            assertThat(repository.getNextAvailableId())
                     .isEqualTo(defaultId()+2);
             Mockito.verify(jsonEditor).loadFromFile();
         }

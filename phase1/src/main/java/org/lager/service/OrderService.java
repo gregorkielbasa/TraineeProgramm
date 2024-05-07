@@ -33,7 +33,7 @@ public class OrderService {
     }
 
     public Order order(long basketId, LocalDateTime dataTime) {
-        long newOrderId = repository.getNextAvailableNumber();
+        long newOrderId = repository.getNextAvailableId();
         logger.debug("OrderService starts to order {} Basket", basketId);
         List<OrderItem> items = getOrderItemsFromBasket(basketId);
         Order newOrder = new Order(newOrderId, basketId, dataTime, items);
@@ -45,7 +45,7 @@ public class OrderService {
 
     private List<OrderItem> getOrderItemsFromBasket(long basketId) {
         List<OrderItem> result = new ArrayList<>();
-        getContentOfBasket(basketId).forEach((productNumber, amount) -> result.add(new OrderItem(productNumber, amount)));
+        getContentOfBasket(basketId).forEach((productId, amount) -> result.add(new OrderItem(productId, amount)));
         return result;
     }
 

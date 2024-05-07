@@ -96,7 +96,7 @@ class CustomerCsvRepositoryTest implements WithAssertions {
             Mockito.verify(csvEditor, Mockito.times(2)).saveToFile(Mockito.anyList());
 
             assertThat(argumentCaptor.getValue()).containsExactlyInAnyOrder(defaultCustomerAsCsvRecord(), anotherCustomerAsCsvRecord());
-            assertThat(customerCsvRepository.getNextAvailableNumber()).isEqualTo(defaultNumber() + 2);
+            assertThat(customerCsvRepository.getNextAvailableId()).isEqualTo(defaultId() + 2);
         }
 
         @Test
@@ -115,8 +115,8 @@ class CustomerCsvRepositoryTest implements WithAssertions {
     }
 
     @Nested
-    @DisplayName("gives next available Number")
-    class CustomerRepositoryNextNumber {
+    @DisplayName("gives next available ID")
+    class CustomerRepositoryNextId {
 
         @Test
         @DisplayName("but File is empty")
@@ -125,8 +125,8 @@ class CustomerCsvRepositoryTest implements WithAssertions {
                     .when(csvEditor).loadFromFile();
 
             CustomerCsvRepository customerCsvRepository = new CustomerCsvRepository(csvEditor, csvMapper);
-            assertThat(customerCsvRepository.getNextAvailableNumber())
-                    .isEqualTo(defaultNumber());
+            assertThat(customerCsvRepository.getNextAvailableId())
+                    .isEqualTo(defaultId());
             Mockito.verify(csvEditor).loadFromFile();
         }
 
@@ -137,8 +137,8 @@ class CustomerCsvRepositoryTest implements WithAssertions {
                     .thenReturn(List.of(anotherCustomerAsCsvRecord(), defaultCustomerAsCsvRecord()));
 
             CustomerCsvRepository customerCsvRepository = new CustomerCsvRepository(csvEditor, csvMapper);
-            assertThat(customerCsvRepository.getNextAvailableNumber())
-                    .isEqualTo(defaultNumber() + 2);
+            assertThat(customerCsvRepository.getNextAvailableId())
+                    .isEqualTo(defaultId() + 2);
             Mockito.verify(csvEditor).loadFromFile();
         }
     }
@@ -148,8 +148,8 @@ class CustomerCsvRepositoryTest implements WithAssertions {
     class CustomerRepositoryRead {
 
         @Test
-        @DisplayName("NULL Number")
-        void nullNumber() throws IOException {
+        @DisplayName("NULL ID")
+        void nullId() throws IOException {
             Mockito.when(csvEditor.loadFromFile())
                     .thenReturn(List.of());
 
@@ -160,25 +160,25 @@ class CustomerCsvRepositoryTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("non existing Number")
+        @DisplayName("non existing ID")
         void nonExisitng() throws IOException {
             Mockito.when(csvEditor.loadFromFile())
                     .thenReturn(List.of());
 
             CustomerCsvRepository customerCsvRepository = new CustomerCsvRepository(csvEditor, csvMapper);
-            assertThat(customerCsvRepository.read(incorrectNumber()))
+            assertThat(customerCsvRepository.read(incorrectId()))
                     .isEmpty();
             Mockito.verify(csvEditor).loadFromFile();
         }
 
         @Test
-        @DisplayName("existing Number")
+        @DisplayName("existing ID")
         void exisitng() throws IOException {
             Mockito.when(csvEditor.loadFromFile())
                     .thenReturn(List.of(anotherCustomerAsCsvRecord(), defaultCustomerAsCsvRecord()));
 
             CustomerCsvRepository customerCsvRepository = new CustomerCsvRepository(csvEditor, csvMapper);
-            assertThat(customerCsvRepository.read(defaultNumber()))
+            assertThat(customerCsvRepository.read(defaultId()))
                     .isEqualTo(Optional.of(defaultCustomer()));
             Mockito.verify(csvEditor).loadFromFile();
         }
@@ -189,8 +189,8 @@ class CustomerCsvRepositoryTest implements WithAssertions {
     class CustomerRepositoryDelete {
 
         @Test
-        @DisplayName("NULL Number")
-        void nullNumber() throws IOException {
+        @DisplayName("NULL ID")
+        void nullId() throws IOException {
             Mockito.when(csvEditor.loadFromFile())
                     .thenReturn(List.of());
 
@@ -201,7 +201,7 @@ class CustomerCsvRepositoryTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("non existing Number")
+        @DisplayName("non existing ID")
         void nonExisitng() throws IOException {
             Mockito.when(csvEditor.loadFromFile())
                     .thenReturn(List.of(defaultCustomerAsCsvRecord()));
@@ -209,14 +209,14 @@ class CustomerCsvRepositoryTest implements WithAssertions {
                     .when(csvEditor).saveToFile(Mockito.anyList());
 
             CustomerCsvRepository customerCsvRepository = new CustomerCsvRepository(csvEditor, csvMapper);
-            customerCsvRepository.delete(incorrectNumber());
+            customerCsvRepository.delete(incorrectId());
 
             Mockito.verify(csvEditor).loadFromFile();
             Mockito.verify(csvEditor).saveToFile(List.of(defaultCustomerAsCsvRecord()));
         }
 
         @Test
-        @DisplayName("existing Number")
+        @DisplayName("existing ID")
         void exisitng() throws IOException {
             Mockito.when(csvEditor.loadFromFile())
                     .thenReturn(List.of(anotherCustomerAsCsvRecord(), defaultCustomerAsCsvRecord()));
@@ -224,7 +224,7 @@ class CustomerCsvRepositoryTest implements WithAssertions {
                     .when(csvEditor).saveToFile(Mockito.anyList());
 
             CustomerCsvRepository customerCsvRepository = new CustomerCsvRepository(csvEditor, csvMapper);
-            customerCsvRepository.delete(defaultNumber());
+            customerCsvRepository.delete(defaultId());
 
             Mockito.verify(csvEditor).loadFromFile();
             Mockito.verify(csvEditor).saveToFile(List.of(anotherCustomerAsCsvRecord()));

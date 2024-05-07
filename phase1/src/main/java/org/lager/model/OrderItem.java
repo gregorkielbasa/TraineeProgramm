@@ -1,4 +1,4 @@
 package org.lager.model;
 
-public record OrderItem(long productNumber, int amount) {
+public record OrderItem(long productId, int amount) {
 }

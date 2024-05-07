@@ -12,7 +12,7 @@ import java.util.*;
 public class OrderJsonRepository implements OrderRepository {
     private final JsonEditor jsonEditor;
     private final OrderJsonMapper jsonMapper;
-    private final long defaultOrderID = 1000L;
+    private final long defaultOrderId = 1000L;
     private final static Logger logger = LoggerFactory.getLogger(OrderJsonRepository.class);
 
     private final Map<Long, Order> orders;
@@ -32,7 +32,7 @@ public class OrderJsonRepository implements OrderRepository {
 
     private void validateId(Long id) throws RepositoryException {
         if (id == null)
-            throw new RepositoryException("Given id is NULL");
+            throw new RepositoryException("Given ID is NULL");
     }
 
     @Override
@@ -55,10 +55,11 @@ public class OrderJsonRepository implements OrderRepository {
     }
 
     @Override
-    public long getNextAvailableNumber() {
-        return 1 + orders.keySet().stream()
+    public long getNextAvailableId() {
+        return orders.keySet().stream()
                 .max(Long::compareTo)
-                .orElse(defaultOrderID - 1);
+                .map(x -> x + 1)
+                .orElse(defaultOrderId);
     }
 
     private void saveOrdersToFile() {

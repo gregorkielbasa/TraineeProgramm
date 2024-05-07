@@ -17,32 +17,32 @@ public class ProductService {
     }
 
     public Product create(String newProductName) {
-        long newProductNumber = repository.getNextAvailableNumber();
-        logger.debug("ProductService starts to insert new Product with {} ID and {} name", newProductNumber, newProductName);
-        Product newProduct = new Product(newProductNumber, newProductName);
+        long newProductId = repository.getNextAvailableId();
+        logger.debug("ProductService starts to insert new Product with {} ID and {} name", newProductId, newProductName);
+        Product newProduct = new Product(newProductId, newProductName);
         repository.save(newProduct);
-        logger.debug("ProductService finished to insert new {} Product", newProductNumber);
+        logger.debug("ProductService finished to insert new {} Product", newProductId);
         return newProduct;
     }
 
-    public Optional<Product> search(long productNumber) {
-        return repository.read(productNumber);
+    public Optional<Product> search(long productId) {
+        return repository.read(productId);
     }
 
-    public void validatePresence(long productNumber) {
-        search(productNumber)
-                .orElseThrow(() -> new NoSuchProductException(productNumber));
+    public void validatePresence(long productId) {
+        search(productId)
+                .orElseThrow(() -> new NoSuchProductException(productId));
     }
 
-    public void delete(long productNumber) {
-        logger.info("ProductService deletes {} Product", productNumber);
-        repository.delete(productNumber);
+    public void delete(long productId) {
+        logger.info("ProductService deletes {} Product", productId);
+        repository.delete(productId);
     }
 
-    public void rename(long productNumber, String productNewName) {
-        logger.debug("ProductService tries to rename {} Product to {}", productNumber, productNewName);
-        Product product = search(productNumber)
-                .orElseThrow(() -> new NoSuchProductException(productNumber));
+    public void rename(long productId, String productNewName) {
+        logger.debug("ProductService tries to rename {} Product to {}", productId, productNewName);
+        Product product = search(productId)
+                .orElseThrow(() -> new NoSuchProductException(productId));
         product.setName(productNewName);
         repository.save(product);
     }

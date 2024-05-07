@@ -22,10 +22,10 @@ class BasketTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("should return an empty map and right customer number")
+        @DisplayName("should return an empty map and right customer ID")
         void getAllEmpty() {
             assertThat(basket.getContent()).isEmpty();
-            assertThat(basket.getCustomerNumber()).isEqualTo(123_123_123L);
+            assertThat(basket.getCustomerId()).isEqualTo(123_123_123L);
         }
 
         @Test
@@ -214,7 +214,7 @@ class BasketTest implements WithAssertions {
 
         @Test
         @DisplayName("of two different Baskets")
-        void differentNumberBasket() {
+        void differentIdBasket() {
             Basket basket1 = new Basket(123_456_789L);
             basket1.insert(100_000_000, 1);
 

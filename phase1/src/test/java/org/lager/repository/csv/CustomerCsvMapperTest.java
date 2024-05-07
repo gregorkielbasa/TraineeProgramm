@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import static org.lager.CustomerFixtures.*;
 
-@DisplayName("Customer CSV Mapper")
+@DisplayName("Customer CSV ObjectMapper")
 class CustomerCsvMapperTest implements WithAssertions {
 
     CustomerCsvMapper csvMapper;
@@ -57,8 +57,8 @@ class CustomerCsvMapperTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("and Customer CSV Record contains incorrect Customer Number")
-        void incorrectNumber() {
+        @DisplayName("and Customer CSV Record contains incorrect Customer's ID")
+        void incorrectId() {
             assertThat(csvMapper.csvRecordToCustomer("123123abc,Name"))
                     .isEmpty();
         }
@@ -71,8 +71,8 @@ class CustomerCsvMapperTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("Customer CSV Record has illegal number")
-        void illegalNumber() {
+        @DisplayName("Customer CSV Record has illegal ID")
+        void illegalId() {
             assertThat(csvMapper.csvRecordToCustomer("123,Name"))
                     .isEmpty();
         }

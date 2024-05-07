@@ -34,11 +34,11 @@ public class OrderJsonMapper {
             throw new NullPointerException("Order JSON Record is NULL");
 
         long id = jsonRecord.id();
-        long customerNumber = jsonRecord.customerNumber();
+        long customerId = jsonRecord.customerId();
         List<OrderItem > items = jsonRecord.items();
         LocalDateTime dateTime = jsonRecord.dateTime();
 
-        return new Order(id, customerNumber, dateTime, items);
+        return new Order(id, customerId, dateTime, items);
     }
 
     public Optional<JsonOrder> orderToJsonRecord(Order order) {
@@ -58,10 +58,10 @@ public class OrderJsonMapper {
             throw new NullPointerException("Order is NULL");
 
         long id = order.getId();
-        long customerNumber = order.getCustomerNumber();
+        long customerId = order.getCustomerId();
         LocalDateTime dateTime = order.getDateTime();
         List<OrderItem> items = order.getItems();
 
-        return new JsonOrder(id, customerNumber, dateTime, items);
+        return new JsonOrder(id, customerId, dateTime, items);
     }
 }

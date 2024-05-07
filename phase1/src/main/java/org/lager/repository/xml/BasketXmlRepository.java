@@ -25,20 +25,20 @@ public class BasketXmlRepository implements BasketRepository {
     }
 
     @Override
-    public Optional<Basket> read(Long number) {
-        validateNumber(number);
-        return Optional.ofNullable(baskets.get(number));
+    public Optional<Basket> read(Long id) {
+        validateId(id);
+        return Optional.ofNullable(baskets.get(id));
     }
 
-    private void validateNumber(Long number) {
-        if (number == null)
-            throw new RepositoryException("Given Number is NULL");
+    private void validateId(Long id) {
+        if (id == null)
+            throw new RepositoryException("Given ID is NULL");
     }
 
     @Override
     public void save(Basket basket) throws RepositoryException {
         validateBasket(basket);
-        baskets.put(basket.getCustomerNumber(), basket);
+        baskets.put(basket.getCustomerId(), basket);
         saveBasketsToFile();
     }
 
@@ -48,9 +48,9 @@ public class BasketXmlRepository implements BasketRepository {
     }
 
     @Override
-    public void delete(Long number) throws RepositoryException {
-        validateNumber(number);
-        baskets.remove(number);
+    public void delete(Long id) throws RepositoryException {
+        validateId(id);
+        baskets.remove(id);
         saveBasketsToFile();
     }
 
@@ -71,7 +71,7 @@ public class BasketXmlRepository implements BasketRepository {
             logger.info("Basket Repository has loaded XML File");
 
             xmlMapper.xmlToBasketsList(xmlRecords)
-                    .forEach(basket -> baskets.put(basket.getCustomerNumber(), basket));
+                    .forEach(basket -> baskets.put(basket.getCustomerId(), basket));
         } catch (IOException e) {
             logger.error("Basket Repository was not able to load CSV File");
         }

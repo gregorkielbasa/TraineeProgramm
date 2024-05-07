@@ -17,32 +17,32 @@ public class CustomerService {
     }
 
     public Customer create(String newCustomerName) {
-        long newCustomerNumber = repository.getNextAvailableNumber();
-        logger.debug("CustomerService starts to insert new Customer with {} ID and {} name", newCustomerNumber, newCustomerName);
-        Customer newCustomer = new Customer(newCustomerNumber, newCustomerName);
+        long newCustomerId = repository.getNextAvailableId();
+        logger.debug("CustomerService starts to insert new Customer with {} ID and {} name", newCustomerId, newCustomerName);
+        Customer newCustomer = new Customer(newCustomerId, newCustomerName);
         repository.save(newCustomer);
-        logger.debug("CustomerService finished to insert new {} Customer", newCustomerNumber);
+        logger.debug("CustomerService finished to insert new {} Customer", newCustomerId);
         return newCustomer;
     }
 
-    public Optional<Customer> search(long customerNumber) {
-        return repository.read(customerNumber);
+    public Optional<Customer> search(long customerId) {
+        return repository.read(customerId);
     }
 
-    public void validatePresence(long customerNumber) {
-        search(customerNumber)
-                .orElseThrow(() -> new NoSuchCustomerException(customerNumber));
+    public void validatePresence(long customerId) {
+        search(customerId)
+                .orElseThrow(() -> new NoSuchCustomerException(customerId));
     }
 
-    public void delete(long customerNumber) {
-        logger.info("CustomerService deletes {} Customer", customerNumber);
-        repository.delete(customerNumber);
+    public void delete(long customerId) {
+        logger.info("CustomerService deletes {} Customer", customerId);
+        repository.delete(customerId);
     }
 
-    public void rename(long customerNumber, String customerNewName) {
-        logger.debug("CustomerService tries to rename {} Customer to {}", customerNumber, customerNewName);
-        Customer customer = search(customerNumber)
-                .orElseThrow(() -> new NoSuchCustomerException(customerNumber));
+    public void rename(long customerId, String customerNewName) {
+        logger.debug("CustomerService tries to rename {} Customer to {}", customerId, customerNewName);
+        Customer customer = search(customerId)
+                .orElseThrow(() -> new NoSuchCustomerException(customerId));
         customer.setName(customerNewName);
         repository.save(customer);
     }

@@ -23,43 +23,43 @@ public class BasketService {
         this.productService = productService;
     }
 
-    private Optional<Basket> getBasket(long customerNumber) {
-        return repository.read(customerNumber);
+    private Optional<Basket> getBasket(long customerId) {
+        return repository.read(customerId);
     }
 
-    public Map<Long, Integer> getContentOfBasket(long customerNumber) {
-        return getBasket(customerNumber)
+    public Map<Long, Integer> getContentOfBasket(long customerId) {
+        return getBasket(customerId)
                 .map(Basket::getContent)
                 .orElse(Collections.emptyMap());
     }
 
-    public void dropBasket(long customerNumber) {
-        logger.info("BasketService empties {} Basket", customerNumber);
-        repository.delete(customerNumber);
+    public void dropBasket(long customerId) {
+        logger.info("BasketService empties {} Basket", customerId);
+        repository.delete(customerId);
     }
 
-    public void removeFromBasket(long customerNumber, long productNumber) {
-        logger.debug("BasketService remove {} Product from {} Basket", productNumber, customerNumber);
-        Basket basket = getBasket(customerNumber)
-                .orElseThrow(() -> new NoSuchBasketException(customerNumber));
-        basket.remove(productNumber);
+    public void removeFromBasket(long customerId, long productId) {
+        logger.debug("BasketService remove {} Product from {} Basket", productId, customerId);
+        Basket basket = getBasket(customerId)
+                .orElseThrow(() -> new NoSuchBasketException(customerId));
+        basket.remove(productId);
         repository.save(basket);
     }
 
-    public void addToBasket(long customerNumber, long productNumber, int amount) {
-        logger.debug("BasketService starts to add {} Product to {} Basket", productNumber, customerNumber);
-        productService.validatePresence(productNumber);
-        Basket basket = getBasket(customerNumber)
-                .orElseGet(() -> createBasket(customerNumber));
-        basket.insert(productNumber, amount);
+    public void addToBasket(long customerId, long productId, int amount) {
+        logger.debug("BasketService starts to add {} Product to {} Basket", productId, customerId);
+        productService.validatePresence(productId);
+        Basket basket = getBasket(customerId)
+                .orElseGet(() -> createBasket(customerId));
+        basket.insert(productId, amount);
         repository.save(basket);
-        logger.debug("BasketService finished to add {} Product to {} Basket", productNumber, customerNumber);
+        logger.debug("BasketService finished to add {} Product to {} Basket", productId, customerId);
     }
 
-    private Basket createBasket(long customerNumber) {
-        customerService.validatePresence(customerNumber);
-        Basket newBasket = new Basket(customerNumber);
-        logger.info("BasketService created new Basket with ID {}", customerNumber);
+    private Basket createBasket(long customerId) {
+        customerService.validatePresence(customerId);
+        Basket newBasket = new Basket(customerId);
+        logger.info("BasketService created new Basket with ID {}", customerId);
         return newBasket;
     }
 }
