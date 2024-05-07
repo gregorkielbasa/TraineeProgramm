@@ -5,21 +5,37 @@ import org.lager.repository.CustomerRepository;
 import org.lager.repository.OrderRepository;
 import org.lager.repository.ProductRepository;
 import org.lager.repository.csv.*;
-import org.lager.repository.json.JsonEditor;
-import org.lager.repository.json.OrderJsonMapper;
-import org.lager.repository.json.OrderJsonRepository;
-import org.lager.repository.xml.BasketXmlMapper;
-import org.lager.repository.xml.BasketXmlRepository;
-import org.lager.repository.xml.XmlEditor;
-import org.lager.service.BasketService;
-import org.lager.service.CustomerService;
-import org.lager.service.OrderService;
-import org.lager.service.ProductService;
+import org.lager.repository.json.*;
+import org.lager.repository.xml.*;
+import org.lager.service.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 public class AppConfig {
+
+    @Value("${basket.xml.file.path}")
+    private String basketXmlFilePath;
+
+    @Value("${customer.csv.file.path}")
+    private String customerCsvFilePath;
+    @Value("${customer.csv.file.header}")
+    private String customerCsvFileHeader;
+
+    @Value("${order.json.file.path}")
+    private String orderJsonFilePath;
+
+    @Value("${product.csv.file.path}")
+    private String productCsvFilePath;
+    @Value("${product.csv.file.header}")
+    private String productCsvFileHeader;
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     @Bean
     public BasketService basketService() {
@@ -49,7 +65,7 @@ public class AppConfig {
 
     @Bean
     public XmlEditor basketXmlEditor() {
-        return new XmlEditor("filePath");
+        return new XmlEditor(basketXmlFilePath);
     }
 
     @Bean
@@ -65,7 +81,7 @@ public class AppConfig {
 
     @Bean
     public CsvEditor customerCsvEditor() {
-        return new CsvEditor("filePath", "fileHeader");
+        return new CsvEditor(customerCsvFilePath, customerCsvFileHeader);
     }
 
     @Bean
@@ -81,7 +97,7 @@ public class AppConfig {
 
     @Bean
     public JsonEditor orderJsonEditor() {
-        return new JsonEditor("filePath");
+        return new JsonEditor(orderJsonFilePath);
     }
 
     @Bean
@@ -97,7 +113,7 @@ public class AppConfig {
 
     @Bean
     public CsvEditor productCsvEditor() {
-        return new CsvEditor("filePath", "fileHeader");
+        return new CsvEditor(productCsvFilePath, productCsvFileHeader);
     }
 
     @Bean
