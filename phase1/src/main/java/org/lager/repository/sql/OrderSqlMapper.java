@@ -66,7 +66,7 @@ public class OrderSqlMapper {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS order_items (
-                        order_id bigint PRIMARY KEY,
+                        order_id bigint NOT NULL,
                         product_id bigint NOT NULL,
                         amount integer NOT NULL,
                         PRIMARY KEY (order_id, product_id)

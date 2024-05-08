@@ -27,7 +27,7 @@ public class CustomerSqlMapper {
                     return Optional.of(newCustomer);
                 }
             } catch (SQLException e) {
-                logger.warn("Customer SQL Mapper was not able to decode Customer");
+                logger.warn("Customer SQL Mapper was not able to decode Customer" + e.getMessage());
             } catch (CustomerIllegalIdException | CustomerIllegalNameException e) {
                 logger.warn("Customer SQL Mapper was not able to create a new Customer");
             }

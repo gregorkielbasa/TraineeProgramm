@@ -11,12 +11,13 @@ import org.lager.service.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
+@Profile("fileDB")
 @PropertySource("classpath:application.properties")
-public class AppConfig {
+public class FileAppConfig {
 
     @Value("${basket.xml.file.path}")
     private String basketXmlFilePath;
@@ -33,6 +34,7 @@ public class AppConfig {
     private String productCsvFilePath;
     @Value("${product.csv.file.header}")
     private String productCsvFileHeader;
+
 
     @Bean
     public BasketService basketService() {
@@ -57,7 +59,7 @@ public class AppConfig {
 
     @Bean
     public BasketRepository basketRepository() {
-        return new BasketXmlRepository(basketXmlEditor(), basketXmlMapper());
+        return new BasketXmlRepository(basketXmlEditor(), basketMapper());
     }
 
     @Bean
@@ -66,14 +68,14 @@ public class AppConfig {
     }
 
     @Bean
-    public BasketXmlMapper basketXmlMapper() {
+    public BasketXmlMapper basketMapper() {
         return new BasketXmlMapper();
     }
 
 
     @Bean
     public CustomerRepository customerRepository() {
-        return new CustomerCsvRepository(customerCsvEditor(), customerCsvMapper());
+        return new CustomerCsvRepository(customerCsvEditor(), customerMapper());
     }
 
     @Bean
@@ -82,14 +84,14 @@ public class AppConfig {
     }
 
     @Bean
-    public CustomerCsvMapper customerCsvMapper() {
+    public CustomerCsvMapper customerMapper() {
         return new CustomerCsvMapper();
     }
 
 
     @Bean
     public OrderRepository orderRepository() {
-        return new OrderJsonRepository(orderJsonEditor(), orderJsonMapper());
+        return new OrderJsonRepository(orderJsonEditor(), orderMapper());
     }
 
     @Bean
@@ -98,14 +100,14 @@ public class AppConfig {
     }
 
     @Bean
-    public OrderJsonMapper orderJsonMapper() {
+    public OrderJsonMapper orderMapper() {
         return new OrderJsonMapper();
     }
 
 
     @Bean
     public ProductRepository productRepository() {
-        return new ProductCsvRepository(productCsvEditor(), productCsvMapper());
+        return new ProductCsvRepository(productCsvEditor(), productMapper());
     }
 
     @Bean
@@ -114,7 +116,7 @@ public class AppConfig {
     }
 
     @Bean
-    public ProductCsvMapper productCsvMapper() {
+    public ProductCsvMapper productMapper() {
         return new ProductCsvMapper();
     }
 }

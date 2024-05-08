@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.Optional;
 
-public class SqlConnector<T> {
+public class SqlConnector {
 
     private final static Logger logger = LoggerFactory.getLogger(SqlConnector.class);
     ConnectionSupplier connectionSupplier;
@@ -22,7 +22,7 @@ public class SqlConnector<T> {
     }
 
     //SELECT
-    public Optional<T> receiveFromDB(CommandQuery command, ResultSetDecoder<Optional<T>> decoder) {
+    public <T> Optional<T> receiveFromDB(CommandQuery command, ResultSetDecoder<Optional<T>> decoder) {
         try (Connection connection = connectionSupplier.get()) {
             try (ResultSet result = command.execute(connection)) {
                 return decoder.decode(result);

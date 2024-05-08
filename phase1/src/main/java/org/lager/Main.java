@@ -12,7 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        ApplicationContext context = new AnnotationConfigApplicationContext(FileAppConfig.class, PostgresAppConfig.class);
 
         CustomerService customerService = context.getBean(CustomerService.class);
         ProductService productService = context.getBean(ProductService.class);
