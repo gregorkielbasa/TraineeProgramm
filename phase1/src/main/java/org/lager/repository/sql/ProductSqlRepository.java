@@ -12,9 +12,9 @@ import java.util.Optional;
 public class ProductSqlRepository implements ProductRepository {
 
     private final ProductSqlMapper mapper;
-    private final SqlConnector<Product> connector;
+    private final SqlConnector connector;
 
-    public ProductSqlRepository(ProductSqlMapper mapper, SqlConnector<Product> connector) {
+    public ProductSqlRepository(ProductSqlMapper mapper, SqlConnector connector) {
         this.mapper = mapper;
         this.connector = connector;
 

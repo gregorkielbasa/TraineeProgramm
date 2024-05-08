@@ -30,7 +30,7 @@ class ProductSqlRepositoryTest implements WithAssertions {
     @Mock
     ProductSqlMapper mockMapper;
     @Mock
-    SqlConnector<Product> mockConnector;
+    SqlConnector mockConnector;
     @Mock
     CommandUpdate initCommand;
 

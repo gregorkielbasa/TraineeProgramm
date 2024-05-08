@@ -22,7 +22,7 @@ class BasketSqlRepositoryTest {
     @Mock
     BasketSqlMapper mockMapper;
     @Mock
-    SqlConnector<Basket> mockConnector;
+    SqlConnector mockConnector;
     @Mock
     CommandUpdate initCommand;
 

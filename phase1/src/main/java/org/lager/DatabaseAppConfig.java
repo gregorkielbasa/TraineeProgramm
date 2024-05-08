@@ -18,16 +18,16 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@Profile("postDB")
+@Profile("database")
 @PropertySource("classpath:application.properties")
-public class PostgresAppConfig {
+public class DatabaseAppConfig {
 
-    @Value("${postgresql.url}")
-    private String postgresqlUrl;
-    @Value("${postgresql.user}")
-    private String postgresqlUser;
-    @Value("${postgresql.password}")
-    private String postgresqlPassword;
+    @Value("${database.url}")
+    private String databaseUrl;
+    @Value("${database.user}")
+    private String databaseUser;
+    @Value("${database.password}")
+    private String databasePassword;
 
     @Bean
     public BasketService basketService() {
@@ -52,7 +52,7 @@ public class PostgresAppConfig {
 
     @Bean
     public ConnectionSupplier connectionSupplier() {
-        return new ConnectionSupplierImpl(postgresqlUrl, postgresqlUser, postgresqlPassword);
+        return new ConnectionSupplierImpl(databaseUrl, databaseUser, databasePassword);
     }
 
     @Bean

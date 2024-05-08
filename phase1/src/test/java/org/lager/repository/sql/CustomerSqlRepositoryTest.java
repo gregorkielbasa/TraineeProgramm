@@ -28,7 +28,7 @@ class CustomerSqlRepositoryTest implements WithAssertions {
     @Mock
     CustomerSqlMapper mockMapper;
     @Mock
-    SqlConnector<Customer> mockConnector;
+    SqlConnector mockConnector;
     @Mock
     CommandUpdate initCommand;
 

@@ -24,7 +24,7 @@ import java.util.*;
 @DisplayName("SQL Connector")
 class SqlConnectorTest implements WithAssertions {
 
-    private SqlConnector<String> connector;
+    private SqlConnector connector;
     @Mock
     private ConnectionSupplier connectionSupplier;
     @Mock
@@ -49,7 +49,7 @@ class SqlConnectorTest implements WithAssertions {
             Mockito.when(mockDecoder.decode(mockResultSet)).thenReturn(Optional.of("result"));
 
             //When
-            connector = new SqlConnector<>(connectionSupplier);
+            connector = new SqlConnector(connectionSupplier);
             Optional<String> result = connector.receiveFromDB(mockCommand, mockDecoder);
 
             //Then
@@ -70,7 +70,7 @@ class SqlConnectorTest implements WithAssertions {
             Mockito.when(mockDecoder.decode(mockResultSet)).thenReturn(Optional.empty());
 
             //When
-            connector = new SqlConnector<>(connectionSupplier);
+            connector = new SqlConnector(connectionSupplier);
             Optional<String> result = connector.receiveFromDB(mockCommand, mockDecoder);
 
             //Then
@@ -90,7 +90,7 @@ class SqlConnectorTest implements WithAssertions {
             Mockito.doThrow(SQLException.class).when(mockCommand).execute(mockConnection);
 
             //When
-            connector = new SqlConnector<>(connectionSupplier);
+            connector = new SqlConnector(connectionSupplier);
             assertThatThrownBy(() -> connector.receiveFromDB(mockCommand, mockDecoder))
                     .isInstanceOf(SqlCommandException.class);
 
@@ -107,7 +107,7 @@ class SqlConnectorTest implements WithAssertions {
             Mockito.doThrow(SQLException.class).when(connectionSupplier).get();
 
             //When
-            connector = new SqlConnector<>(connectionSupplier);
+            connector = new SqlConnector(connectionSupplier);
             assertThatThrownBy(() -> connector.receiveFromDB(mockCommand, mockDecoder))
                     .isInstanceOf(SqlConnectionException.class);
 
@@ -135,7 +135,7 @@ class SqlConnectorTest implements WithAssertions {
             Mockito.doNothing().when(mockConnection).commit();
 
             //When
-            connector = new SqlConnector<>(connectionSupplier);
+            connector = new SqlConnector(connectionSupplier);
             connector.sendToDB(mockCommand1, mockCommand2);
 
             //Then
@@ -157,7 +157,7 @@ class SqlConnectorTest implements WithAssertions {
             Mockito.doThrow(SQLException.class).when(mockCommand2).execute(mockConnection);
 
             //When
-            connector = new SqlConnector<>(connectionSupplier);
+            connector = new SqlConnector(connectionSupplier);
             assertThatThrownBy(() -> connector.sendToDB(mockCommand1, mockCommand2))
                     .isInstanceOf(SqlCommandException.class);
 
@@ -179,7 +179,7 @@ class SqlConnectorTest implements WithAssertions {
             Mockito.doThrow(SQLException.class).when(mockCommand1).execute(mockConnection);
 
             //When
-            connector = new SqlConnector<>(connectionSupplier);
+            connector = new SqlConnector(connectionSupplier);
             assertThatThrownBy(() -> connector.sendToDB(mockCommand1, mockCommand2))
                     .isInstanceOf(SqlCommandException.class);
 
@@ -198,7 +198,7 @@ class SqlConnectorTest implements WithAssertions {
             Mockito.doThrow(SQLException.class).when(connectionSupplier).get();
 
             //When
-            connector = new SqlConnector<>(connectionSupplier);
+            connector = new SqlConnector(connectionSupplier);
             assertThatThrownBy(() -> connector.sendToDB(mockCommand1, mockCommand2))
                     .isInstanceOf(SqlConnectionException.class);
 

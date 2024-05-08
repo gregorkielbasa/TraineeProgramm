@@ -12,9 +12,9 @@ import java.util.Optional;
 public class CustomerSqlRepository implements CustomerRepository {
 
     private final CustomerSqlMapper mapper;
-    private final SqlConnector<Customer> connector;
+    private final SqlConnector connector;
 
-    public CustomerSqlRepository(CustomerSqlMapper mapper, SqlConnector<Customer> connector) {
+    public CustomerSqlRepository(CustomerSqlMapper mapper, SqlConnector connector) {
         this.mapper = mapper;
         this.connector = connector;
 

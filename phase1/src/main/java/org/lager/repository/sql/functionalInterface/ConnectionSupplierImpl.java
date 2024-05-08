@@ -6,19 +6,19 @@ import java.sql.SQLException;
 
 public class ConnectionSupplierImpl implements ConnectionSupplier {
 
-    private final String postgresqlUrl;
-    private final String postgresqlUser;
-    private final String postgresqlPassword;
+    private final String databaseUrl;
+    private final String databaseUser;
+    private final String databasePassword;
 
-    public ConnectionSupplierImpl(String postgresqlUrl, String postgresqlUser, String postgresqlPassword) {
-        this.postgresqlUrl = postgresqlUrl;
-        this.postgresqlUser = postgresqlUser;
-        this.postgresqlPassword = postgresqlPassword;
+    public ConnectionSupplierImpl(String databaseUrl, String databaseUser, String databasePassword) {
+        this.databaseUrl = databaseUrl;
+        this.databaseUser = databaseUser;
+        this.databasePassword = databasePassword;
     }
 
     @Override
     public Connection get() throws SQLException {
         return DriverManager
-                .getConnection(postgresqlUrl, postgresqlUser, postgresqlPassword);
+                .getConnection(databaseUrl, databaseUser, databasePassword);
     }
 }

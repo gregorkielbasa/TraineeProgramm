@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@Profile("fileDB")
+@Profile("file")
 @PropertySource("classpath:application.properties")
 public class FileAppConfig {
 

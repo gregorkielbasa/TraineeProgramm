@@ -12,9 +12,9 @@ import java.util.Optional;
 
 public class BasketSqlRepository implements BasketRepository {
     private final BasketSqlMapper mapper;
-    private final SqlConnector<Basket> connector;
+    private final SqlConnector connector;
 
-    public BasketSqlRepository(BasketSqlMapper mapper, SqlConnector<Basket> connector) {
+    public BasketSqlRepository(BasketSqlMapper mapper, SqlConnector connector) {
         this.mapper = mapper;
         this.connector = connector;
 

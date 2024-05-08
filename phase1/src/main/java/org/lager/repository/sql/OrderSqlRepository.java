@@ -12,9 +12,9 @@ import java.util.Optional;
 
 public class OrderSqlRepository implements OrderRepository {
     private final OrderSqlMapper mapper;
-    private final SqlConnector<Order> connector;
+    private final SqlConnector connector;
 
-    public OrderSqlRepository(OrderSqlMapper mapper, SqlConnector<Order> connector) {
+    public OrderSqlRepository(OrderSqlMapper mapper, SqlConnector connector) {
         this.mapper = mapper;
         this.connector = connector;
 
