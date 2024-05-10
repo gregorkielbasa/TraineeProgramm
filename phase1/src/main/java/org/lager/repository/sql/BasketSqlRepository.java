@@ -3,8 +3,8 @@ package org.lager.repository.sql;
 import org.lager.exception.RepositoryException;
 import org.lager.model.Basket;
 import org.lager.repository.BasketRepository;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class BasketSqlRepository implements BasketRepository {
     }
 
     private void initialTables() {
-        CommandUpdate command = mapper.getInitialCommand();
+        SqlProcedure command = mapper.getInitialCommand();
 
         connector.sendToDB(command);
     }
@@ -31,16 +31,16 @@ public class BasketSqlRepository implements BasketRepository {
     @Override
     public void save(Basket basket) throws RepositoryException {
         validateBasket(basket);
-        ArrayList<CommandUpdate> commandQueue = new ArrayList<>();
+        ArrayList<SqlProcedure> commandQueue = new ArrayList<>();
         commandQueue.add(mapper.getDeleteWholeBasketCommand(basket.getCustomerId()));
         commandQueue.addAll(mapper.getInsertWholeBasketList(basket));
-        connector.sendToDB(commandQueue.toArray(new CommandUpdate[0]));
+        connector.sendToDB(commandQueue.toArray(new SqlProcedure[0]));
     }
 
     @Override
     public Optional<Basket> read(Long id) {
         validateId(id);
-        CommandQuery command = mapper.getReadWholeBasketCommand(id);
+        SqlFunction command = mapper.getReadWholeBasketCommand(id);
         ResultSetDecoder<Optional<Basket>> decoder = mapper.getResultSetDecoder();
 
         return connector.receiveFromDB(command, decoder);
@@ -49,7 +49,7 @@ public class BasketSqlRepository implements BasketRepository {
     @Override
     public void delete(Long id) throws RepositoryException {
         validateId(id);
-        CommandUpdate command = mapper.getDeleteWholeBasketCommand(id);
+        SqlProcedure command = mapper.getDeleteWholeBasketCommand(id);
 
         if (read(id).isPresent())
             connector.sendToDB(command);

@@ -5,8 +5,7 @@ import org.lager.repository.CustomerRepository;
 import org.lager.repository.OrderRepository;
 import org.lager.repository.ProductRepository;
 import org.lager.repository.sql.*;
-import org.lager.repository.sql.functionalInterface.ConnectionSupplier;
-import org.lager.repository.sql.functionalInterface.ConnectionSupplierImpl;
+import org.lager.repository.sql.ConnectionSupplier;
 import org.lager.service.BasketService;
 import org.lager.service.CustomerService;
 import org.lager.service.OrderService;
@@ -52,7 +51,7 @@ public class DatabaseAppConfig {
 
     @Bean
     public ConnectionSupplier connectionSupplier() {
-        return new ConnectionSupplierImpl(databaseUrl, databaseUser, databasePassword);
+        return new ConnectionSupplier(databaseUrl, databaseUser, databasePassword);
     }
 
     @Bean

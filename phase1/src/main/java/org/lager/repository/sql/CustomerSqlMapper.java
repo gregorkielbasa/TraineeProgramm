@@ -3,8 +3,8 @@ package org.lager.repository.sql;
 import org.lager.exception.CustomerIllegalIdException;
 import org.lager.exception.CustomerIllegalNameException;
 import org.lager.model.Customer;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class CustomerSqlMapper {
         };
     }
 
-    public CommandUpdate getInitialCommand() {
+    public SqlProcedure getInitialCommand() {
         return connection -> {
             Statement statement = connection.createStatement();
                 statement.execute("""
@@ -46,7 +46,7 @@ public class CustomerSqlMapper {
         };
     }
 
-    public CommandQuery getCustomerWithHighestIdCommand() {
+    public SqlFunction getCustomerWithHighestIdCommand() {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
@@ -54,7 +54,7 @@ public class CustomerSqlMapper {
         };
     }
 
-    public CommandQuery getReadCommand(Long id) {
+    public SqlFunction getReadCommand(Long id) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("SELECT * FROM customers WHERE id=?;");
@@ -63,7 +63,7 @@ public class CustomerSqlMapper {
         };
     }
 
-    public CommandUpdate getDeleteCommand(Long id) {
+    public SqlProcedure getDeleteCommand(Long id) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("DELETE FROM customers WHERE id=?;");
@@ -72,7 +72,7 @@ public class CustomerSqlMapper {
         };
     }
 
-    public CommandUpdate getInsertCommand(Customer customer) {
+    public SqlProcedure getInsertCommand(Customer customer) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("INSERT INTO customers VALUES (?, ?);");
@@ -82,7 +82,7 @@ public class CustomerSqlMapper {
         };
     }
 
-    public CommandUpdate getUpdateNameCommand(Customer customer) {
+    public SqlProcedure getUpdateNameCommand(Customer customer) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("UPDATE customers SET name=? WHERE id=?;");

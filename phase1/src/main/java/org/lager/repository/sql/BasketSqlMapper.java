@@ -1,8 +1,8 @@
 package org.lager.repository.sql;
 
 import org.lager.model.Basket;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class BasketSqlMapper {
         };
     }
 
-    public CommandUpdate getInitialCommand() {
+    public SqlProcedure getInitialCommand() {
         return connection -> {
             Statement statement = connection.createStatement();
                 statement.execute("""
@@ -53,7 +53,7 @@ public class BasketSqlMapper {
         };
     }
 
-    public CommandQuery getReadWholeBasketCommand(long id) {
+    public SqlFunction getReadWholeBasketCommand(long id) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("SELECT * FROM basket_items WHERE customer_id=?;");
@@ -62,7 +62,7 @@ public class BasketSqlMapper {
         };
     }
 
-    public CommandUpdate getDeleteWholeBasketCommand(long id) {
+    public SqlProcedure getDeleteWholeBasketCommand(long id) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("DELETE FROM basket_items WHERE customer_id=?;");
@@ -71,13 +71,13 @@ public class BasketSqlMapper {
         };
     }
 
-    public List<CommandUpdate> getInsertWholeBasketList(Basket basket) {
+    public List<SqlProcedure> getInsertWholeBasketList(Basket basket) {
         return basket.getContent().entrySet().stream()
                 .map(entry -> getInsertBasketItemCommand(basket.getCustomerId(), entry.getKey(), entry.getValue()))
                 .toList();
     }
 
-    public CommandUpdate getInsertBasketItemCommand(long customerId, long productId, int amount) {
+    public SqlProcedure getInsertBasketItemCommand(long customerId, long productId, int amount) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("INSERT INTO basket_items VALUES (?, ?, ?);");

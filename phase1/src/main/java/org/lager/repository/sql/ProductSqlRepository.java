@@ -3,8 +3,8 @@ package org.lager.repository.sql;
 import org.lager.exception.RepositoryException;
 import org.lager.model.Product;
 import org.lager.repository.ProductRepository;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
 
 import java.util.Optional;
@@ -22,7 +22,7 @@ public class ProductSqlRepository implements ProductRepository {
     }
 
     private void initialTables() {
-        CommandUpdate command = mapper.getInitialCommand();
+        SqlProcedure command = mapper.getInitialCommand();
 
         connector.sendToDB(command);
     }
@@ -30,7 +30,7 @@ public class ProductSqlRepository implements ProductRepository {
     @Override
     public long getNextAvailableId() {
         long defaultProductId = 100_000_000;
-        CommandQuery command = mapper.getProductWithHighestIdCommand();
+        SqlFunction command = mapper.getProductWithHighestIdCommand();
         ResultSetDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
 
         Optional<Product> topProduct = connector.receiveFromDB(command, decoder);
@@ -43,7 +43,7 @@ public class ProductSqlRepository implements ProductRepository {
     @Override
     public Optional<Product> read(Long id) {
         validateId(id);
-        CommandQuery command = mapper.getReadCommand(id);
+        SqlFunction command = mapper.getReadCommand(id);
         ResultSetDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
 
         return connector.receiveFromDB(command, decoder);
@@ -51,7 +51,7 @@ public class ProductSqlRepository implements ProductRepository {
 
     @Override
     public void delete(Long id) throws RepositoryException {
-        CommandUpdate command = mapper.getDeleteCommand(id);
+        SqlProcedure command = mapper.getDeleteCommand(id);
 
         if (read(id).isPresent())
             connector.sendToDB(command);
@@ -68,13 +68,13 @@ public class ProductSqlRepository implements ProductRepository {
     }
 
     private void insert(Product product) throws RepositoryException {
-        CommandUpdate command = mapper.getInsertCommand(product);
+        SqlProcedure command = mapper.getInsertCommand(product);
 
         connector.sendToDB(command);
     }
 
     private void updateName(Product product) throws RepositoryException {
-        CommandUpdate command = mapper.getUpdateNameCommand(product);
+        SqlProcedure command = mapper.getUpdateNameCommand(product);
 
         connector.sendToDB(command);
     }

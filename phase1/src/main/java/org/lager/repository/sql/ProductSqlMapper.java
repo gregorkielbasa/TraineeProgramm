@@ -3,8 +3,8 @@ package org.lager.repository.sql;
 import org.lager.exception.ProductIllegalIdException;
 import org.lager.exception.ProductIllegalNameException;
 import org.lager.model.Product;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class ProductSqlMapper {
         };
     }
 
-    public CommandUpdate getInitialCommand() {
+    public SqlProcedure getInitialCommand() {
         return connection -> {
             Statement statement = connection.createStatement();
                 statement.execute("""
@@ -48,7 +48,7 @@ public class ProductSqlMapper {
         };
     }
 
-    public CommandQuery getProductWithHighestIdCommand() {
+    public SqlFunction getProductWithHighestIdCommand() {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("SELECT * FROM products ORDER BY id DESC LIMIT 1;");
@@ -56,7 +56,7 @@ public class ProductSqlMapper {
         };
     }
 
-    public CommandQuery getReadCommand(Long id) {
+    public SqlFunction getReadCommand(Long id) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("SELECT * FROM products WHERE id=?;");
@@ -65,7 +65,7 @@ public class ProductSqlMapper {
         };
     }
 
-    public CommandUpdate getDeleteCommand(Long id) {
+    public SqlProcedure getDeleteCommand(Long id) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("DELETE FROM products WHERE id=?;");
@@ -74,7 +74,7 @@ public class ProductSqlMapper {
         };
     }
 
-    public CommandUpdate getInsertCommand(Product product) {
+    public SqlProcedure getInsertCommand(Product product) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("INSERT INTO products VALUES (?, ?);");
@@ -84,7 +84,7 @@ public class ProductSqlMapper {
         };
     }
 
-    public CommandUpdate getUpdateNameCommand(Product product) {
+    public SqlProcedure getUpdateNameCommand(Product product) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("UPDATE products SET name=? WHERE id=?;");

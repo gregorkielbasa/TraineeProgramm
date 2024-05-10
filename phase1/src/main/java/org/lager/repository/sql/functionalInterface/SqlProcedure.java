@@ -3,7 +3,7 @@ package org.lager.repository.sql.functionalInterface;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public interface ConnectionSupplier {
+public interface SqlProcedure {
 
-    public Connection get() throws SQLException;
+    void execute(Connection connection) throws SQLException;
 }

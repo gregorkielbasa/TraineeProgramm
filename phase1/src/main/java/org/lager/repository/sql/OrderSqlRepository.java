@@ -3,8 +3,8 @@ package org.lager.repository.sql;
 import org.lager.exception.RepositoryException;
 import org.lager.model.Order;
 import org.lager.repository.OrderRepository;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
 
 import java.util.ArrayList;
@@ -22,8 +22,8 @@ public class OrderSqlRepository implements OrderRepository {
     }
 
     private void initialTables() {
-        CommandUpdate command1 = mapper.getOrderInitialCommand();
-        CommandUpdate command2 = mapper.getOrderItemInitialCommand();
+        SqlProcedure command1 = mapper.getOrderInitialCommand();
+        SqlProcedure command2 = mapper.getOrderItemInitialCommand();
 
         connector.sendToDB(command1, command2);
     }
@@ -31,7 +31,7 @@ public class OrderSqlRepository implements OrderRepository {
     @Override
     public long getNextAvailableId() {
         long defaultOrderId = 1000;
-        CommandQuery command = mapper.getOrderWithHighestIdCommand();
+        SqlFunction command = mapper.getOrderWithHighestIdCommand();
         ResultSetDecoder<Optional<Order>> decoder = mapper.getResultSetDecoder();
 
         Optional<Order> topOrder = connector.receiveFromDB(command, decoder);
@@ -47,16 +47,16 @@ public class OrderSqlRepository implements OrderRepository {
         if (read(order.getId()).isPresent())
             throw new RepositoryException("Given Order ID is already taken!");
 
-        ArrayList<CommandUpdate> commandQueue = new ArrayList<>();
+        ArrayList<SqlProcedure> commandQueue = new ArrayList<>();
         commandQueue.add(mapper.getInsertEmptyOrderCommand(order));
         commandQueue.addAll(mapper.getInsertOrderItemsListCommand(order));
-        connector.sendToDB(commandQueue.toArray(new CommandUpdate[0]));
+        connector.sendToDB(commandQueue.toArray(new SqlProcedure[0]));
     }
 
     @Override
     public Optional<Order> read(Long id) {
         validateId(id);
-        CommandQuery command = mapper.getReadCommand(id);
+        SqlFunction command = mapper.getReadCommand(id);
         ResultSetDecoder<Optional<Order>> decoder = mapper.getResultSetDecoder();
 
         return connector.receiveFromDB(command, decoder);

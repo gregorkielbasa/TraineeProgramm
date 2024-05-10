@@ -2,8 +2,8 @@ package org.lager.repository.sql;
 
 import org.lager.model.Order;
 import org.lager.model.OrderItem;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class OrderSqlMapper {
         };
     }
 
-    public CommandUpdate getOrderInitialCommand() {
+    public SqlProcedure getOrderInitialCommand() {
         return connection -> {
             Statement statement = connection.createStatement();
                 statement.execute("""
@@ -60,7 +60,7 @@ public class OrderSqlMapper {
         };
     }
 
-    public CommandUpdate getOrderItemInitialCommand() {
+    public SqlProcedure getOrderItemInitialCommand() {
         return connection -> {
             Statement statement = connection.createStatement();
                 statement.execute("""
@@ -73,7 +73,7 @@ public class OrderSqlMapper {
         };
     }
 
-    public CommandQuery getOrderWithHighestIdCommand() {
+    public SqlFunction getOrderWithHighestIdCommand() {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("""
@@ -86,7 +86,7 @@ public class OrderSqlMapper {
         };
     }
 
-    public CommandQuery getReadCommand(long id) {
+    public SqlFunction getReadCommand(long id) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("""
@@ -100,7 +100,7 @@ public class OrderSqlMapper {
         };
     }
 
-    public CommandUpdate getDeleteAllOrderItemsCommand(long id) {
+    public SqlProcedure getDeleteAllOrderItemsCommand(long id) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("DELETE FROM order_items WHERE order_id=?;");
@@ -109,7 +109,7 @@ public class OrderSqlMapper {
         };
     }
 
-    public CommandUpdate getInsertEmptyOrderCommand(Order order) {
+    public SqlProcedure getInsertEmptyOrderCommand(Order order) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("INSERT INTO orders VALUES (?, ?, ?);");
@@ -120,13 +120,13 @@ public class OrderSqlMapper {
         };
     }
 
-    public List<CommandUpdate> getInsertOrderItemsListCommand(Order order) {
+    public List<SqlProcedure> getInsertOrderItemsListCommand(Order order) {
         return order.getItems().stream()
                 .map(item -> getInsertOrderItemCommand(order.getCustomerId(), item.productId(), item.amount()))
                 .toList();
     }
 
-    public CommandUpdate getInsertOrderItemCommand(long customerId, long productId, int amount) {
+    public SqlProcedure getInsertOrderItemCommand(long customerId, long productId, int amount) {
         return connection -> {
             PreparedStatement statement = connection
                     .prepareStatement("INSERT INTO order_items VALUES (?, ?, ?);");

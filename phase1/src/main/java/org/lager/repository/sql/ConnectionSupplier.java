@@ -1,24 +1,25 @@
-package org.lager.repository.sql.functionalInterface;
+package org.lager.repository.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConnectionSupplierImpl implements ConnectionSupplier {
+public class ConnectionSupplier {
 
     private final String databaseUrl;
     private final String databaseUser;
     private final String databasePassword;
 
-    public ConnectionSupplierImpl(String databaseUrl, String databaseUser, String databasePassword) {
+    public ConnectionSupplier(String databaseUrl, String databaseUser, String databasePassword) {
         this.databaseUrl = databaseUrl;
         this.databaseUser = databaseUser;
         this.databasePassword = databasePassword;
     }
 
-    @Override
     public Connection get() throws SQLException {
-        return DriverManager
+        Connection connection = DriverManager
                 .getConnection(databaseUrl, databaseUser, databasePassword);
+        connection.setAutoCommit(false);
+        return connection;
     }
 }
