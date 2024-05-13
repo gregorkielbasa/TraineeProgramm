@@ -25,10 +25,16 @@ public class OrderSqlMapper {
         return resultSet -> {
             try {
                 List<OrderItem> items = new ArrayList<>();
+                long orderId = 0;
+                long customerId = 0;
+                LocalDateTime dateTime = null;
 
                 while (resultSet.next()) {
                     long productId = resultSet.getLong("product_id");
                     int productAmount = resultSet.getInt("amount");
+                    orderId = resultSet.getLong("order_id");
+                    customerId = resultSet.getLong("customer_id");
+                    dateTime = resultSet.getTimestamp("dateTime").toLocalDateTime();
 
                     items.add(new OrderItem(productId, productAmount));
                 }
@@ -36,9 +42,6 @@ public class OrderSqlMapper {
                 if (items.isEmpty())
                     return Optional.empty();
 
-                long orderId = resultSet.getLong("order_id");
-                long customerId = resultSet.getLong("customer_id");
-                LocalDateTime dateTime = resultSet.getTimestamp("dateTime").toLocalDateTime();
                 Order newOrder = new Order(orderId, customerId, dateTime, items);
                 return Optional.of(newOrder);
             } catch (SQLException e) {
@@ -116,7 +119,7 @@ public class OrderSqlMapper {
 
         commandQueue.add(getInsertEmptyOrderCommand(order));
         order.getItems().stream()
-                .map(item -> getInsertOrderItemCommand(order.getCustomerId(), item.productId(), item.amount()))
+                .map(item -> getInsertOrderItemCommand(order.getId(), item.productId(), item.amount()))
                 .forEach(commandQueue::add);
 
         return commandQueue.toArray(new SqlProcedure[0]);
@@ -133,11 +136,11 @@ public class OrderSqlMapper {
         };
     }
 
-    public SqlProcedure getInsertOrderItemCommand(long customerId, long productId, int amount) {
+    private SqlProcedure getInsertOrderItemCommand(long orderId, long productId, int amount) {
         return connection -> {
             String command = "INSERT INTO order_items VALUES (?, ?, ?);";
             PreparedStatement statement = connection.prepareStatement(command);
-            statement.setLong(1, customerId);
+            statement.setLong(1, orderId);
             statement.setLong(2, productId);
             statement.setInt(3, amount);
             statement.executeUpdate();
