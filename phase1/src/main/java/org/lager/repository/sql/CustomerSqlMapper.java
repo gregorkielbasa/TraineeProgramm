@@ -27,9 +27,9 @@ public class CustomerSqlMapper {
                     return Optional.of(newCustomer);
                 }
             } catch (SQLException e) {
-                logger.warn("Customer SQL Mapper was not able to decode Customer" + e.getMessage());
+                logger.warn("Customer SQL Mapper was not able to decode Customer{}", e.getMessage());
             } catch (CustomerIllegalIdException | CustomerIllegalNameException e) {
-                logger.warn("Customer SQL Mapper was not able to create a new Customer");
+                logger.warn("Customer SQL Mapper was not able to create a new Customer{}", e.getMessage());
             }
             return Optional.empty();
         };
@@ -37,58 +37,59 @@ public class CustomerSqlMapper {
 
     public SqlProcedure getInitialCommand() {
         return connection -> {
+            String command = """
+                    CREATE TABLE IF NOT EXISTS customers (
+                    id bigint PRIMARY KEY,
+                    name character varying(16) NOT NULL
+                    );""";
             Statement statement = connection.createStatement();
-                statement.execute("""
-                        CREATE TABLE IF NOT EXISTS customers (
-                        id bigint PRIMARY KEY,
-                        name character varying(16) NOT NULL
-                        );""");
+            statement.execute(command);
         };
     }
 
     public SqlFunction getCustomerWithHighestIdCommand() {
         return connection -> {
-            PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
-                return statement.executeQuery();
+            String command = "SELECT * FROM customers ORDER BY id DESC LIMIT 1;";
+            Statement statement = connection.createStatement();
+            return statement.executeQuery(command);
         };
     }
 
     public SqlFunction getReadCommand(Long id) {
         return connection -> {
-            PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM customers WHERE id=?;");
-                statement.setLong(1, id);
-                return statement.executeQuery();
+            String command = "SELECT * FROM customers WHERE id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, id);
+            return statement.executeQuery();
         };
     }
 
     public SqlProcedure getDeleteCommand(Long id) {
         return connection -> {
-            PreparedStatement statement = connection
-                    .prepareStatement("DELETE FROM customers WHERE id=?;");
-                statement.setLong(1, id);
-                statement.executeUpdate();
+            String command = "DELETE FROM customers WHERE id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, id);
+            statement.executeUpdate();
         };
     }
 
     public SqlProcedure getInsertCommand(Customer customer) {
         return connection -> {
-            PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO customers VALUES (?, ?);");
-                statement.setLong(1, customer.getId());
-                statement.setString(2, customer.getName());
-                statement.executeUpdate();
+            String command = "INSERT INTO customers VALUES (?, ?);";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, customer.getId());
+            statement.setString(2, customer.getName());
+            statement.executeUpdate();
         };
     }
 
     public SqlProcedure getUpdateNameCommand(Customer customer) {
         return connection -> {
-            PreparedStatement statement = connection
-                    .prepareStatement("UPDATE customers SET name=? WHERE id=?;");
-                statement.setString(1, customer.getName());
-                statement.setLong(2, customer.getId());
-                statement.executeUpdate();
+            String command = "UPDATE customers SET name=? WHERE id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setString(1, customer.getName());
+            statement.setLong(2, customer.getId());
+            statement.executeUpdate();
         };
     }
 }

@@ -39,20 +39,20 @@ public class ProductSqlMapper {
 
     public SqlProcedure getInitialCommand() {
         return connection -> {
-            Statement statement = connection.createStatement();
             String command = """
                     CREATE TABLE IF NOT EXISTS products (
                     id bigint PRIMARY KEY,
                     name character varying(24) NOT NULL
                     );""";
+            Statement statement = connection.createStatement();
             statement.execute(command);
         };
     }
 
     public SqlFunction getProductWithHighestIdCommand() {
         return connection -> {
-            Statement statement = connection.createStatement();
             String command = "SELECT * FROM products ORDER BY id DESC LIMIT 1;";
+            Statement statement = connection.createStatement();
             return statement.executeQuery(command);
         };
     }
