@@ -42,7 +42,7 @@ public class BasketSqlMapper {
 
     public CommandUpdate getInitialCommand() {
         return connection -> {
-            try (Statement statement = connection.createStatement()) {
+            Statement statement = connection.createStatement();
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS basket_items (
                         customer_id bigint NOT NULL,
@@ -50,27 +50,24 @@ public class BasketSqlMapper {
                         amount integer NOT NULL,
                         PRIMARY KEY (customer_id, product_id)
                         );""");
-            }
         };
     }
 
     public CommandQuery getReadWholeBasketCommand(long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM basket_items WHERE customer_id=?;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("SELECT * FROM basket_items WHERE customer_id=?;");
                 statement.setLong(1, id);
                 return statement.executeQuery();
-            }
         };
     }
 
     public CommandUpdate getDeleteWholeBasketCommand(long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("DELETE FROM basket_items WHERE customer_id=?;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("DELETE FROM basket_items WHERE customer_id=?;");
                 statement.setLong(1, id);
                 statement.executeUpdate();
-            }
         };
     }
 
@@ -82,13 +79,12 @@ public class BasketSqlMapper {
 
     public CommandUpdate getInsertBasketItemCommand(long customerId, long productId, int amount) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO basket_items VALUES (?, ?, ?);")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("INSERT INTO basket_items VALUES (?, ?, ?);");
                 statement.setLong(1, customerId);
                 statement.setLong(2, productId);
                 statement.setInt(3, amount);
                 statement.executeUpdate();
-            }
         };
     }
 }

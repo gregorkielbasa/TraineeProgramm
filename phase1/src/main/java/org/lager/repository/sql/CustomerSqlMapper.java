@@ -37,64 +37,58 @@ public class CustomerSqlMapper {
 
     public CommandUpdate getInitialCommand() {
         return connection -> {
-            try (Statement statement = connection.createStatement()) {
+            Statement statement = connection.createStatement();
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS customers (
                         id bigint PRIMARY KEY,
                         name character varying(16) NOT NULL
                         );""");
-            }
         };
     }
 
     public CommandQuery getCustomerWithHighestIdCommand() {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
                 return statement.executeQuery();
-            }
         };
     }
 
     public CommandQuery getReadCommand(Long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM customers WHERE id=?;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("SELECT * FROM customers WHERE id=?;");
                 statement.setLong(1, id);
                 return statement.executeQuery();
-            }
         };
     }
 
     public CommandUpdate getDeleteCommand(Long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("DELETE FROM customers WHERE id=?;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("DELETE FROM customers WHERE id=?;");
                 statement.setLong(1, id);
                 statement.executeUpdate();
-            }
         };
     }
 
     public CommandUpdate getInsertCommand(Customer customer) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO customers VALUES (?, ?);")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("INSERT INTO customers VALUES (?, ?);");
                 statement.setLong(1, customer.getId());
                 statement.setString(2, customer.getName());
                 statement.executeUpdate();
-            }
         };
     }
 
     public CommandUpdate getUpdateNameCommand(Customer customer) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("UPDATE customers SET name=? WHERE id=?;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("UPDATE customers SET name=? WHERE id=?;");
                 statement.setString(1, customer.getName());
                 statement.setLong(2, customer.getId());
                 statement.executeUpdate();
-            }
         };
     }
 }

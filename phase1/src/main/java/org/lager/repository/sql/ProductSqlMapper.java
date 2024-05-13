@@ -39,64 +39,58 @@ public class ProductSqlMapper {
 
     public CommandUpdate getInitialCommand() {
         return connection -> {
-            try (Statement statement = connection.createStatement()) {
+            Statement statement = connection.createStatement();
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS products (
                         id bigint PRIMARY KEY,
                         name character varying(24) NOT NULL
                         );""");
-            }
         };
     }
 
     public CommandQuery getProductWithHighestIdCommand() {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM products ORDER BY id DESC LIMIT 1;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("SELECT * FROM products ORDER BY id DESC LIMIT 1;");
                 return statement.executeQuery();
-            }
         };
     }
 
     public CommandQuery getReadCommand(Long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM products WHERE id=?;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("SELECT * FROM products WHERE id=?;");
                 statement.setLong(1, id);
                 return statement.executeQuery();
-            }
         };
     }
 
     public CommandUpdate getDeleteCommand(Long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("DELETE FROM products WHERE id=?;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("DELETE FROM products WHERE id=?;");
                 statement.setLong(1, id);
                 statement.executeUpdate();
-            }
         };
     }
 
     public CommandUpdate getInsertCommand(Product product) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO products VALUES (?, ?);")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("INSERT INTO products VALUES (?, ?);");
                 statement.setLong(1, product.getId());
                 statement.setString(2, product.getName());
                 statement.executeUpdate();
-            }
         };
     }
 
     public CommandUpdate getUpdateNameCommand(Product product) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("UPDATE products SET name=? WHERE id=?;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("UPDATE products SET name=? WHERE id=?;");
                 statement.setString(1, product.getName());
                 statement.setLong(2, product.getId());
                 statement.executeUpdate();
-            }
         };
     }
 }

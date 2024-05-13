@@ -50,20 +50,19 @@ public class OrderSqlMapper {
 
     public CommandUpdate getOrderInitialCommand() {
         return connection -> {
-            try (Statement statement = connection.createStatement()) {
+            Statement statement = connection.createStatement();
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS orders (
                         order_id bigint PRIMARY KEY,
                         customer_id bigint NOT NULL,
                         dateTime TIMESTAMP WITHOUT TIME ZONE NOT NULL
                         );""");
-            }
         };
     }
 
     public CommandUpdate getOrderItemInitialCommand() {
         return connection -> {
-            try (Statement statement = connection.createStatement()) {
+            Statement statement = connection.createStatement();
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS order_items (
                         order_id bigint NOT NULL,
@@ -71,58 +70,53 @@ public class OrderSqlMapper {
                         amount integer NOT NULL,
                         PRIMARY KEY (order_id, product_id)
                         );""");
-            }
         };
     }
 
     public CommandQuery getOrderWithHighestIdCommand() {
         return connection -> {
-            try (PreparedStatement statement = connection
+            PreparedStatement statement = connection
                     .prepareStatement("""
-                            SELECT orders.order_id, orders.customer_id, orders.dateTime, order_times.product_id, order_times.amount 
+                            SELECT orders.order_id, orders.customer_id, orders.dateTime, order_items.product_id, order_items.amount 
                             FROM orders
                             INNER JOIN order_items
                             ON orders.order_id=order_items.order_id
-                            ORDER BY order_id DESC LIMIT 1;""")) {
+                            ORDER BY order_id DESC LIMIT 1;""");
                 return statement.executeQuery();
-            }
         };
     }
 
     public CommandQuery getReadCommand(long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
+            PreparedStatement statement = connection
                     .prepareStatement("""
-                            SELECT orders.order_id, orders.customer_id, orders.dateTime, order_times.product_id, order_times.amount 
+                            SELECT orders.order_id, orders.customer_id, orders.dateTime, order_items.product_id, order_items.amount 
                             FROM orders
                             INNER JOIN order_items
                             ON orders.order_id=order_items.order_id
-                            WHERE orders.order_id=?;""")) {
+                            WHERE orders.order_id=?;""");
                 statement.setLong(1, id);
                 return statement.executeQuery();
-            }
         };
     }
 
     public CommandUpdate getDeleteAllOrderItemsCommand(long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("DELETE FROM order_items WHERE order_id=?;")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("DELETE FROM order_items WHERE order_id=?;");
                 statement.setLong(1, id);
                 statement.executeUpdate();
-            }
         };
     }
 
     public CommandUpdate getInsertEmptyOrderCommand(Order order) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO orders VALUES (?, ?, ?);")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("INSERT INTO orders VALUES (?, ?, ?);");
                 statement.setLong(1, order.getId());
                 statement.setLong(2, order.getCustomerId());
                 statement.setTimestamp(3, Timestamp.valueOf(order.getDateTime()));
                 statement.executeUpdate();
-            }
         };
     }
 
@@ -134,13 +128,12 @@ public class OrderSqlMapper {
 
     public CommandUpdate getInsertOrderItemCommand(long customerId, long productId, int amount) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO order_items VALUES (?, ?, ?);")) {
+            PreparedStatement statement = connection
+                    .prepareStatement("INSERT INTO order_items VALUES (?, ?, ?);");
                 statement.setLong(1, customerId);
                 statement.setLong(2, productId);
                 statement.setInt(3, amount);
                 statement.executeUpdate();
-            }
         };
     }
 }
