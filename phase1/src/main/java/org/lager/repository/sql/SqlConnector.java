@@ -9,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class SqlConnector {
 
@@ -37,7 +39,13 @@ public class SqlConnector {
         }
     }
 
-    //INSERT //UPDATE
+    public void sendToDB(SqlProcedure command1, SqlProcedure[] commands2) throws SqlConnectionException {
+        SqlProcedure[] combinedCommands = Stream
+                .concat(Stream.of(command1), Stream.of(commands2)).toArray(SqlProcedure[]::new);
+        sendToDB(combinedCommands);
+    }
+
+    //INSERT //UPDATE //DELETE
     public void sendToDB(SqlProcedure... commands) throws SqlCommandException {
         try (Connection connection = connectionSupplier.get()) {
             try {
