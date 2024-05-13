@@ -3,7 +3,7 @@ package org.lager.repository.sql;
 import org.lager.model.Basket;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,7 @@ public class BasketSqlMapper {
 
     private final static Logger logger = LoggerFactory.getLogger(BasketSqlMapper.class);
 
-    public ResultSetDecoder<Optional<Basket>> getResultSetDecoder() {
+    public SqlDecoder<Optional<Basket>> getResultSetDecoder() {
         return resultSet -> {
             try {
                 if (!resultSet.next())

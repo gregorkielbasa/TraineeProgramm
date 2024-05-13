@@ -5,7 +5,7 @@ import org.lager.exception.ProductIllegalNameException;
 import org.lager.model.Product;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ public class ProductSqlMapper {
 
     private final static Logger logger = LoggerFactory.getLogger(ProductSqlMapper.class);
 
-    public ResultSetDecoder<Optional<Product>> getResultSetDecoder() {
+    public SqlDecoder<Optional<Product>> getResultSetDecoder() {
         return resultSet -> {
             try {
                 if (resultSet.next()) {
@@ -29,9 +29,9 @@ public class ProductSqlMapper {
                     return Optional.of(newProduct);
                 }
             } catch (SQLException e) {
-                logger.warn("Product SQL Mapper was not able to decode Product");
+                logger.warn("Product SQL Mapper was not able to decode Product{}", e.getMessage());
             } catch (ProductIllegalIdException | ProductIllegalNameException e) {
-                logger.warn("Product SQL Mapper was not able to create a new Product");
+                logger.warn("Product SQL Mapper was not able to create a new Product{}", e.getMessage());
             }
             return Optional.empty();
         };
@@ -40,57 +40,58 @@ public class ProductSqlMapper {
     public SqlProcedure getInitialCommand() {
         return connection -> {
             Statement statement = connection.createStatement();
-                statement.execute("""
-                        CREATE TABLE IF NOT EXISTS products (
-                        id bigint PRIMARY KEY,
-                        name character varying(24) NOT NULL
-                        );""");
+            String command = """
+                    CREATE TABLE IF NOT EXISTS products (
+                    id bigint PRIMARY KEY,
+                    name character varying(24) NOT NULL
+                    );""";
+            statement.execute(command);
         };
     }
 
     public SqlFunction getProductWithHighestIdCommand() {
         return connection -> {
-            PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM products ORDER BY id DESC LIMIT 1;");
-                return statement.executeQuery();
+            Statement statement = connection.createStatement();
+            String command = "SELECT * FROM products ORDER BY id DESC LIMIT 1;";
+            return statement.executeQuery(command);
         };
     }
 
     public SqlFunction getReadCommand(Long id) {
         return connection -> {
-            PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM products WHERE id=?;");
-                statement.setLong(1, id);
-                return statement.executeQuery();
+            String command = "SELECT * FROM products WHERE id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, id);
+            return statement.executeQuery();
         };
     }
 
     public SqlProcedure getDeleteCommand(Long id) {
         return connection -> {
-            PreparedStatement statement = connection
-                    .prepareStatement("DELETE FROM products WHERE id=?;");
-                statement.setLong(1, id);
-                statement.executeUpdate();
+            String command = "DELETE FROM products WHERE id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, id);
+            statement.executeUpdate();
         };
     }
 
     public SqlProcedure getInsertCommand(Product product) {
         return connection -> {
-            PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO products VALUES (?, ?);");
-                statement.setLong(1, product.getId());
-                statement.setString(2, product.getName());
-                statement.executeUpdate();
+            String command = "INSERT INTO products VALUES (?, ?);";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, product.getId());
+            statement.setString(2, product.getName());
+            statement.executeUpdate();
         };
     }
 
     public SqlProcedure getUpdateNameCommand(Product product) {
         return connection -> {
-            PreparedStatement statement = connection
-                    .prepareStatement("UPDATE products SET name=? WHERE id=?;");
-                statement.setString(1, product.getName());
-                statement.setLong(2, product.getId());
-                statement.executeUpdate();
+            String command = "UPDATE products SET name=? WHERE id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setString(1, product.getName());
+            statement.setLong(2, product.getId());
+            statement.executeUpdate();
         };
     }
 }

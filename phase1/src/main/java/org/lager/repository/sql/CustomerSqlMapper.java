@@ -5,7 +5,7 @@ import org.lager.exception.CustomerIllegalNameException;
 import org.lager.model.Customer;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ public class CustomerSqlMapper {
 
     private final static Logger logger = LoggerFactory.getLogger(CustomerSqlMapper.class);
 
-    public ResultSetDecoder<Optional<Customer>> getResultSetDecoder() {
+    public SqlDecoder<Optional<Customer>> getResultSetDecoder() {
         return resultSet -> {
             try {
                 if (resultSet.next()) {

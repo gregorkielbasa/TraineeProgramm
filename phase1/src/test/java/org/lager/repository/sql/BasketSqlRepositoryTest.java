@@ -3,16 +3,12 @@ package org.lager.repository.sql;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.model.Basket;
-import org.lager.model.Customer;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Basket SQL Repository")
@@ -24,7 +20,7 @@ class BasketSqlRepositoryTest {
     @Mock
     SqlConnector mockConnector;
     @Mock
-    CommandUpdate initCommand;
+    SqlProcedure initCommand;
 
     @BeforeEach
     void init() {

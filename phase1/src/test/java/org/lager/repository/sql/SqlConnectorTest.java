@@ -7,10 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.SqlCommandException;
 import org.lager.exception.SqlConnectionException;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
-import org.lager.repository.sql.functionalInterface.ConnectionSupplier;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -34,9 +33,9 @@ class SqlConnectorTest implements WithAssertions {
     @DisplayName("receives from DB")
     class receiveFromDB {
         @Mock
-        private CommandQuery mockCommand;
+        private SqlFunction mockCommand;
         @Mock
-        private ResultSetDecoder<Optional<String>> mockDecoder;
+        private SqlDecoder<Optional<String>> mockDecoder;
         @Mock
         private ResultSet mockResultSet;
 
@@ -120,9 +119,9 @@ class SqlConnectorTest implements WithAssertions {
     @DisplayName("sends to DB")
     class sendToDB {
         @Mock
-        private CommandUpdate mockCommand1;
+        private SqlProcedure mockCommand1;
         @Mock
-        private CommandUpdate mockCommand2;
+        private SqlProcedure mockCommand2;
 
         @Test
         @DisplayName("and executes properly")

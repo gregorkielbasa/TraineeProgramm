@@ -5,7 +5,7 @@ import org.lager.model.Customer;
 import org.lager.repository.CustomerRepository;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 
 import java.util.Optional;
 
@@ -31,7 +31,7 @@ public class CustomerSqlRepository implements CustomerRepository {
     public long getNextAvailableId() {
         long defaultCustomerId = 100_000_000;
         SqlFunction command = mapper.getCustomerWithHighestIdCommand();
-        ResultSetDecoder<Optional<Customer>> decoder = mapper.getResultSetDecoder();
+        SqlDecoder<Optional<Customer>> decoder = mapper.getResultSetDecoder();
 
         Optional<Customer> topCustomer = connector.receiveFromDB(command, decoder);
 
@@ -44,7 +44,7 @@ public class CustomerSqlRepository implements CustomerRepository {
     public Optional<Customer> read(Long id) {
         validateId(id);
         SqlFunction command = mapper.getReadCommand(id);
-        ResultSetDecoder<Optional<Customer>> decoder = mapper.getResultSetDecoder();
+        SqlDecoder<Optional<Customer>> decoder = mapper.getResultSetDecoder();
 
         return connector.receiveFromDB(command, decoder);
     }

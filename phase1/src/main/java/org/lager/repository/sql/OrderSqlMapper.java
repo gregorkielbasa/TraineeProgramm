@@ -4,7 +4,7 @@ import org.lager.model.Order;
 import org.lager.model.OrderItem;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ public class OrderSqlMapper {
 
     private final static Logger logger = LoggerFactory.getLogger(OrderSqlMapper.class);
 
-    public ResultSetDecoder<Optional<Order>> getResultSetDecoder() {
+    public SqlDecoder<Optional<Order>> getResultSetDecoder() {
         return resultSet -> {
             try {
                 List<OrderItem> items = new ArrayList<>();

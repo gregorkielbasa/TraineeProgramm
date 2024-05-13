@@ -8,16 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.RepositoryException;
 import org.lager.model.Product;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.lager.ProductFixtures.defaultId;
 import static org.lager.ProductFixtures.defaultProduct;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,7 +31,7 @@ class ProductSqlRepositoryTest implements WithAssertions {
     @Mock
     SqlConnector mockConnector;
     @Mock
-    CommandUpdate initCommand;
+    SqlProcedure initCommand;
 
     @BeforeEach
     void init() {
@@ -48,9 +47,9 @@ class ProductSqlRepositoryTest implements WithAssertions {
     class getNextAvailableId {
 
         @Mock
-        CommandQuery mockCommand;
+        SqlFunction mockCommand;
         @Mock
-        ResultSetDecoder<Optional<Product>> mockDecoder;
+        SqlDecoder<Optional<Product>> mockDecoder;
 
         @Test
         @DisplayName("and it works")
@@ -94,9 +93,9 @@ class ProductSqlRepositoryTest implements WithAssertions {
     class read {
 
         @Mock
-        CommandQuery mockCommand;
+        SqlFunction mockCommand;
         @Mock
-        ResultSetDecoder<Optional<Product>> mockDecoder;
+        SqlDecoder<Optional<Product>> mockDecoder;
 
         @Test
         @DisplayName("and gets a Product")
@@ -140,11 +139,11 @@ class ProductSqlRepositoryTest implements WithAssertions {
     class delete {
 
         @Mock
-        CommandQuery mockReadCommand;
+        SqlFunction mockReadCommand;
         @Mock
-        ResultSetDecoder<Optional<Product>> mockDecoder;
+        SqlDecoder<Optional<Product>> mockDecoder;
         @Mock
-        CommandUpdate mockCommand;
+        SqlProcedure mockCommand;
 
         @Test
         @DisplayName("and gets a Product")
@@ -191,11 +190,11 @@ class ProductSqlRepositoryTest implements WithAssertions {
     class save {
 
         @Mock
-        CommandQuery mockReadCommand;
+        SqlFunction mockReadCommand;
         @Mock
-        ResultSetDecoder<Optional<Product>> mockDecoder;
+        SqlDecoder<Optional<Product>> mockDecoder;
         @Mock
-        CommandUpdate mockCommand;
+        SqlProcedure mockCommand;
 
         @Test
         @DisplayName("but Product is present")
@@ -243,11 +242,11 @@ class ProductSqlRepositoryTest implements WithAssertions {
     class ThrowsException {
 
         @Mock
-        CommandQuery mockReadCommand;
+        SqlFunction mockReadCommand;
         @Mock
-        ResultSetDecoder<Optional<Product>> mockDecoder;
+        SqlDecoder<Optional<Product>> mockDecoder;
         @Mock
-        CommandUpdate mockCommand;
+        SqlProcedure mockCommand;
 
         @Test
         @DisplayName("when tries to save NULL Product")

@@ -5,7 +5,7 @@ import org.lager.model.Basket;
 import org.lager.repository.BasketRepository;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class BasketSqlRepository implements BasketRepository {
     public Optional<Basket> read(Long id) {
         validateId(id);
         SqlFunction command = mapper.getReadWholeBasketCommand(id);
-        ResultSetDecoder<Optional<Basket>> decoder = mapper.getResultSetDecoder();
+        SqlDecoder<Optional<Basket>> decoder = mapper.getResultSetDecoder();
 
         return connector.receiveFromDB(command, decoder);
     }

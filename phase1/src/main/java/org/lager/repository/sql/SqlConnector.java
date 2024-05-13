@@ -4,11 +4,10 @@ import org.lager.exception.SqlCommandException;
 import org.lager.exception.SqlConnectionException;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.rowset.JdbcRowSet;
 import java.sql.*;
 import java.util.Optional;
 
@@ -22,7 +21,7 @@ public class SqlConnector {
     }
 
     //SELECT
-    public <T> Optional<T> receiveFromDB(SqlFunction command, ResultSetDecoder<Optional<T>> decoder) {
+    public <T> Optional<T> receiveFromDB(SqlFunction command, SqlDecoder<Optional<T>> decoder) {
         try (Connection connection = connectionSupplier.get()) {
             try (ResultSet result = command.execute(connection)) {
                 connection.commit();

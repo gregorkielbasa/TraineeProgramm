@@ -5,7 +5,7 @@ import org.lager.model.Order;
 import org.lager.repository.OrderRepository;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -32,7 +32,7 @@ public class OrderSqlRepository implements OrderRepository {
     public long getNextAvailableId() {
         long defaultOrderId = 1000;
         SqlFunction command = mapper.getOrderWithHighestIdCommand();
-        ResultSetDecoder<Optional<Order>> decoder = mapper.getResultSetDecoder();
+        SqlDecoder<Optional<Order>> decoder = mapper.getResultSetDecoder();
 
         Optional<Order> topOrder = connector.receiveFromDB(command, decoder);
 
@@ -57,7 +57,7 @@ public class OrderSqlRepository implements OrderRepository {
     public Optional<Order> read(Long id) {
         validateId(id);
         SqlFunction command = mapper.getReadCommand(id);
-        ResultSetDecoder<Optional<Order>> decoder = mapper.getResultSetDecoder();
+        SqlDecoder<Optional<Order>> decoder = mapper.getResultSetDecoder();
 
         return connector.receiveFromDB(command, decoder);
     }

@@ -1,16 +1,20 @@
 package org.lager.repository.sql;
 
 import org.lager.exception.RepositoryException;
+import org.lager.exception.SqlConnectionException;
 import org.lager.model.Product;
 import org.lager.repository.ProductRepository;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 public class ProductSqlRepository implements ProductRepository {
 
+    private final static Logger logger = LoggerFactory.getLogger(ProductSqlRepository.class);
     private final ProductSqlMapper mapper;
     private final SqlConnector connector;
 
@@ -24,37 +28,60 @@ public class ProductSqlRepository implements ProductRepository {
     private void initialTables() {
         SqlProcedure command = mapper.getInitialCommand();
 
-        connector.sendToDB(command);
+        try {
+            connector.sendToDB(command);
+            logger.info("ProductRepository initialised Product Table");
+        } catch (SqlConnectionException e) {
+            logger.error("ProductRepository could not initialise Product Table");
+            throw new RepositoryException(e.getMessage());
+        }
     }
 
     @Override
     public long getNextAvailableId() {
         long defaultProductId = 100_000_000;
         SqlFunction command = mapper.getProductWithHighestIdCommand();
-        ResultSetDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
+        SqlDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
 
-        Optional<Product> topProduct = connector.receiveFromDB(command, decoder);
-
-        return topProduct
-                .map(product -> product.getId() + 1)
-                .orElse(defaultProductId);
+        try {
+            Optional<Product> topProduct = connector.receiveFromDB(command, decoder);
+            logger.debug("ProductRepository received Product with highest ID");
+            return topProduct
+                    .map(product -> product.getId() + 1)
+                    .orElse(defaultProductId);
+        } catch (SqlConnectionException e) {
+            logger.error("ProductRepository could not read Product with highest ID");
+            throw new RepositoryException(e.getMessage());
+        }
     }
 
     @Override
     public Optional<Product> read(Long id) {
         validateId(id);
         SqlFunction command = mapper.getReadCommand(id);
-        ResultSetDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
+        SqlDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
 
-        return connector.receiveFromDB(command, decoder);
+        try {
+            logger.debug("ProductRepository received Product with {} ID", id);
+            return connector.receiveFromDB(command, decoder);
+        } catch (SqlConnectionException e) {
+            logger.error("ProductRepository could not read Product with {} ID", id);
+            throw new RepositoryException(e.getMessage());
+        }
     }
 
     @Override
     public void delete(Long id) throws RepositoryException {
+        validateId(id);
         SqlProcedure command = mapper.getDeleteCommand(id);
 
-        if (read(id).isPresent())
+        try {
             connector.sendToDB(command);
+            logger.info("ProductRepository deleted Product with {} ID", id);
+        } catch (SqlConnectionException e) {
+            logger.error("ProductRepository could not delete Product with {} ID", id);
+            throw new RepositoryException(e.getMessage());
+        }
     }
 
     @Override
@@ -70,13 +97,25 @@ public class ProductSqlRepository implements ProductRepository {
     private void insert(Product product) throws RepositoryException {
         SqlProcedure command = mapper.getInsertCommand(product);
 
-        connector.sendToDB(command);
+        try {
+            connector.sendToDB(command);
+            logger.info("ProductRepository inserted Product with {} ID", product.getId());
+        } catch (SqlConnectionException e) {
+            logger.error("ProductRepository failed to insert Product with {} ID", product.getId());
+            throw new RepositoryException(e.getMessage());
+        }
     }
 
     private void updateName(Product product) throws RepositoryException {
         SqlProcedure command = mapper.getUpdateNameCommand(product);
 
-        connector.sendToDB(command);
+        try {
+            connector.sendToDB(command);
+            logger.info("ProductRepository updated Product with {} ID", product.getId());
+        } catch (SqlConnectionException e) {
+            logger.info("ProductRepository failed to update Product with {} ID", product.getId());
+            throw new RepositoryException(e.getMessage());
+        }
     }
 
     private void validateProduct(Product product) {
