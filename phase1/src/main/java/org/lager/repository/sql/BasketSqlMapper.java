@@ -1,23 +1,22 @@
 package org.lager.repository.sql;
 
 import org.lager.model.Basket;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 import java.util.Optional;
 
 public class BasketSqlMapper {
 
     private final static Logger logger = LoggerFactory.getLogger(BasketSqlMapper.class);
 
-    public ResultSetDecoder<Optional<Basket>> getResultSetDecoder() {
+    public SqlDecoder<Optional<Basket>> getResultSetDecoder() {
         return resultSet -> {
             try {
                 if (!resultSet.next())
@@ -40,55 +39,52 @@ public class BasketSqlMapper {
         };
     }
 
-    public CommandUpdate getInitialCommand() {
+    public SqlProcedure getInitialCommand() {
         return connection -> {
-            try (Statement statement = connection.createStatement()) {
-                statement.execute("""
-                        CREATE TABLE IF NOT EXISTS basket_items (
-                        customer_id bigint NOT NULL,
-                        product_id bigint NOT NULL,
-                        amount integer NOT NULL,
-                        PRIMARY KEY (customer_id, product_id)
-                        );""");
-            }
+            String command = """
+                    CREATE TABLE IF NOT EXISTS basket_items (
+                    customer_id bigint NOT NULL,
+                    product_id bigint NOT NULL,
+                    amount integer NOT NULL,
+                    PRIMARY KEY (customer_id, product_id)
+                    );""";
+            Statement statement = connection.createStatement();
+            statement.execute(command);
         };
     }
 
-    public CommandQuery getReadWholeBasketCommand(long id) {
+    public SqlFunction getReadWholeBasketCommand(long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM basket_items WHERE customer_id=?;")) {
-                statement.setLong(1, id);
-                return statement.executeQuery();
-            }
+            String command = "SELECT * FROM basket_items WHERE customer_id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, id);
+            return statement.executeQuery();
         };
     }
 
-    public CommandUpdate getDeleteWholeBasketCommand(long id) {
+    public SqlProcedure getDeleteWholeBasketCommand(long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("DELETE FROM basket_items WHERE customer_id=?;")) {
-                statement.setLong(1, id);
-                statement.executeUpdate();
-            }
+            String command = "DELETE FROM basket_items WHERE customer_id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, id);
+            statement.executeUpdate();
         };
     }
 
-    public List<CommandUpdate> getInsertWholeBasketList(Basket basket) {
+    public SqlProcedure[] getInsertWholeBasketCommands(Basket basket) {
         return basket.getContent().entrySet().stream()
                 .map(entry -> getInsertBasketItemCommand(basket.getCustomerId(), entry.getKey(), entry.getValue()))
-                .toList();
+                .toList().toArray(new SqlProcedure[0]);
     }
 
-    public CommandUpdate getInsertBasketItemCommand(long customerId, long productId, int amount) {
+    public SqlProcedure getInsertBasketItemCommand(long customerId, long productId, int amount) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO basket_items VALUES (?, ?, ?);")) {
-                statement.setLong(1, customerId);
-                statement.setLong(2, productId);
-                statement.setInt(3, amount);
-                statement.executeUpdate();
-            }
+            String command = "INSERT INTO basket_items VALUES (?, ?, ?);";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, customerId);
+            statement.setLong(2, productId);
+            statement.setInt(3, amount);
+            statement.executeUpdate();
         };
     }
 }

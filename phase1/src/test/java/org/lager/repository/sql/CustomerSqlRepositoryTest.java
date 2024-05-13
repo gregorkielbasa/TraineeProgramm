@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.RepositoryException;
 import org.lager.model.Customer;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.SQLRecoverableException;
 import java.util.Optional;
 
 import static org.lager.CustomerFixtures.defaultCustomer;
@@ -28,9 +27,9 @@ class CustomerSqlRepositoryTest implements WithAssertions {
     @Mock
     CustomerSqlMapper mockMapper;
     @Mock
-    SqlConnector<Customer> mockConnector;
+    SqlConnector mockConnector;
     @Mock
-    CommandUpdate initCommand;
+    SqlProcedure initCommand;
 
     @BeforeEach
     void init() {
@@ -46,9 +45,9 @@ class CustomerSqlRepositoryTest implements WithAssertions {
     class getNextAvailableId {
 
         @Mock
-        CommandQuery mockCommand;
+        SqlFunction mockCommand;
         @Mock
-        ResultSetDecoder<Optional<Customer>> mockDecoder;
+        SqlDecoder<Optional<Customer>> mockDecoder;
 
         @Test
         @DisplayName("and it works")
@@ -92,9 +91,9 @@ class CustomerSqlRepositoryTest implements WithAssertions {
     class read {
 
         @Mock
-        CommandQuery mockCommand;
+        SqlFunction mockCommand;
         @Mock
-        ResultSetDecoder<Optional<Customer>> mockDecoder;
+        SqlDecoder<Optional<Customer>> mockDecoder;
 
         @Test
         @DisplayName("and gets a Customer")
@@ -138,11 +137,11 @@ class CustomerSqlRepositoryTest implements WithAssertions {
     class delete {
 
         @Mock
-        CommandQuery mockReadCommand;
+        SqlFunction mockReadCommand;
         @Mock
-        ResultSetDecoder<Optional<Customer>> mockDecoder;
+        SqlDecoder<Optional<Customer>> mockDecoder;
         @Mock
-        CommandUpdate mockCommand;
+        SqlProcedure mockCommand;
 
         @Test
         @DisplayName("and gets a Customer")
@@ -189,11 +188,11 @@ class CustomerSqlRepositoryTest implements WithAssertions {
     class save {
 
         @Mock
-        CommandQuery mockReadCommand;
+        SqlFunction mockReadCommand;
         @Mock
-        ResultSetDecoder<Optional<Customer>> mockDecoder;
+        SqlDecoder<Optional<Customer>> mockDecoder;
         @Mock
-        CommandUpdate mockCommand;
+        SqlProcedure mockCommand;
 
         @Test
         @DisplayName("but Customer is present")
@@ -241,11 +240,11 @@ class CustomerSqlRepositoryTest implements WithAssertions {
     class ThrowsException {
 
         @Mock
-        CommandQuery mockReadCommand;
+        SqlFunction mockReadCommand;
         @Mock
-        ResultSetDecoder<Optional<Customer>> mockDecoder;
+        SqlDecoder<Optional<Customer>> mockDecoder;
         @Mock
-        CommandUpdate mockCommand;
+        SqlProcedure mockCommand;
 
         @Test
         @DisplayName("when tries to save NULL Customer")

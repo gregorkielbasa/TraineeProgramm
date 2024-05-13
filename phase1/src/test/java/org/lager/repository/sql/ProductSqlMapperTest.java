@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.model.Product;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,7 +27,7 @@ class ProductSqlMapperTest implements WithAssertions {
 
     @Nested
     @DisplayName("decodes ResultSet")
-    class ResultSetDecoderTest {
+    class SqlDecoderTest {
 
         @Mock
         ResultSet mockResultSet;
@@ -41,7 +41,7 @@ class ProductSqlMapperTest implements WithAssertions {
             Mockito.when(mockResultSet.getString("name")).thenReturn(defaultName());
 
             //When
-            ResultSetDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
+            SqlDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
             Optional<Product> result = decoder.decode(mockResultSet);
 
             //Then
@@ -58,7 +58,7 @@ class ProductSqlMapperTest implements WithAssertions {
             Mockito.when(mockResultSet.next()).thenReturn(false);
 
             //When
-            ResultSetDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
+            SqlDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
             Optional<Product> result = decoder.decode(mockResultSet);
 
             //Then
@@ -75,7 +75,7 @@ class ProductSqlMapperTest implements WithAssertions {
             Mockito.when(mockResultSet.getString("name")).thenReturn(null);
 
             //When
-            ResultSetDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
+            SqlDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
             Optional<Product> result = decoder.decode(mockResultSet);
 
             //Then
@@ -94,7 +94,7 @@ class ProductSqlMapperTest implements WithAssertions {
             Mockito.when(mockResultSet.getString("name")).thenReturn(defaultName());
 
             //When
-            ResultSetDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
+            SqlDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
             Optional<Product> result = decoder.decode(mockResultSet);
 
             //Then
@@ -113,7 +113,7 @@ class ProductSqlMapperTest implements WithAssertions {
             Mockito.when(mockResultSet.getString("name")).thenThrow(SQLException.class);
 
             //When
-            ResultSetDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
+            SqlDecoder<Optional<Product>> decoder = mapper.getResultSetDecoder();
             Optional<Product> result = decoder.decode(mockResultSet);
 
             //Then
@@ -145,7 +145,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockConnection.createStatement()).thenReturn(mockStatement);
 
                 //When
-                CommandUpdate command = mapper.getInitialCommand();
+                SqlProcedure command = mapper.getInitialCommand();
                 command.execute(mockConnection);
 
                 //Then
@@ -166,7 +166,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.doThrow(SQLException.class).when(mockStatement).execute(any());
 
                 //When
-                CommandUpdate command = mapper.getInitialCommand();
+                SqlProcedure command = mapper.getInitialCommand();
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -183,7 +183,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.doThrow(SQLException.class).when(mockConnection).createStatement();
 
                 //When
-                CommandUpdate command = mapper.getInitialCommand();
+                SqlProcedure command = mapper.getInitialCommand();
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -209,7 +209,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockStatement.executeQuery()).thenReturn(mockResultSet);
 
                 //When
-                CommandQuery command = mapper.getProductWithHighestIdCommand();
+                SqlFunction command = mapper.getProductWithHighestIdCommand();
                 ResultSet result = command.execute(mockConnection);
 
                 //Then
@@ -227,7 +227,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockStatement.executeQuery()).thenThrow(SQLException.class);
 
                 //When
-                CommandQuery command = mapper.getProductWithHighestIdCommand();
+                SqlFunction command = mapper.getProductWithHighestIdCommand();
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -244,7 +244,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockConnection.prepareStatement(any())).thenThrow(SQLException.class);
 
                 //When
-                CommandQuery command = mapper.getProductWithHighestIdCommand();
+                SqlFunction command = mapper.getProductWithHighestIdCommand();
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -270,7 +270,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockStatement.executeQuery()).thenReturn(mockResultSet);
 
                 //When
-                CommandQuery command = mapper.getReadCommand(12345L);
+                SqlFunction command = mapper.getReadCommand(12345L);
                 ResultSet result = command.execute(mockConnection);
 
                 //Then
@@ -289,7 +289,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockStatement.executeQuery()).thenThrow(SQLException.class);
 
                 //When
-                CommandQuery command = mapper.getReadCommand(12345L);
+                SqlFunction command = mapper.getReadCommand(12345L);
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -306,7 +306,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockConnection.prepareStatement(any())).thenThrow(SQLException.class);
 
                 //When
-                CommandQuery command = mapper.getReadCommand(12345L);
+                SqlFunction command = mapper.getReadCommand(12345L);
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -329,7 +329,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockConnection.prepareStatement(any())).thenReturn(mockStatement);
 
                 //When
-                CommandUpdate command = mapper.getDeleteCommand(12345L);
+                SqlProcedure command = mapper.getDeleteCommand(12345L);
                 command.execute(mockConnection);
 
                 //Then
@@ -347,7 +347,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockStatement.executeUpdate()).thenThrow(SQLException.class);
 
                 //When
-                CommandUpdate command = mapper.getDeleteCommand(12345L);
+                SqlProcedure command = mapper.getDeleteCommand(12345L);
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -364,7 +364,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockConnection.prepareStatement(any())).thenThrow(SQLException.class);
 
                 //When
-                CommandUpdate command = mapper.getDeleteCommand(12345L);
+                SqlProcedure command = mapper.getDeleteCommand(12345L);
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -387,7 +387,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockConnection.prepareStatement(any())).thenReturn(mockStatement);
 
                 //When
-                CommandUpdate command = mapper.getInsertCommand(defaultProduct());
+                SqlProcedure command = mapper.getInsertCommand(defaultProduct());
                 command.execute(mockConnection);
 
                 //Then
@@ -406,7 +406,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockStatement.executeUpdate()).thenThrow(SQLException.class);
 
                 //When
-                CommandUpdate command = mapper.getInsertCommand(defaultProduct());
+                SqlProcedure command = mapper.getInsertCommand(defaultProduct());
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -425,7 +425,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockConnection.prepareStatement(any())).thenThrow(SQLException.class);
 
                 //When
-                CommandUpdate command = mapper.getInsertCommand(defaultProduct());
+                SqlProcedure command = mapper.getInsertCommand(defaultProduct());
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -448,7 +448,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockConnection.prepareStatement(any())).thenReturn(mockStatement);
 
                 //When
-                CommandUpdate command = mapper.getUpdateNameCommand(defaultProduct());
+                SqlProcedure command = mapper.getUpdateNameCommand(defaultProduct());
                 command.execute(mockConnection);
 
                 //Then
@@ -467,7 +467,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockStatement.executeUpdate()).thenThrow(SQLException.class);
 
                 //When
-                CommandUpdate command = mapper.getUpdateNameCommand(defaultProduct());
+                SqlProcedure command = mapper.getUpdateNameCommand(defaultProduct());
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -486,7 +486,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.when(mockConnection.prepareStatement(any())).thenThrow(SQLException.class);
 
                 //When
-                CommandUpdate command = mapper.getUpdateNameCommand(defaultProduct());
+                SqlProcedure command = mapper.getUpdateNameCommand(defaultProduct());
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 

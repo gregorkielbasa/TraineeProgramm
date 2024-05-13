@@ -3,9 +3,9 @@ package org.lager.repository.sql;
 import org.lager.exception.CustomerIllegalIdException;
 import org.lager.exception.CustomerIllegalNameException;
 import org.lager.model.Customer;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ public class CustomerSqlMapper {
 
     private final static Logger logger = LoggerFactory.getLogger(CustomerSqlMapper.class);
 
-    public ResultSetDecoder<Optional<Customer>> getResultSetDecoder() {
+    public SqlDecoder<Optional<Customer>> getResultSetDecoder() {
         return resultSet -> {
             try {
                 if (resultSet.next()) {
@@ -27,74 +27,69 @@ public class CustomerSqlMapper {
                     return Optional.of(newCustomer);
                 }
             } catch (SQLException e) {
-                logger.warn("Customer SQL Mapper was not able to decode Customer");
+                logger.warn("Customer SQL Mapper was not able to decode Customer{}", e.getMessage());
             } catch (CustomerIllegalIdException | CustomerIllegalNameException e) {
-                logger.warn("Customer SQL Mapper was not able to create a new Customer");
+                logger.warn("Customer SQL Mapper was not able to create a new Customer{}", e.getMessage());
             }
             return Optional.empty();
         };
     }
 
-    public CommandUpdate getInitialCommand() {
+    public SqlProcedure getInitialCommand() {
         return connection -> {
-            try (Statement statement = connection.createStatement()) {
-                statement.execute("""
-                        CREATE TABLE IF NOT EXISTS customers (
-                        id bigint PRIMARY KEY,
-                        name character varying(16) NOT NULL
-                        );""");
-            }
+            String command = """
+                    CREATE TABLE IF NOT EXISTS customers (
+                    id bigint PRIMARY KEY,
+                    name character varying(16) NOT NULL
+                    );""";
+            Statement statement = connection.createStatement();
+            statement.execute(command);
         };
     }
 
-    public CommandQuery getCustomerWithHighestIdCommand() {
+    public SqlFunction getCustomerWithHighestIdCommand() {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;")) {
-                return statement.executeQuery();
-            }
+            String command = "SELECT * FROM customers ORDER BY id DESC LIMIT 1;";
+            Statement statement = connection.createStatement();
+            return statement.executeQuery(command);
         };
     }
 
-    public CommandQuery getReadCommand(Long id) {
+    public SqlFunction getReadCommand(Long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("SELECT * FROM customers WHERE id=?;")) {
-                statement.setLong(1, id);
-                return statement.executeQuery();
-            }
+            String command = "SELECT * FROM customers WHERE id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, id);
+            return statement.executeQuery();
         };
     }
 
-    public CommandUpdate getDeleteCommand(Long id) {
+    public SqlProcedure getDeleteCommand(Long id) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("DELETE FROM customers WHERE id=?;")) {
-                statement.setLong(1, id);
-                statement.executeUpdate();
-            }
+            String command = "DELETE FROM customers WHERE id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, id);
+            statement.executeUpdate();
         };
     }
 
-    public CommandUpdate getInsertCommand(Customer customer) {
+    public SqlProcedure getInsertCommand(Customer customer) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO customers VALUES (?, ?);")) {
-                statement.setLong(1, customer.getId());
-                statement.setString(2, customer.getName());
-                statement.executeUpdate();
-            }
+            String command = "INSERT INTO customers VALUES (?, ?);";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setLong(1, customer.getId());
+            statement.setString(2, customer.getName());
+            statement.executeUpdate();
         };
     }
 
-    public CommandUpdate getUpdateNameCommand(Customer customer) {
+    public SqlProcedure getUpdateNameCommand(Customer customer) {
         return connection -> {
-            try (PreparedStatement statement = connection
-                    .prepareStatement("UPDATE customers SET name=? WHERE id=?;")) {
-                statement.setString(1, customer.getName());
-                statement.setLong(2, customer.getId());
-                statement.executeUpdate();
-            }
+            String command = "UPDATE customers SET name=? WHERE id=?;";
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.setString(1, customer.getName());
+            statement.setLong(2, customer.getId());
+            statement.executeUpdate();
         };
     }
 }

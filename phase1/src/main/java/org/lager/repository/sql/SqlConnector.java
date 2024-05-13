@@ -2,17 +2,18 @@ package org.lager.repository.sql;
 
 import org.lager.exception.SqlCommandException;
 import org.lager.exception.SqlConnectionException;
-import org.lager.repository.sql.functionalInterface.CommandUpdate;
-import org.lager.repository.sql.functionalInterface.CommandQuery;
-import org.lager.repository.sql.functionalInterface.ConnectionSupplier;
-import org.lager.repository.sql.functionalInterface.ResultSetDecoder;
+import org.lager.repository.sql.functionalInterface.SqlProcedure;
+import org.lager.repository.sql.functionalInterface.SqlFunction;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-public class SqlConnector<T> {
+public class SqlConnector {
 
     private final static Logger logger = LoggerFactory.getLogger(SqlConnector.class);
     ConnectionSupplier connectionSupplier;
@@ -22,12 +23,14 @@ public class SqlConnector<T> {
     }
 
     //SELECT
-    public Optional<T> receiveFromDB(CommandQuery command, ResultSetDecoder<Optional<T>> decoder) {
+    public <T> Optional<T> receiveFromDB(SqlFunction command, SqlDecoder<Optional<T>> decoder) {
         try (Connection connection = connectionSupplier.get()) {
             try (ResultSet result = command.execute(connection)) {
+                connection.commit();
                 return decoder.decode(result);
             } catch (SQLException e) {
-                logger.error("SQL Connector could not execute CommandQuery!\n{}", e.getMessage());
+                logger.error("SQL Connector failed to execute SQL Function!\n{}", e.getMessage());
+                safeRollback(connection);
                 throw new SqlCommandException(e.getMessage());
             }
         } catch (SQLException e) {
@@ -36,22 +39,38 @@ public class SqlConnector<T> {
         }
     }
 
-    //INSERT //UPDATE
-    public void sendToDB(CommandUpdate... commands) throws SqlCommandException {
+    public void sendToDB(SqlProcedure command1, SqlProcedure[] commands2) throws SqlConnectionException {
+        SqlProcedure[] combinedCommands = Stream
+                .concat(Stream.of(command1), Stream.of(commands2)).toArray(SqlProcedure[]::new);
+        sendToDB(combinedCommands);
+    }
+
+    //INSERT //UPDATE //DELETE
+    public void sendToDB(SqlProcedure... commands) throws SqlCommandException {
         try (Connection connection = connectionSupplier.get()) {
-            connection.setAutoCommit(false);
             try {
-                for (CommandUpdate command : commands)
+                for (SqlProcedure command : commands)
                     command.execute(connection);
                 connection.commit();
             } catch (SQLException e) {
-                connection.rollback();
-                logger.error("SQL Connector could not execute CommandUpdate!\n{}", e.getMessage());
+                logger.error("SQL Connector failed to execute SQL Procedure!\n{}", e.getMessage());
+                safeRollback(connection);
                 throw new SqlCommandException(e.getMessage());
             }
         } catch (SQLException e) {
             logger.error("SQL Connector broke connection!\n{}", e.getMessage());
             throw new SqlConnectionException(e.getMessage());
+        }
+    }
+
+    private void safeRollback(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.rollback();
+                logger.debug("SQL Connector rolled back changes");
+            } catch (SQLException e) {
+                logger.warn("SQL Connector failed to rollback changes!\n{}", e.getMessage());
+            }
         }
     }
 }
