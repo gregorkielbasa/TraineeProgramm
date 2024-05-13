@@ -1,16 +1,21 @@
 package org.lager.repository.sql;
 
 import org.lager.exception.RepositoryException;
+import org.lager.exception.SqlConnectionException;
 import org.lager.model.Order;
 import org.lager.repository.OrderRepository;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.SqlDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
 public class OrderSqlRepository implements OrderRepository {
+
+    private final static Logger logger = LoggerFactory.getLogger(OrderSqlRepository.class);
     private final OrderSqlMapper mapper;
     private final SqlConnector connector;
 
@@ -25,7 +30,13 @@ public class OrderSqlRepository implements OrderRepository {
         SqlProcedure command1 = mapper.getOrderInitialCommand();
         SqlProcedure command2 = mapper.getOrderItemInitialCommand();
 
-        connector.sendToDB(command1, command2);
+        try {
+            connector.sendToDB(command1, command2);
+            logger.info("OrderRepository initialised Order and OrderItems Table");
+        } catch (SqlConnectionException e) {
+            logger.error("OrderRepository could not initialise Order and OrderItems Table");
+            throw new RepositoryException(e.getMessage());
+        }
     }
 
     @Override
@@ -34,23 +45,16 @@ public class OrderSqlRepository implements OrderRepository {
         SqlFunction command = mapper.getOrderWithHighestIdCommand();
         SqlDecoder<Optional<Order>> decoder = mapper.getResultSetDecoder();
 
-        Optional<Order> topOrder = connector.receiveFromDB(command, decoder);
-
-        return topOrder
-                .map(order -> order.getId() + 1)
-                .orElse(defaultOrderId);
-    }
-
-    @Override
-    public void save(Order order) throws RepositoryException {
-        validateOrder(order);
-        if (read(order.getId()).isPresent())
-            throw new RepositoryException("Given Order ID is already taken!");
-
-        ArrayList<SqlProcedure> commandQueue = new ArrayList<>();
-        commandQueue.add(mapper.getInsertEmptyOrderCommand(order));
-        commandQueue.addAll(mapper.getInsertOrderItemsListCommand(order));
-        connector.sendToDB(commandQueue.toArray(new SqlProcedure[0]));
+        try {
+            Optional<Order> topOrder = connector.receiveFromDB(command, decoder);
+            logger.debug("ProductRepository received Product with highest ID");
+            return topOrder
+                    .map(order -> order.getId() + 1)
+                    .orElse(defaultOrderId);
+        } catch (SqlConnectionException e) {
+            logger.error("OrderRepository could not read Order with highest ID");
+            throw new RepositoryException(e.getMessage());
+        }
     }
 
     @Override
@@ -59,7 +63,30 @@ public class OrderSqlRepository implements OrderRepository {
         SqlFunction command = mapper.getReadCommand(id);
         SqlDecoder<Optional<Order>> decoder = mapper.getResultSetDecoder();
 
-        return connector.receiveFromDB(command, decoder);
+        try {
+            logger.debug("OrderRepository received Order with {} ID", id);
+            return connector.receiveFromDB(command, decoder);
+        } catch (SqlConnectionException e) {
+            logger.error("OrderRepository could not read Order with {} ID", id);
+            throw new RepositoryException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void save(Order order) throws RepositoryException {
+        validateOrder(order);
+        SqlProcedure[] commands = mapper.getInsertOrderCommands(order);
+
+        if (read(order.getId()).isPresent())
+            throw new RepositoryException("Given Order ID is already taken!");
+
+        try {
+            connector.sendToDB(commands);
+            logger.info("OrderRepository saved Order with {} ID", order.getCustomerId());
+        } catch (SqlConnectionException e) {
+            logger.error("OrderRepository failed to save Order with {} ID", order.getCustomerId());
+            throw new RepositoryException(e.getMessage());
+        }
     }
 
     @Override
@@ -67,7 +94,7 @@ public class OrderSqlRepository implements OrderRepository {
         throw new RepositoryException("Unsupported Operation - DELETE");
     }
 
-    private void validateOrder(Order order) {
+    private void validateOrder(Order order) throws RepositoryException {
         if (order == null)
             throw new RepositoryException("Given Order is NULL");
     }
