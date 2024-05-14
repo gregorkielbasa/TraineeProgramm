@@ -5,9 +5,11 @@ import org.lager.model.Product;
 import org.lager.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service
 public class ProductService {
     private final ProductRepository repository;
     private final static Logger logger = LoggerFactory.getLogger(ProductService.class);

@@ -5,16 +5,19 @@ import org.lager.repository.CustomerRepository;
 import org.lager.repository.OrderRepository;
 import org.lager.repository.ProductRepository;
 import org.lager.repository.csv.*;
-import org.lager.repository.json.*;
-import org.lager.repository.xml.*;
-import org.lager.service.*;
+import org.lager.repository.json.JsonEditor;
+import org.lager.repository.json.OrderJsonMapper;
+import org.lager.repository.json.OrderJsonRepository;
+import org.lager.repository.xml.BasketXmlMapper;
+import org.lager.repository.xml.BasketXmlRepository;
+import org.lager.repository.xml.XmlEditor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 
-@Configuration
+@SpringBootConfiguration
 @Profile("file")
 @PropertySource("classpath:application.properties")
 public class FileAppConfig {
@@ -34,27 +37,6 @@ public class FileAppConfig {
     private String productCsvFilePath;
     @Value("${product.csv.file.header}")
     private String productCsvFileHeader;
-
-
-    @Bean
-    public BasketService basketService() {
-        return new BasketService(basketRepository(), customerService(), productService());
-    }
-
-    @Bean
-    public CustomerService customerService() {
-        return new CustomerService(customerRepository());
-    }
-
-    @Bean
-    public OrderService orderService() {
-        return new OrderService(orderRepository(), basketService());
-    }
-
-    @Bean
-    public ProductService productService() {
-        return new ProductService(productRepository());
-    }
 
 
     @Bean

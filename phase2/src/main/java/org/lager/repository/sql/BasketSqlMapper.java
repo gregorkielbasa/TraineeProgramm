@@ -6,12 +6,16 @@ import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
 
+@Component
+@Profile("database")
 public class BasketSqlMapper {
 
     private final static Logger logger = LoggerFactory.getLogger(BasketSqlMapper.class);

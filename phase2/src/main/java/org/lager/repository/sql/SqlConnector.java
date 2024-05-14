@@ -7,12 +7,16 @@ import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+@Component
+@Profile("database")
 public class SqlConnector {
 
     private final static Logger logger = LoggerFactory.getLogger(SqlConnector.class);

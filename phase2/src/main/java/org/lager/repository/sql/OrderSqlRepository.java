@@ -9,10 +9,14 @@ import org.lager.repository.sql.functionalInterface.SqlProcedure;
 import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
+@Repository
+@Profile("database")
 public class OrderSqlRepository implements OrderRepository {
 
     private final static Logger logger = LoggerFactory.getLogger(OrderSqlRepository.class);

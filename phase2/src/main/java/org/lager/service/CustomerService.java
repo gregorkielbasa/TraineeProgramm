@@ -5,9 +5,11 @@ import org.lager.model.Customer;
 import org.lager.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service
 public class CustomerService {
     private final CustomerRepository repository;
     private final static Logger logger = LoggerFactory.getLogger(CustomerService.class);
