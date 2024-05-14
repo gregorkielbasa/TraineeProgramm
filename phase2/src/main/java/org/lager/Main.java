@@ -4,13 +4,16 @@ import org.lager.service.BasketService;
 import org.lager.service.CustomerService;
 import org.lager.service.OrderService;
 import org.lager.service.ProductService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-
+@SpringBootApplication
 public class Main {
 
     public static void main(String[] args) {
+        SpringApplication.run(Main.class, args);
 
         ApplicationContext context = new AnnotationConfigApplicationContext(FileAppConfig.class, DatabaseAppConfig.class);
 

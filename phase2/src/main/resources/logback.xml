@@ -21,7 +21,7 @@
         </encoder>
     </appender>
     <root level="DEBUG">
-        <appender-ref ref="ConsoleAll"/>
+        <appender-ref ref="ConsoleInfo"/>
         <appender-ref ref="FileAll"/>
     </root>
 <!--    <logger name="org.lager.service.BasketService" level="TRACE" additivity="true">-->
