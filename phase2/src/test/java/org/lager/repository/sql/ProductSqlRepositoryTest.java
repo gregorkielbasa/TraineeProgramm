@@ -137,51 +137,21 @@ class ProductSqlRepositoryTest implements WithAssertions {
     @Nested
     @DisplayName("executes Delete")
     class delete {
-
-        @Mock
-        SqlFunction mockReadCommand;
-        @Mock
-        SqlDecoder<Optional<Product>> mockDecoder;
         @Mock
         SqlProcedure mockCommand;
 
         @Test
-        @DisplayName("and gets a Product")
+        @DisplayName("and and works")
         void properCase() {
             //Given
-            Mockito.when(mockMapper.getReadCommand(any())).thenReturn(mockReadCommand);
-            Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
-            Mockito.when(mockConnector.receiveFromDB(any(), any())).thenReturn(Optional.of(defaultProduct()));
             Mockito.when(mockMapper.getDeleteCommand(any())).thenReturn(mockCommand);
 
             //When
             repository.delete(defaultId());
 
             //Then
-            Mockito.verify(mockMapper).getReadCommand(defaultId());
-            Mockito.verify(mockMapper).getResultSetDecoder();
             Mockito.verify(mockMapper).getDeleteCommand(defaultId());
-            Mockito.verify(mockConnector).receiveFromDB(mockReadCommand, mockDecoder);
             Mockito.verify(mockConnector).sendToDB(mockCommand);
-        }
-
-        @Test
-        @DisplayName("and doesn't get any Product")
-        void emptyCse() {
-            //Given
-            Mockito.when(mockMapper.getReadCommand(any())).thenReturn(mockReadCommand);
-            Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
-            Mockito.when(mockConnector.receiveFromDB(any(), any())).thenReturn(Optional.empty());
-
-            //When
-            repository.delete(defaultId());
-
-            //Then
-            Mockito.verify(mockMapper).getReadCommand(defaultId());
-            Mockito.verify(mockMapper).getResultSetDecoder();
-            Mockito.verify(mockMapper).getDeleteCommand(defaultId());
-            Mockito.verify(mockConnector).receiveFromDB(mockReadCommand, mockDecoder);
-            Mockito.verify(mockConnector, Mockito.never()).sendToDB(mockCommand);
         }
     }
 

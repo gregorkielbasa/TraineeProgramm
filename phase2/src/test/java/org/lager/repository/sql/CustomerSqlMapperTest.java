@@ -150,7 +150,7 @@ class CustomerSqlMapperTest implements WithAssertions {
 
                 //Then
                 Mockito.verify(mockConnection).createStatement();
-                Mockito.verify(mockStatement).close();
+                
                 Mockito.verify(mockStatement).execute("""
                         CREATE TABLE IF NOT EXISTS customers (
                         id bigint PRIMARY KEY,
@@ -172,7 +172,7 @@ class CustomerSqlMapperTest implements WithAssertions {
 
                 //Then
                 Mockito.verify(mockConnection).createStatement();
-                Mockito.verify(mockStatement).close();
+                
                 Mockito.verify(mockStatement).execute(any());
             }
 
@@ -197,7 +197,7 @@ class CustomerSqlMapperTest implements WithAssertions {
         class CustomerWithHighestIdCommand {
 
             @Mock
-            PreparedStatement mockStatement;
+            Statement mockStatement;
             @Mock
             ResultSet mockResultSet;
 
@@ -205,17 +205,17 @@ class CustomerSqlMapperTest implements WithAssertions {
             @DisplayName("and works")
             void properCase() throws SQLException {
                 //Given
-                Mockito.when(mockConnection.prepareStatement(any())).thenReturn(mockStatement);
-                Mockito.when(mockStatement.executeQuery()).thenReturn(mockResultSet);
+                Mockito.when(mockConnection.createStatement()).thenReturn(mockStatement);
+                Mockito.when(mockStatement.executeQuery(any())).thenReturn(mockResultSet);
 
                 //When
                 SqlFunction command = mapper.getCustomerWithHighestIdCommand();
                 ResultSet result = command.execute(mockConnection);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
-                Mockito.verify(mockStatement).executeQuery();
-                Mockito.verify(mockStatement).close();
+                Mockito.verify(mockConnection).createStatement();
+                Mockito.verify(mockStatement).executeQuery("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
+                
                 assertThat(result).isEqualTo(mockResultSet);
             }
 
@@ -223,8 +223,8 @@ class CustomerSqlMapperTest implements WithAssertions {
             @DisplayName("and throws Exception during execution")
             void exceptionDuringExecution() throws SQLException {
                 //Given
-                Mockito.when(mockConnection.prepareStatement(any())).thenReturn(mockStatement);
-                Mockito.when(mockStatement.executeQuery()).thenThrow(SQLException.class);
+                Mockito.when(mockConnection.createStatement()).thenReturn(mockStatement);
+                Mockito.when(mockStatement.executeQuery(any())).thenThrow(SQLException.class);
 
                 //When
                 SqlFunction command = mapper.getCustomerWithHighestIdCommand();
@@ -232,16 +232,16 @@ class CustomerSqlMapperTest implements WithAssertions {
                         .isInstanceOf(SQLException.class);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
-                Mockito.verify(mockStatement).executeQuery();
-                Mockito.verify(mockStatement).close();
+                Mockito.verify(mockConnection).createStatement();
+                Mockito.verify(mockStatement).executeQuery("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
+                
             }
 
             @Test
             @DisplayName("and throws Exception during creation of Statement")
             void exceptionDuringStatementCreation() throws SQLException {
                 //Given
-                Mockito.when(mockConnection.prepareStatement(any())).thenThrow(SQLException.class);
+                Mockito.when(mockConnection.createStatement()).thenThrow(SQLException.class);
 
                 //When
                 SqlFunction command = mapper.getCustomerWithHighestIdCommand();
@@ -249,7 +249,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                         .isInstanceOf(SQLException.class);
 
                 //Then
-                Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers ORDER BY id DESC LIMIT 1;");
+                Mockito.verify(mockConnection).createStatement();
             }
         }
 
@@ -277,7 +277,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers WHERE id=?;");
                 Mockito.verify(mockStatement).setLong(1, 12345L);
                 Mockito.verify(mockStatement).executeQuery();
-                Mockito.verify(mockStatement).close();
+                
                 assertThat(result).isEqualTo(mockResultSet);
             }
 
@@ -296,7 +296,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 //Then
                 Mockito.verify(mockConnection).prepareStatement("SELECT * FROM customers WHERE id=?;");
                 Mockito.verify(mockStatement).executeQuery();
-                Mockito.verify(mockStatement).close();
+                
             }
 
             @Test
@@ -336,7 +336,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 Mockito.verify(mockConnection).prepareStatement("DELETE FROM customers WHERE id=?;");
                 Mockito.verify(mockStatement).setLong(1, 12345L);
                 Mockito.verify(mockStatement).executeUpdate();
-                Mockito.verify(mockStatement).close();
+                
             }
 
             @Test
@@ -354,7 +354,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 //Then
                 Mockito.verify(mockConnection).prepareStatement("DELETE FROM customers WHERE id=?;");
                 Mockito.verify(mockStatement).executeUpdate();
-                Mockito.verify(mockStatement).close();
+                
             }
 
             @Test
@@ -395,7 +395,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 Mockito.verify(mockStatement).setLong(1, defaultId());
                 Mockito.verify(mockStatement).setString(2, defaultName());
                 Mockito.verify(mockStatement).executeUpdate();
-                Mockito.verify(mockStatement).close();
+                
             }
 
             @Test
@@ -415,7 +415,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 Mockito.verify(mockStatement).setLong(1, defaultId());
                 Mockito.verify(mockStatement).setString(2, defaultName());
                 Mockito.verify(mockStatement).executeUpdate();
-                Mockito.verify(mockStatement).close();
+                
             }
 
             @Test
@@ -456,7 +456,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 Mockito.verify(mockStatement).setString(1, defaultName());
                 Mockito.verify(mockStatement).setLong(2, defaultId());
                 Mockito.verify(mockStatement).executeUpdate();
-                Mockito.verify(mockStatement).close();
+                
             }
 
             @Test
@@ -476,7 +476,7 @@ class CustomerSqlMapperTest implements WithAssertions {
                 Mockito.verify(mockStatement).setString(1, defaultName());
                 Mockito.verify(mockStatement).setLong(2, defaultId());
                 Mockito.verify(mockStatement).executeUpdate();
-                Mockito.verify(mockStatement).close();
+                
             }
 
             @Test

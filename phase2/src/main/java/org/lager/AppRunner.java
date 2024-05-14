@@ -27,6 +27,8 @@ public class AppRunner implements ApplicationRunner {
         customerService.create("testUser");
         productService.create("testProduct");
 
+        System.out.println(productService.search(100_000_000L));
+
         basketService.addToBasket(100000000L, 100000000L, 100);
 
         orderService.order(100000000L);

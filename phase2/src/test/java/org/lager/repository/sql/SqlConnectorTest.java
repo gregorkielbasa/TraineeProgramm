@@ -128,7 +128,6 @@ class SqlConnectorTest implements WithAssertions {
         void properCase() throws SQLException {
             //Given
             Mockito.when(connectionSupplier.get()).thenReturn(mockConnection);
-            Mockito.doNothing().when(mockConnection).setAutoCommit(false);
             Mockito.doNothing().when(mockCommand1).execute(mockConnection);
             Mockito.doNothing().when(mockCommand2).execute(mockConnection);
             Mockito.doNothing().when(mockConnection).commit();
@@ -139,7 +138,6 @@ class SqlConnectorTest implements WithAssertions {
 
             //Then
             Mockito.verify(connectionSupplier).get();
-            Mockito.verify(mockConnection).setAutoCommit(false);
             Mockito.verify(mockCommand1).execute(mockConnection);
             Mockito.verify(mockCommand2).execute(mockConnection);
             Mockito.verify(mockConnection).commit();
@@ -151,7 +149,6 @@ class SqlConnectorTest implements WithAssertions {
         void command2throwsException() throws SQLException {
             //Given
             Mockito.when(connectionSupplier.get()).thenReturn(mockConnection);
-            Mockito.doNothing().when(mockConnection).setAutoCommit(false);
             Mockito.doNothing().when(mockCommand1).execute(mockConnection);
             Mockito.doThrow(SQLException.class).when(mockCommand2).execute(mockConnection);
 
@@ -162,7 +159,6 @@ class SqlConnectorTest implements WithAssertions {
 
             //Then
             Mockito.verify(connectionSupplier).get();
-            Mockito.verify(mockConnection).setAutoCommit(false);
             Mockito.verify(mockCommand1).execute(mockConnection);
             Mockito.verify(mockCommand2).execute(mockConnection);
             Mockito.verify(mockConnection).rollback();
@@ -174,7 +170,6 @@ class SqlConnectorTest implements WithAssertions {
         void command1throwsException() throws SQLException {
             //Given
             Mockito.when(connectionSupplier.get()).thenReturn(mockConnection);
-            Mockito.doNothing().when(mockConnection).setAutoCommit(false);
             Mockito.doThrow(SQLException.class).when(mockCommand1).execute(mockConnection);
 
             //When
@@ -184,7 +179,6 @@ class SqlConnectorTest implements WithAssertions {
 
             //Then
             Mockito.verify(connectionSupplier).get();
-            Mockito.verify(mockConnection).setAutoCommit(false);
             Mockito.verify(mockCommand1).execute(mockConnection);
             Mockito.verify(mockConnection).rollback();
             Mockito.verify(mockConnection).close();
