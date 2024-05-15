@@ -63,7 +63,7 @@ class ProductSqlMapperTest implements WithAssertions {
 
             //Then
             Mockito.verify(mockResultSet).next();
-            assertThat(result).isEqualTo(Optional.empty());
+            assertThat(result).isEmpty();
         }
 
         @Test
@@ -335,7 +335,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 Mockito.verify(mockConnection).prepareStatement("DELETE FROM products WHERE id=?;");
                 Mockito.verify(mockStatement).setLong(1, 12345L);
                 Mockito.verify(mockStatement).executeUpdate();
-                
+
             }
 
             @Test
@@ -353,7 +353,7 @@ class ProductSqlMapperTest implements WithAssertions {
                 //Then
                 Mockito.verify(mockConnection).prepareStatement("DELETE FROM products WHERE id=?;");
                 Mockito.verify(mockStatement).executeUpdate();
-                
+
             }
 
             @Test

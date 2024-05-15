@@ -27,6 +27,10 @@ public class BasketFixtures {
         return PRODUCT_1_ID;
     }
 
+    public static long anotherProductId() {
+        return PRODUCT_2_ID;
+    }
+
     public static Basket defaultEmptyBasket() {
 
         return new Basket(CUSTOMER_1_ID);
