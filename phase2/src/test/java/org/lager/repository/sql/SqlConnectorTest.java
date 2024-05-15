@@ -54,6 +54,7 @@ class SqlConnectorTest implements WithAssertions {
             //Then
             Mockito.verify(connectionSupplier).get();
             Mockito.verify(mockCommand).execute(mockConnection);
+            Mockito.verify(mockConnection).commit();
             Mockito.verify(mockDecoder).decode(mockResultSet);
             Mockito.verify(mockResultSet).close();
             Mockito.verify(mockConnection).close();
@@ -75,6 +76,7 @@ class SqlConnectorTest implements WithAssertions {
             //Then
             Mockito.verify(connectionSupplier).get();
             Mockito.verify(mockCommand).execute(mockConnection);
+            Mockito.verify(mockConnection).commit();
             Mockito.verify(mockDecoder).decode(mockResultSet);
             Mockito.verify(mockResultSet).close();
             Mockito.verify(mockConnection).close();
@@ -96,6 +98,27 @@ class SqlConnectorTest implements WithAssertions {
             //Then
             Mockito.verify(connectionSupplier).get();
             Mockito.verify(mockCommand).execute(mockConnection);
+            Mockito.verify(mockConnection).rollback();
+            Mockito.verify(mockConnection).close();
+        }
+
+        @Test
+        @DisplayName("and throws an exception during Query execution and cannot rollback")
+        void throwsExceptionDuringRollbackExecution() throws SQLException {
+            //Given
+            Mockito.when(connectionSupplier.get()).thenReturn(mockConnection);
+            Mockito.doThrow(SQLException.class).when(mockCommand).execute(mockConnection);
+            Mockito.doThrow(SQLException.class).when(mockConnection).rollback();
+
+            //When
+            connector = new SqlConnector(connectionSupplier);
+            assertThatThrownBy(() -> connector.receiveFromDB(mockCommand, mockDecoder))
+                    .isInstanceOf(SqlCommandException.class);
+
+            //Then
+            Mockito.verify(connectionSupplier).get();
+            Mockito.verify(mockCommand).execute(mockConnection);
+            Mockito.verify(mockConnection).rollback();
             Mockito.verify(mockConnection).close();
         }
 
@@ -135,6 +158,27 @@ class SqlConnectorTest implements WithAssertions {
             //When
             connector = new SqlConnector(connectionSupplier);
             connector.sendToDB(mockCommand1, mockCommand2);
+
+            //Then
+            Mockito.verify(connectionSupplier).get();
+            Mockito.verify(mockCommand1).execute(mockConnection);
+            Mockito.verify(mockCommand2).execute(mockConnection);
+            Mockito.verify(mockConnection).commit();
+            Mockito.verify(mockConnection).close();
+        }
+
+        @Test
+        @DisplayName("and executes properly with Array")
+        void properCaseWithArray() throws SQLException {
+            //Given
+            Mockito.when(connectionSupplier.get()).thenReturn(mockConnection);
+            Mockito.doNothing().when(mockCommand1).execute(mockConnection);
+            Mockito.doNothing().when(mockCommand2).execute(mockConnection);
+            Mockito.doNothing().when(mockConnection).commit();
+
+            //When
+            connector = new SqlConnector(connectionSupplier);
+            connector.sendToDB(mockCommand1, new SqlProcedure[]{mockCommand2});
 
             //Then
             Mockito.verify(connectionSupplier).get();

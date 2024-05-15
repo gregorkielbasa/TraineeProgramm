@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.RepositoryException;
+import org.lager.exception.SqlConnectionException;
 import org.lager.model.Product;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
@@ -86,6 +87,23 @@ class ProductSqlRepositoryTest implements WithAssertions {
             Mockito.verify(mockConnector).receiveFromDB(mockCommand, mockDecoder);
             assertThat(result).isEqualTo(defaultId());
         }
+
+        @Test
+        @DisplayName("and throws an Exception")
+        void throwsException() {
+            //Given
+            Mockito.when(mockMapper.getProductWithHighestIdCommand()).thenReturn(mockCommand);
+            Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).receiveFromDB(any(), any());
+
+            //When
+            assertThatThrownBy(() -> repository.getNextAvailableId())
+                    .isInstanceOf(RepositoryException.class);
+
+            //Then
+            Mockito.verify(mockMapper).getProductWithHighestIdCommand();
+            Mockito.verify(mockMapper).getResultSetDecoder();
+        }
     }
 
     @Nested
@@ -132,6 +150,23 @@ class ProductSqlRepositoryTest implements WithAssertions {
             Mockito.verify(mockConnector).receiveFromDB(mockCommand, mockDecoder);
             assertThat(result).isEqualTo(Optional.empty());
         }
+
+        @Test
+        @DisplayName("and throws an Exception")
+        void throwsException() {
+            //Given
+            Mockito.when(mockMapper.getReadCommand(any())).thenReturn(mockCommand);
+            Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).receiveFromDB(any(), any());
+
+            //When
+            assertThatThrownBy(() -> repository.read(defaultId()))
+                    .isInstanceOf(RepositoryException.class);
+
+            //Then
+            Mockito.verify(mockMapper).getReadCommand(defaultId());
+            Mockito.verify(mockMapper).getResultSetDecoder();
+        }
     }
 
     @Nested
@@ -152,6 +187,21 @@ class ProductSqlRepositoryTest implements WithAssertions {
             //Then
             Mockito.verify(mockMapper).getDeleteCommand(defaultId());
             Mockito.verify(mockConnector).sendToDB(mockCommand);
+        }
+
+        @Test
+        @DisplayName("and throws an Exception")
+        void throwsException() {
+            //Given
+            Mockito.when(mockMapper.getDeleteCommand(any())).thenReturn(mockCommand);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).sendToDB(any());
+
+            //When
+            assertThatThrownBy(() -> repository.delete(defaultId()))
+                    .isInstanceOf(RepositoryException.class);
+
+            //Then
+            Mockito.verify(mockMapper).getDeleteCommand(defaultId());
         }
     }
 
@@ -187,6 +237,26 @@ class ProductSqlRepositoryTest implements WithAssertions {
         }
 
         @Test
+        @DisplayName("but Product is present and throws an Exception")
+        void existsAndThrowsException() {
+            //Given
+            Mockito.when(mockMapper.getReadCommand(any())).thenReturn(mockReadCommand);
+            Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
+            Mockito.when(mockConnector.receiveFromDB(any(), any())).thenReturn(Optional.of(defaultProduct()));
+            Mockito.when(mockMapper.getUpdateNameCommand(any())).thenReturn(mockCommand);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).sendToDB(mockCommand);
+
+            //When
+            assertThatThrownBy(() -> repository.save(defaultProduct()))
+                    .isInstanceOf(RepositoryException.class);
+
+            //Then
+            Mockito.verify(mockMapper).getReadCommand(defaultId());
+            Mockito.verify(mockMapper).getResultSetDecoder();
+            Mockito.verify(mockMapper).getUpdateNameCommand(defaultProduct());
+        }
+
+        @Test
         @DisplayName("and inserts a new Product")
         void newProduct() {
             //Given
@@ -205,6 +275,26 @@ class ProductSqlRepositoryTest implements WithAssertions {
             Mockito.verify(mockConnector).receiveFromDB(mockReadCommand, mockDecoder);
             Mockito.verify(mockConnector).sendToDB(mockCommand);
         }
+
+        @Test
+        @DisplayName("but Product is present and throws an Exception")
+        void newProductAndThrowsException() {
+            //Given
+            Mockito.when(mockMapper.getReadCommand(any())).thenReturn(mockReadCommand);
+            Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
+            Mockito.when(mockConnector.receiveFromDB(any(), any())).thenReturn(Optional.empty());
+            Mockito.when(mockMapper.getInsertCommand(any())).thenReturn(mockCommand);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).sendToDB(mockCommand);
+
+            //When
+            assertThatThrownBy(() -> repository.save(defaultProduct()))
+                    .isInstanceOf(RepositoryException.class);
+
+            //Then
+            Mockito.verify(mockMapper).getReadCommand(defaultId());
+            Mockito.verify(mockMapper).getResultSetDecoder();
+            Mockito.verify(mockMapper).getInsertCommand(defaultProduct());
+        }
     }
 
     @Nested
@@ -217,6 +307,16 @@ class ProductSqlRepositoryTest implements WithAssertions {
         SqlDecoder<Optional<Product>> mockDecoder;
         @Mock
         SqlProcedure mockCommand;
+
+        @Test
+        @DisplayName("")
+        void initialisationFail() {
+            Mockito.when(mockMapper.getInitialCommand()).thenReturn(initCommand);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).sendToDB(initCommand);
+
+            assertThatThrownBy(() -> new ProductSqlRepository(mockMapper, mockConnector))
+                    .isInstanceOf(RepositoryException.class);
+        }
 
         @Test
         @DisplayName("when tries to save NULL Product")
