@@ -1,14 +1,18 @@
 package org.lager.repository.sql;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.lager.CustomerFixtures;
 import org.lager.exception.RepositoryException;
+import org.lager.exception.SqlConnectionException;
 import org.lager.model.Customer;
+import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.lager.repository.sql.functionalInterface.SqlFunction;
 import org.lager.repository.sql.functionalInterface.SqlProcedure;
-import org.lager.repository.sql.functionalInterface.SqlDecoder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -84,6 +88,23 @@ class CustomerSqlRepositoryTest implements WithAssertions {
             Mockito.verify(mockConnector).receiveFromDB(mockCommand, mockDecoder);
             assertThat(result).isEqualTo(defaultId());
         }
+
+        @Test
+        @DisplayName("and throws an Exception")
+        void throwsException() {
+            //Given
+            Mockito.when(mockMapper.getCustomerWithHighestIdCommand()).thenReturn(mockCommand);
+            Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).receiveFromDB(any(), any());
+
+            //When
+            assertThatThrownBy(() -> repository.getNextAvailableId())
+                    .isInstanceOf(RepositoryException.class);
+
+            //Then
+            Mockito.verify(mockMapper).getCustomerWithHighestIdCommand();
+            Mockito.verify(mockMapper).getResultSetDecoder();
+        }
     }
 
     @Nested
@@ -130,6 +151,23 @@ class CustomerSqlRepositoryTest implements WithAssertions {
             Mockito.verify(mockConnector).receiveFromDB(mockCommand, mockDecoder);
             assertThat(result).isEqualTo(Optional.empty());
         }
+
+        @Test
+        @DisplayName("and throws an Exception")
+        void throwsException() {
+            //Given
+            Mockito.when(mockMapper.getReadCommand(any())).thenReturn(mockCommand);
+            Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).receiveFromDB(any(), any());
+
+            //When
+            assertThatThrownBy(() -> repository.read(CustomerFixtures.defaultId()))
+                    .isInstanceOf(RepositoryException.class);
+
+            //Then
+            Mockito.verify(mockMapper).getReadCommand(CustomerFixtures.defaultId());
+            Mockito.verify(mockMapper).getResultSetDecoder();
+        }
     }
 
     @Nested
@@ -150,6 +188,21 @@ class CustomerSqlRepositoryTest implements WithAssertions {
             //Then
             Mockito.verify(mockMapper).getDeleteCommand(defaultId());
             Mockito.verify(mockConnector).sendToDB(mockCommand);
+        }
+
+        @Test
+        @DisplayName("and throws an Exception")
+        void throwsException() {
+            //Given
+            Mockito.when(mockMapper.getDeleteCommand(any())).thenReturn(mockCommand);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).sendToDB(any());
+
+            //When
+            assertThatThrownBy(() -> repository.delete(CustomerFixtures.defaultId()))
+                    .isInstanceOf(RepositoryException.class);
+
+            //Then
+            Mockito.verify(mockMapper).getDeleteCommand(CustomerFixtures.defaultId());
         }
     }
 
@@ -185,6 +238,26 @@ class CustomerSqlRepositoryTest implements WithAssertions {
         }
 
         @Test
+        @DisplayName("but Customer is present and throws an Exception")
+        void existingAndThrowsException() {
+            //Given
+            Mockito.when(mockMapper.getReadCommand(any())).thenReturn(mockReadCommand);
+            Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
+            Mockito.when(mockConnector.receiveFromDB(any(), any())).thenReturn(Optional.of(defaultCustomer()));
+            Mockito.when(mockMapper.getUpdateNameCommand(any())).thenReturn(mockCommand);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).sendToDB(mockCommand);
+
+            //When
+            assertThatThrownBy(() -> repository.save(defaultCustomer()))
+                    .isInstanceOf(RepositoryException.class);
+
+            //Then
+            Mockito.verify(mockMapper).getReadCommand(defaultId());
+            Mockito.verify(mockMapper).getResultSetDecoder();
+            Mockito.verify(mockMapper).getUpdateNameCommand(defaultCustomer());
+        }
+
+        @Test
         @DisplayName("and inserts a new Customer")
         void newCustomer() {
             //Given
@@ -203,6 +276,26 @@ class CustomerSqlRepositoryTest implements WithAssertions {
             Mockito.verify(mockConnector).receiveFromDB(mockReadCommand, mockDecoder);
             Mockito.verify(mockConnector).sendToDB(mockCommand);
         }
+
+        @Test
+        @DisplayName("and inserts a new Customer and throws an Exception")
+        void newCustomerAndThrowsException() {
+            //Given
+            Mockito.when(mockMapper.getReadCommand(any())).thenReturn(mockReadCommand);
+            Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
+            Mockito.when(mockConnector.receiveFromDB(any(), any())).thenReturn(Optional.empty());
+            Mockito.when(mockMapper.getInsertCommand(any())).thenReturn(mockCommand);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).sendToDB(mockCommand);
+
+            //When
+            assertThatThrownBy(() -> repository.save(defaultCustomer()))
+                    .isInstanceOf(RepositoryException.class);
+
+            //Then
+            Mockito.verify(mockMapper).getReadCommand(defaultId());
+            Mockito.verify(mockMapper).getResultSetDecoder();
+            Mockito.verify(mockMapper).getInsertCommand(defaultCustomer());
+        }
     }
 
     @Nested
@@ -215,6 +308,16 @@ class CustomerSqlRepositoryTest implements WithAssertions {
         SqlDecoder<Optional<Customer>> mockDecoder;
         @Mock
         SqlProcedure mockCommand;
+
+        @Test
+        @DisplayName("when fails to initialize tables")
+        void initialisationFail() {
+            Mockito.when(mockMapper.getInitialCommand()).thenReturn(initCommand);
+            Mockito.doThrow(SqlConnectionException.class).when(mockConnector).sendToDB(initCommand);
+
+            assertThatThrownBy(() -> new CustomerSqlRepository(mockMapper, mockConnector))
+                    .isInstanceOf(RepositoryException.class);
+        }
 
         @Test
         @DisplayName("when tries to save NULL Customer")

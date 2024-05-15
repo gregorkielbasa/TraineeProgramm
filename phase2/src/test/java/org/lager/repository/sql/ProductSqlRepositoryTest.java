@@ -309,7 +309,7 @@ class ProductSqlRepositoryTest implements WithAssertions {
         SqlProcedure mockCommand;
 
         @Test
-        @DisplayName("")
+        @DisplayName("when fails to initialize tables")
         void initialisationFail() {
             Mockito.when(mockMapper.getInitialCommand()).thenReturn(initCommand);
             Mockito.doThrow(SqlConnectionException.class).when(mockConnector).sendToDB(initCommand);
