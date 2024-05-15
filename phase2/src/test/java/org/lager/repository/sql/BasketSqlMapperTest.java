@@ -296,7 +296,7 @@ class BasketSqlMapperTest implements WithAssertions {
             }
 
             @Test
-            @DisplayName("")
+            @DisplayName("and works")
             void insertBiggerBasket() {
                 //Given
                 BasketSqlMapper mockMapper = spy(mapper);

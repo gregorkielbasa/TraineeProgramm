@@ -109,15 +109,6 @@ public class OrderSqlMapper {
         };
     }
 
-    public SqlProcedure getDeleteAllOrderItemsCommand(long id) {
-        return connection -> {
-            String command = "DELETE FROM order_items WHERE order_id=?;";
-            PreparedStatement statement = connection.prepareStatement(command);
-            statement.setLong(1, id);
-            statement.executeUpdate();
-        };
-    }
-
     public SqlProcedure[] getInsertOrderCommands(Order order) {
         ArrayList<SqlProcedure> commandQueue = new ArrayList<>();
 
