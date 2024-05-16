@@ -6,6 +6,7 @@ import org.lager.repository.json.JsonOrder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public class OrderFixtures {
     private final static long ORDER_ID = 1000;
@@ -29,8 +30,12 @@ public class OrderFixtures {
         return LocalDateTime.of(2024, 12, 31, 23, 59);
     }
 
-    public static List<OrderItem> defaultItems() {
+    public static List<OrderItem> defaultItemsList() {
         return List.of(ITEM_1, ITEM_2);
+    }
+
+    public static Map<Long, Integer> defaultItemsMap() {
+        return Map.of(ITEM_1.productId(), ITEM_1.amount(), ITEM_2.productId(), ITEM_2.amount());
     }
 
     public static Order defaultOrder() {

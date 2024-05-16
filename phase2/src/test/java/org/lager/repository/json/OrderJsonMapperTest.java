@@ -5,14 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.lager.model.Order;
-import org.lager.model.OrderItem;
-import org.mockito.internal.matchers.Or;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.lager.OrderFixtures.*;
 
 @DisplayName("Order JSON ObjectMapper")
@@ -36,7 +32,7 @@ class OrderJsonMapperTest implements WithAssertions {
         @Test
         @DisplayName("a record with NULL Date")
         void nullDate() {
-            JsonOrder input = new JsonOrder(defaultId(), defaultCustomerId(), null, defaultItems());
+            JsonOrder input = new JsonOrder(defaultId(), defaultCustomerId(), null, defaultItemsList());
             Optional<Order> output = jsonMapper.jsonRecordToOrder(input);
 
             assertThat(output).isEmpty();
