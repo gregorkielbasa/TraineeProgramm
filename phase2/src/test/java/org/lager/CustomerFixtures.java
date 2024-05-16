@@ -12,6 +12,10 @@ public class CustomerFixtures {
         return CUSTOMER_1_ID;
     }
 
+    public static long anotherId() {
+        return CUSTOMER_2_ID;
+    }
+
     public static String defaultName() {
         return CUSTOMER_1_NAME;
     }

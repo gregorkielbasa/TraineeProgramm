@@ -111,7 +111,7 @@ class OrderSqlMapperTest {
                 Mockito.when(mockConnection.createStatement()).thenReturn(mockStatement);
 
                 //When
-                SqlProcedure command = mapper.getOrderInitialCommand();
+                SqlProcedure command = mapper.getInitialOrderCommand();
                 command.execute(mockConnection);
 
                 //Then
@@ -131,7 +131,7 @@ class OrderSqlMapperTest {
                 Mockito.when(mockConnection.createStatement()).thenReturn(mockStatement);
 
                 //When
-                SqlProcedure command = mapper.getOrderItemInitialCommand();
+                SqlProcedure command = mapper.getInitialOrderItemCommand();
                 command.execute(mockConnection);
 
                 //Then
@@ -153,7 +153,7 @@ class OrderSqlMapperTest {
                 Mockito.doThrow(SQLException.class).when(mockStatement).execute(any());
 
                 //When
-                SqlProcedure command = mapper.getOrderInitialCommand();
+                SqlProcedure command = mapper.getInitialOrderCommand();
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 
@@ -170,7 +170,7 @@ class OrderSqlMapperTest {
                 Mockito.doThrow(SQLException.class).when(mockConnection).createStatement();
 
                 //When
-                SqlProcedure command = mapper.getOrderInitialCommand();
+                SqlProcedure command = mapper.getInitialOrderCommand();
                 assertThatThrownBy(() -> command.execute(mockConnection))
                         .isInstanceOf(SQLException.class);
 

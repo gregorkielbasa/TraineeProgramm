@@ -55,7 +55,7 @@ class BasketSqlRepositoryTest {
         SqlDecoder<Optional<Basket>> mockDecoder;
 
         @Test
-        @DisplayName("and gets a Customer")
+        @DisplayName("and gets a Basket")
         void properCase() {
             //Given
             Mockito.when(mockMapper.getReadWholeBasketCommand(anyLong())).thenReturn(mockCommand);
@@ -87,7 +87,7 @@ class BasketSqlRepositoryTest {
             Mockito.verify(mockMapper).getReadWholeBasketCommand(defaultCustomerId());
             Mockito.verify(mockMapper).getResultSetDecoder();
             Mockito.verify(mockConnector).receiveFromDB(mockCommand, mockDecoder);
-            assertThat(result).isEqualTo(Optional.empty());
+            assertThat(result).isEmpty();
         }
 
         @Test
@@ -158,8 +158,8 @@ class BasketSqlRepositoryTest {
         SqlProcedure[] mockInsertCommands = new SqlProcedure[2];
 
         @Test
-        @DisplayName("but Customer is present")
-        void existingCustomer() {
+        @DisplayName("but Basket is present")
+        void existingBasket() {
             //Given
             Mockito.when(mockMapper.getReadWholeBasketCommand(anyLong())).thenReturn(mockReadCommand);
             Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
@@ -181,7 +181,7 @@ class BasketSqlRepositoryTest {
         }
 
         @Test
-        @DisplayName("but Customer is present and throws an Exception")
+        @DisplayName("but Basket is present and throws an Exception")
         void existingAndThrowsException() {
             //Given
             Mockito.when(mockMapper.getReadWholeBasketCommand(anyLong())).thenReturn(mockReadCommand);
@@ -203,8 +203,8 @@ class BasketSqlRepositoryTest {
         }
 
         @Test
-        @DisplayName("and inserts a new Customer")
-        void newCustomer() {
+        @DisplayName("and inserts a new Basket")
+        void newBasket() {
             //Given
             Mockito.when(mockMapper.getReadWholeBasketCommand(anyLong())).thenReturn(mockReadCommand);
             Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
@@ -223,8 +223,8 @@ class BasketSqlRepositoryTest {
         }
 
         @Test
-        @DisplayName("and inserts a new Customer and throws an Exception")
-        void newCustomerAndThrowsException() {
+        @DisplayName("and inserts a new Basket and throws an Exception")
+        void newBasketAndThrowsException() {
             //Given
             Mockito.when(mockMapper.getReadWholeBasketCommand(anyLong())).thenReturn(mockReadCommand);
             Mockito.when(mockMapper.getResultSetDecoder()).thenReturn(mockDecoder);
@@ -268,7 +268,7 @@ class BasketSqlRepositoryTest {
 
         @Test
         @DisplayName("when tries to save NULL Basket")
-        void nullCustomer() {
+        void nullBasket() {
             assertThatThrownBy(() -> repository.save(null))
                     .isInstanceOf(RepositoryException.class);
         }

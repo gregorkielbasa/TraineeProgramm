@@ -55,7 +55,7 @@ public class OrderSqlMapper {
         };
     }
 
-    public SqlProcedure getOrderInitialCommand() {
+    public SqlProcedure getInitialOrderCommand() {
         return connection -> {
             String command = """
                     CREATE TABLE IF NOT EXISTS orders (
@@ -68,7 +68,7 @@ public class OrderSqlMapper {
         };
     }
 
-    public SqlProcedure getOrderItemInitialCommand() {
+    public SqlProcedure getInitialOrderItemCommand() {
         return connection -> {
             String command = """
                     CREATE TABLE IF NOT EXISTS order_items (

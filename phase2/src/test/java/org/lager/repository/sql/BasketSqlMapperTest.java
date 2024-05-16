@@ -66,6 +66,28 @@ class BasketSqlMapperTest implements WithAssertions {
         }
 
         @Test
+        @DisplayName("and returns more complicated Basket")
+        void biggerCase() throws SQLException {
+            //Given
+            Mockito.when(mockResultSet.next())
+                    .thenReturn(true).thenReturn(true).thenReturn(false);
+            Mockito.when(mockResultSet.getLong("customer_id"))
+                    .thenReturn(anotherCustomerId()).thenReturn(anotherCustomerId());
+            Mockito.when(mockResultSet.getLong("product_id"))
+                    .thenReturn(defaultProductId()).thenReturn(anotherProductId());
+            Mockito.when(mockResultSet.getInt("amount"))
+                    .thenReturn(2).thenReturn(3);
+
+            //When
+            SqlDecoder<Optional<Basket>> decoder = mapper.getResultSetDecoder();
+            Optional<Basket> result = decoder.decode(mockResultSet);
+
+            //Then
+            Mockito.verify(mockResultSet, Mockito.times(3)).next();
+            assertThat(result).isEqualTo(Optional.of(anotherBasket()));
+        }
+
+        @Test
         @DisplayName("and things go wrong")
         void serverError() throws SQLException {
             //Given

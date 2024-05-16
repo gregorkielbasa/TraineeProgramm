@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Repository
@@ -31,8 +30,8 @@ public class OrderSqlRepository implements OrderRepository {
     }
 
     private void initialTables() {
-        SqlProcedure command1 = mapper.getOrderInitialCommand();
-        SqlProcedure command2 = mapper.getOrderItemInitialCommand();
+        SqlProcedure command1 = mapper.getInitialOrderCommand();
+        SqlProcedure command2 = mapper.getInitialOrderItemCommand();
 
         try {
             connector.sendToDB(command1, command2);

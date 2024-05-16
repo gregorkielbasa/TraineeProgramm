@@ -21,11 +21,13 @@ class CustomerServiceIntegration implements WithAssertions {
     CustomerService service;
 
     @Test
-    void properCase() {
+    void testCustomerServiceOperations() {
 
         assertThat(service.search(defaultId())).isEmpty();
         service.create("customerOne");
+        service.create("customerTwo");
         assertThat(service.search(defaultId())).isEqualTo(Optional.of(defaultCustomer()));
+        assertThat(service.search(anotherId())).isEqualTo(Optional.of(anotherCustomer()));
 
         service.rename(defaultId(), "newName");
         assertThat(service.search(defaultId())).isEqualTo(Optional.of(customerWithName("newName")));
