@@ -15,7 +15,7 @@ import static org.lager.CustomerFixtures.*;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:integrationtest.properties")
 @ActiveProfiles("database")
-class CustomerServiceIntegration implements WithAssertions {
+class TestCustomerServiceIntegration implements WithAssertions {
 
     @Autowired
     CustomerService service;
@@ -34,5 +34,6 @@ class CustomerServiceIntegration implements WithAssertions {
 
         service.delete(defaultId());
         assertThat(service.search(defaultId())).isEmpty();
+        assertThat(service.search(anotherId())).isEqualTo(Optional.of(anotherCustomer()));
     }
 }

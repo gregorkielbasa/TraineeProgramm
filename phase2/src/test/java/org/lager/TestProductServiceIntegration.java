@@ -15,7 +15,7 @@ import static org.lager.ProductFixtures.*;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:integrationtest.properties")
 @ActiveProfiles("database")
-class ProductServiceIntegration implements WithAssertions {
+class TestProductServiceIntegration implements WithAssertions {
 
     @Autowired
     ProductService service;
