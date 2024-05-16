@@ -21,9 +21,10 @@ class ProductServiceIntegration implements WithAssertions {
     ProductService service;
 
     @Test
-    void testCustomerServiceOperations() {
+    void testProductServiceOperations() {
 
         assertThat(service.search(defaultId())).isEmpty();
+        assertThat(service.search(anotherId())).isEmpty();
         service.create("Product One");
         service.create("Product Two");
         assertThat(service.search(defaultId())).isEqualTo(Optional.of(defaultProduct()));
@@ -34,5 +35,6 @@ class ProductServiceIntegration implements WithAssertions {
 
         service.delete(defaultId());
         assertThat(service.search(defaultId())).isEmpty();
+        assertThat(service.search(anotherId())).isEqualTo(Optional.of(anotherProduct()));
     }
 }
