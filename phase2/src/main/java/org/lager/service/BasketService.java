@@ -26,7 +26,7 @@ public class BasketService {
     }
 
     private Optional<Basket> getBasket(long customerId) {
-        return repository.read(customerId);
+        return repository.findById(customerId);
     }
 
     public Map<Long, Integer> getContentOfBasket(long customerId) {
@@ -37,7 +37,7 @@ public class BasketService {
 
     public void dropBasket(long customerId) {
         logger.info("BasketService empties {} Basket", customerId);
-        repository.delete(customerId);
+        repository.deleteById(customerId);
     }
 
     public void removeFromBasket(long customerId, long productId) {

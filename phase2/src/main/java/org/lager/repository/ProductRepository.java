@@ -1,8 +1,9 @@
 package org.lager.repository;
 
 import org.lager.model.Product;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface ProductRepository extends Repository<Product, Long> {
-
-    long getNextAvailableId();
+@Repository
+public interface ProductRepository extends CrudRepository<Product, Long> {
 }
