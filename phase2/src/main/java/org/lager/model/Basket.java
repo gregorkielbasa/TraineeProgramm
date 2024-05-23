@@ -3,6 +3,8 @@ package org.lager.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -13,15 +15,22 @@ import java.util.stream.Collectors;
 public class Basket {
 
     @Id
-    private final long customerId;
-    @MappedCollection(idColumn = "CUSTOMER_ID", keyColumn = "PRODUCT_ID")
+    private final long basketId;
+    @MappedCollection(idColumn = "BASKET_ID", keyColumn = "PRODUCT_ID")
     private final Map<Long, BasketItem> items;
+    @Transient
     private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
     public Basket(long customerId) {
-        this.customerId = customerId;
+        this.basketId = customerId;
         this.items = new HashMap<>();
         logger.info("New Basket {} has been created.", customerId);
+    }
+
+    @PersistenceCreator
+    public Basket(long basketId, Map<Long, BasketItem> items) {
+        this.basketId = basketId;
+        this.items = items;
     }
 
     public Map<Long, Integer> getContent() {
@@ -30,7 +39,7 @@ public class Basket {
     }
 
     public void insert(long productId, int amount) {
-        logger.debug("Basket {} is changing amount of {} Product about {}", customerId, productId, amount);
+        logger.debug("Basket {} is changing amount of {} Product about {}", basketId, productId, amount);
         int newAmount = amount;
         if (isProductPresent(productId))
             newAmount += items.get(productId).amount();
@@ -45,7 +54,7 @@ public class Basket {
     }
 
     public void remove(long productId) {
-        logger.debug("Basket {} is removing {} Product", customerId, productId);
+        logger.debug("Basket {} is removing {} Product", basketId, productId);
         items.remove(productId);
     }
 
@@ -55,20 +64,24 @@ public class Basket {
                 : 0;
     }
 
-    public long getCustomerId() {
-        return customerId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Basket basket = (Basket) o;
-        return customerId == basket.customerId && Objects.equals(items, basket.items);
+        return basketId == basket.basketId && Objects.equals(items, basket.items);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(items, customerId);
+        return Objects.hash(items, basketId);
+    }
+
+    @Override
+    public String toString() {
+        return "Basket{" +
+                "basketId=" + basketId +
+                ", items=" + items +
+                '}';
     }
 }
