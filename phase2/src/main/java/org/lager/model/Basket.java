@@ -16,20 +16,23 @@ public class Basket {
 
     @Id
     private final long basketId;
+    private final long customerId;
     @MappedCollection(idColumn = "BASKET_ID", keyColumn = "PRODUCT_ID")
     private final Map<Long, BasketItem> items;
     @Transient
     private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
     public Basket(long customerId) {
-        this.basketId = customerId;
+        this.basketId = 0;
+        this.customerId = customerId;
         this.items = new HashMap<>();
         logger.info("New Basket {} has been created.", customerId);
     }
 
     @PersistenceCreator
-    public Basket(long basketId, Map<Long, BasketItem> items) {
+    public Basket(long basketId, long customerId, Map<Long, BasketItem> items) {
         this.basketId = basketId;
+        this.customerId = customerId;
         this.items = items;
     }
 
@@ -81,6 +84,7 @@ public class Basket {
     public String toString() {
         return "Basket{" +
                 "basketId=" + basketId +
+                ", customerId=" + customerId +
                 ", items=" + items +
                 '}';
     }
