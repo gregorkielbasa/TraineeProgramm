@@ -9,10 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -27,7 +25,7 @@ public class OrderService {
     }
 
     public Optional<Order> getOrder(long orderID) {
-        return repository.read(orderID);
+        return repository.findById(orderID);
     }
 
     public Order order(long basketId) {
@@ -35,25 +33,24 @@ public class OrderService {
     }
 
     public Order order(long basketId, LocalDateTime dataTime) {
-        long newOrderId = repository.getNextAvailableId();
         logger.debug("OrderService starts to order {} Basket", basketId);
-        List<OrderItem> items = getOrderItemsFromBasket(basketId);
-        Order newOrder = new Order(newOrderId, basketId, dataTime, items);
+        Set<OrderItem> items = getOrderItemsFromBasket(basketId);
+        Order newOrder = new Order(basketId, items);
         repository.save(newOrder);
         basketService.dropBasket(basketId);
         logger.debug("OrderService finished to order {} Basket", basketId);
         return newOrder;
     }
 
-    private List<OrderItem> getOrderItemsFromBasket(long basketId) {
-        List<OrderItem> result = new ArrayList<>();
-        getContentOfBasket(basketId).forEach((productId, amount) -> result.add(new OrderItem(productId, amount)));
-        return result;
+    private Set<OrderItem> getOrderItemsFromBasket(long basketId) {
+        return getContentOfBasket(basketId).entrySet().stream()
+                .map(entry -> new OrderItem(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toSet());
     }
 
     private Map<Long, Integer> getContentOfBasket(long basketId) {
         Map<Long, Integer> contentOfBasket = basketService.getContentOfBasket(basketId);
-        if (contentOfBasket == null)
+        if (contentOfBasket.isEmpty())
             throw new OrderItemListNotPresentException(basketId);
         return contentOfBasket;
     }

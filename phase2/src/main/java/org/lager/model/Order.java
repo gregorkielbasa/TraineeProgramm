@@ -2,7 +2,6 @@ package org.lager.model;
 
 import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemSetNotPresentException;
-import org.lager.exception.OrderTimeNullException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
@@ -11,8 +10,6 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Set;
 import java.util.Objects;
