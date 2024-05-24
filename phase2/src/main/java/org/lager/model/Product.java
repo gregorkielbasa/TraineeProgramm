@@ -45,26 +45,18 @@ public class Product {
             throw new ProductIllegalNameException(name);
     }
 
-    public String getProductName() {
-        return productName;
-    }
-
     public long getProductId() {
         return productId;
+    }
+
+    public String getProductName() {
+        return productName;
     }
 
     public void setProductName(String productName) {
         logger.info("Product {} with {} productName is changing its productName to {}.", this.productId, this.productName, productName);
         validateName(productName);
         this.productName = productName;
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "ID=" + productId +
-                ", productName='" + productName + '\'' +
-                '}';
     }
 
     @Override
@@ -78,5 +70,13 @@ public class Product {
     @Override
     public int hashCode() {
         return Objects.hash(productName, productId);
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "ID=" + productId +
+                ", productName='" + productName + '\'' +
+                '}';
     }
 }

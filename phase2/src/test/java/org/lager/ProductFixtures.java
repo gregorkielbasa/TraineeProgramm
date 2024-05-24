@@ -16,6 +16,10 @@ public class ProductFixtures {
         return PRODUCT_1_NAME;
     }
 
+    public static long anotherProductId() {
+        return PRODUCT_2_ID;
+    }
+
     public static long incorrectProductId() {
         return 1;
     }
@@ -34,10 +38,6 @@ public class ProductFixtures {
 
     public static Product defaultProduct() {
         return new Product(PRODUCT_1_ID, PRODUCT_1_NAME);
-    }
-
-    public static long anotherProductId() {
-        return PRODUCT_2_ID;
     }
 
     public static Product anotherProduct() {

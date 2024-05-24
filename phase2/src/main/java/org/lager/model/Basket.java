@@ -28,10 +28,18 @@ public class Basket {
     }
 
     @PersistenceCreator
-    protected Basket(long basketId, long customerId, Map<Long, BasketItem> items) {
+    public Basket(long basketId, long customerId, Map<Long, BasketItem> items) {
         this.basketId = basketId;
         this.customerId = customerId;
-        this.items = items;
+        this.items = new HashMap<>(items);
+    }
+
+    public long getBasketId() {
+        return basketId;
+    }
+
+    public long getCustomerId() {
+        return customerId;
     }
 
     public Map<Long, Integer> getContent() {
@@ -63,14 +71,6 @@ public class Basket {
         return isProductPresent(productId)
                 ? items.get(productId).amount()
                 : 0;
-    }
-
-    public long getCustomerId() {
-        return customerId;
-    }
-
-    public long getBasketId() {
-        return basketId;
     }
 
     @Override

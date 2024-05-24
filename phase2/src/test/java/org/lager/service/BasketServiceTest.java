@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.NoSuchBasketException;
+import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.NoSuchProductException;
 import org.lager.repository.BasketRepository;
 import org.mockito.Mock;
@@ -16,6 +17,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.lager.BasketFixtures.*;
+import static org.lager.CustomerFixtures.defaultCustomerId;
+import static org.lager.ProductFixtures.anotherProductId;
+import static org.lager.ProductFixtures.defaultProductId;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BasketService")
@@ -37,86 +42,96 @@ class BasketServiceTest implements WithAssertions {
         @Test
         @DisplayName("existing Basket")
         void existingID() {
-            Mockito.when(repository.read(defaultCustomerId()))
+            Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.of(defaultBasket()));
 
             basketService = new BasketService(repository, customerService, productService);
+            Map<Long, Integer> items = basketService.getContentOfBasket(defaultCustomerId());
 
-            assertThat(basketService.getContentOfBasket(defaultCustomerId()))
-                    .containsExactlyInAnyOrderEntriesOf(basketContentOf(defaultBasket()));
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            assertThat(items).containsExactlyInAnyOrderEntriesOf(basketContentOf(defaultBasket()));
         }
 
         @Test
         @DisplayName("non-existing Basket")
         void nonExistingID() {
-            Mockito.when(repository.read(defaultCustomerId()))
+            Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.empty());
 
             basketService = new BasketService(repository, customerService, productService);
+            Map<Long, Integer> items = basketService.getContentOfBasket(defaultCustomerId());
 
-            assertThat(basketService.getContentOfBasket(defaultCustomerId()))
-                    .containsExactlyInAnyOrderEntriesOf(Map.of());
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            assertThat(items).isEmpty();
         }
 
         @Test
         @DisplayName("empty Basket")
-        void emptyID() {
-            Mockito.when(repository.read(defaultCustomerId()))
-                    .thenReturn(Optional.of(defaultEmptyBasket()));
+        void emptyID() {Mockito.when(repository.findByCustomerId(anyLong()))
+                .thenReturn(Optional.of(defaultEmptyBasket()));
 
             basketService = new BasketService(repository, customerService, productService);
+            Map<Long, Integer> items = basketService.getContentOfBasket(defaultCustomerId());
 
-            assertThat(basketService.getContentOfBasket(defaultCustomerId()))
-                    .containsExactlyInAnyOrderEntriesOf(Map.of());
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            assertThat(items).isEmpty();
         }
     }
 
     @Test
     @DisplayName("drop (deletes) a Basket")
     void NotEmptyBasket() {
-        Mockito.doNothing().when(repository).delete(defaultCustomerId());
+        Mockito.doNothing().when(repository).deleteByCustomerId(anyLong());
 
         basketService = new BasketService(repository, customerService, productService);
-
         basketService.dropBasket(defaultCustomerId());
+
+        Mockito.verify(repository).deleteByCustomerId(defaultCustomerId());
     }
 
     @Nested
-    @DisplayName("removes")
+    @DisplayName("removes a product")
     class removeFromBasket {
 
         @Test
         @DisplayName("from an existing Basket")
         void emptyBasket() {
-            Mockito.when(repository.read(defaultCustomerId()))
+            Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.of(defaultBasket()));
-            Mockito.doNothing().when(repository).save(defaultEmptyBasket());
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.removeFromBasket(defaultCustomerId(), defaultProductId());
+
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            Mockito.verify(repository).save(defaultEmptyBasket());
         }
 
         @Test
         @DisplayName("from a non-existing Basket")
         void nonExistingBasket() {
-            Mockito.when(repository.read(defaultCustomerId()))
+            Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.empty());
 
             basketService = new BasketService(repository, customerService, productService);
 
             assertThatThrownBy(() -> basketService.removeFromBasket(defaultCustomerId(), defaultProductId()))
                     .isInstanceOf(NoSuchBasketException.class);
+
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
         }
 
         @Test
         @DisplayName("non-exisitng Product")
         void nonExistingProduct() {
-            Mockito.when(repository.read(defaultCustomerId()))
+            Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.of(defaultBasket()));
-            Mockito.doNothing().when(repository).save(defaultBasket());
 
             basketService = new BasketService(repository, customerService, productService);
-            basketService.removeFromBasket(defaultCustomerId(), 1L);
+            basketService.removeFromBasket(defaultCustomerId(), anotherProductId());
+
+
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            Mockito.verify(repository).save(defaultBasket());
         }
     }
 
@@ -125,54 +140,80 @@ class BasketServiceTest implements WithAssertions {
     class addToBasket {
 
         @Test
-        @DisplayName("basket but product doesn't exist")
-        void nonExistingProduct() {
-            Mockito.doThrow(new NoSuchProductException(defaultProductId()))
-                    .when(productService).validatePresence(defaultProductId());
-
-            basketService = new BasketService(repository, customerService, productService);
-
-            assertThatThrownBy(() -> basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1))
-                    .isInstanceOf(NoSuchProductException.class);
-        }
-
-        @Test
         @DisplayName("non-existing Basket")
         void nonExistingBasket() {
-            Mockito.doNothing().when(productService).validatePresence(defaultProductId());
-            Mockito.doNothing().when(customerService).validatePresence(defaultCustomerId());
-            Mockito.when(repository.read(defaultCustomerId()))
+            Mockito.doNothing().when(productService).validatePresence(anyLong());
+            Mockito.doNothing().when(customerService).validatePresence(anyLong());
+            Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.empty());
-            Mockito.doNothing().when(repository).save(defaultBasket());
 
             basketService = new BasketService(repository, customerService, productService);
-
             basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1);
+
+            Mockito.verify(productService).validatePresence(defaultProductId());
+            Mockito.verify(customerService).validatePresence(defaultCustomerId());
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            Mockito.verify(repository).save(defaultNewBasket());
         }
 
         @Test
         @DisplayName("empty Basket")
         void emptyBasket() {
-            Mockito.doNothing().when(productService).validatePresence(defaultProductId());
-            Mockito.when(repository.read(defaultCustomerId()))
+            Mockito.doNothing().when(productService).validatePresence(anyLong());
+            Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.of(defaultEmptyBasket()));
-            Mockito.doNothing().when(repository).save(defaultBasket());
 
             basketService = new BasketService(repository, customerService, productService);
-
             basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1);
+
+            Mockito.verify(productService).validatePresence(defaultProductId());
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            Mockito.verify(repository).save(defaultBasket());
         }
 
         @Test
         @DisplayName("non-empty Basket")
         void nonEmptyBasket() {
-            Mockito.doNothing().when(productService).validatePresence(defaultProductId());
-            Mockito.when(repository.read(defaultCustomerId()))
+            Mockito.doNothing().when(productService).validatePresence(anyLong());
+            Mockito.when(repository.findByCustomerId(defaultCustomerId()))
                     .thenReturn(Optional.of(defaultBasket()));
-            Mockito.doNothing().when(repository).save(defaultBasketWith(defaultProductId(), 2));
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1);
+
+            Mockito.verify(productService).validatePresence(defaultProductId());
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            Mockito.verify(repository).save(defaultBasketWith(defaultProductId(), 2));
+        }
+
+        @Test
+        @DisplayName("basket but product doesn't exist")
+        void nonExistingProduct() {
+            Mockito.doThrow(new NoSuchProductException(defaultProductId()))
+                    .when(productService).validatePresence(anyLong());
+
+            basketService = new BasketService(repository, customerService, productService);
+
+            assertThatThrownBy(() -> basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1))
+                    .isInstanceOf(NoSuchProductException.class);
+
+            Mockito.verify(productService).validatePresence(defaultProductId());
+        }
+
+        @Test
+        @DisplayName("basket but customer doesn't exist")
+        void nonExistingCustomer() {
+            Mockito.doNothing().when(productService).validatePresence(anyLong());
+            Mockito.doThrow(new NoSuchCustomerException(defaultCustomerId()))
+                    .when(customerService).validatePresence(anyLong());
+
+            basketService = new BasketService(repository, customerService, productService);
+
+            assertThatThrownBy(() -> basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1))
+                    .isInstanceOf(NoSuchCustomerException.class);
+
+            Mockito.verify(productService).validatePresence(defaultProductId());
+            Mockito.verify(customerService).validatePresence(defaultCustomerId());
         }
     }
 }

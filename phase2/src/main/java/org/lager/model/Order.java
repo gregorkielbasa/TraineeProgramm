@@ -25,7 +25,7 @@ public class Order {
     @MappedCollection(idColumn = "ORDER_ID")
     private final Set<OrderItem> items;
 
-    public Order(long customerId, Set<OrderItem> items) {
+    public Order(long customerId, Collection<OrderItem> items) {
         this(0, customerId, items);
         logger.info("New Order {} has been created.", customerId);
     }

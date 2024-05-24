@@ -174,7 +174,7 @@ class BasketTest implements WithAssertions {
 
         @Test
         @DisplayName("of two different Baskets")
-        void differentIdBasket() {
+        void differentCustomerId() {
             Basket basket1 = new Basket(123_456_789L);
             basket1.insert(100_000_000, 1);
 
@@ -191,6 +191,18 @@ class BasketTest implements WithAssertions {
             basket1.insert(123_123_123, 1);
 
             Basket basket2 = new Basket(123_456_789L);
+            basket2.insert(100_000_000, 1);
+
+            assertThat(basket1.equals(basket2)).isFalse();
+        }
+
+        @Test
+        @DisplayName("of two the same Baskets with different Items")
+        void differentBasketId() {
+            Basket basket1 = new Basket(0, 123_456_789L, Map.of());
+            basket1.insert(100_000_000, 1);
+
+            Basket basket2 = new Basket(1, 123_456_789L, Map.of());
             basket2.insert(100_000_000, 1);
 
             assertThat(basket1.equals(basket2)).isFalse();
@@ -234,5 +246,21 @@ class BasketTest implements WithAssertions {
             assertThat(basket1.hashCode())
                     .isNotEqualTo(basket3.hashCode());
         }
+    }
+
+    @Test
+    @DisplayName("")
+    void getBasketIdTest() {
+        Basket basket = new Basket(123_123_123L);
+
+        assertThat(basket.getBasketId()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("")
+    void basketToStringTest() {
+        Basket basket = new Basket(123_123_123L);
+
+        assertThat(basket.toString()).isEqualTo("Basket{basketId=0, customerId=123123123, items={}}");
     }
 }

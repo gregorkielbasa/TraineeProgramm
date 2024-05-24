@@ -25,9 +25,16 @@ class OrderTest implements WithAssertions {
     class OrderThrowsException {
 
         @Test
-        @DisplayName("created with invalid ID")
-        void invalidID() {
+        @DisplayName("created with invalid ID (too high)")
+        void toHightId() {
             assertThatThrownBy(() -> new Order(INVALID_ID, CUSTOMER_ID, VALID_ITEM_LIST))
+                    .isInstanceOf(OrderIllegalIdException.class);
+        }
+
+        @Test
+        @DisplayName("created with invalid ID (too low)")
+        void toLowId() {
+            assertThatThrownBy(() -> new Order(1, CUSTOMER_ID, VALID_ITEM_LIST))
                     .isInstanceOf(OrderIllegalIdException.class);
         }
 
@@ -189,5 +196,13 @@ class OrderTest implements WithAssertions {
 
             assertThat(order1.hashCode()).isNotEqualTo(order2.hashCode());
         }
+    }
+
+    @Test
+    @DisplayName("")
+    void orderToStringTest() {
+        Order order = new Order(VALID_ID, List.of(ITEM_1));
+
+        assertThat(order.toString()).isEqualTo("Order{orderId=0, customerId=1234, items=[OrderItem[productId=123123123, amount=3]]}");
     }
 }

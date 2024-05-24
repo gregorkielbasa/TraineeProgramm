@@ -45,6 +45,10 @@ public class Customer {
             throw new CustomerIllegalNameException(name);
     }
 
+    public long getCustomerId() {
+        return customerId;
+    }
+
     public String getCustomerName() {
         return customerName;
     }
@@ -53,18 +57,6 @@ public class Customer {
         logger.info("Customer {} with {} customerName is changing its customerName to {}.", this.customerId, this.customerName, customerName);
         validateName(customerName);
         this.customerName = customerName;
-    }
-
-    public long getCustomerId() {
-        return customerId;
-    }
-
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "ID=" + customerId +
-                ", customerName='" + customerName + '\'' +
-                '}';
     }
 
     @Override
@@ -78,5 +70,13 @@ public class Customer {
     @Override
     public int hashCode() {
         return Objects.hash(customerName, customerId);
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "ID=" + customerId +
+                ", customerName='" + customerName + '\'' +
+                '}';
     }
 }

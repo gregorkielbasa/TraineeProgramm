@@ -211,13 +211,14 @@ class ProductTest implements WithAssertions {
 
             assertThat(product1.hashCode()).isNotEqualTo(product2.hashCode());
         }
-
-        @Test
-        @DisplayName("to String")
-        void testToString() {
-            Product product = new Product(123_123_123L, "test");
-
-            assertThat(product.toString()).isEqualTo("Product{ID=123123123, productName='test'}");
-        }
     }
+
+    @Test
+    @DisplayName("to String")
+    void testToString() {
+        Product product = new Product(123_123_123L, "test");
+
+        assertThat(product.toString()).isEqualTo("Product{ID=123123123, productName='test'}");
+    }
+
 }
