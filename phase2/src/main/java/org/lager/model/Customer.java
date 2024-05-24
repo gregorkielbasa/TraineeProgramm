@@ -1,12 +1,11 @@
 package org.lager.model;
 
-import org.lager.exception.CustomerIllegalNameException;
 import org.lager.exception.CustomerIllegalIdException;
+import org.lager.exception.CustomerIllegalNameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Objects;
@@ -16,25 +15,24 @@ public class Customer {
     private static final String NAME_REGEX = "^[a-zA-Z]{3,16}$";
     private static final long ID_MIN = 100_000_000;
     private static final long ID_MAX = 999_999_999;
+    private final static Logger logger = LoggerFactory.getLogger(Customer.class);
+
     @Id
     private final long customerId;
     private String customerName;
-    @Transient
-    private final static Logger logger = LoggerFactory.getLogger(Customer.class);
 
     public Customer(String customerName) {
         this(0, customerName);
+        logger.info("New Customer {} has been created.", customerName);
     }
 
     @PersistenceCreator
-    public Customer(long customerId, String customerName) {
+    protected Customer(long customerId, String customerName) {
         validateId(customerId);
         validateName(customerName);
 
         this.customerId = customerId;
         this.customerName = customerName;
-
-        logger.info("New Customer {} has been created.", customerId);
     }
 
     private static void validateId(long customerId) {

@@ -6,40 +6,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 
 @Table("ORDERS")
 public class Order {
     private static final long ID_MIN = 1000;
     private static final long ID_MAX = 9999;
+    private final static Logger logger = LoggerFactory.getLogger(Order.class);
 
     @Id
     private final long orderId;
     private final long customerId;
     @MappedCollection(idColumn = "ORDER_ID")
     private final Set<OrderItem> items;
-    @Transient
-    private final static Logger logger = LoggerFactory.getLogger(Order.class);
 
     public Order(long customerId, Set<OrderItem> items) {
         this(0, customerId, items);
+        logger.info("New Order {} has been created.", customerId);
     }
 
     @PersistenceCreator
-    public Order(long orderId, long customerId, Collection<OrderItem> items) {
+    protected Order(long orderId, long customerId, Collection<OrderItem> items) {
         validateId(orderId);
         this.orderId = orderId;
         this.customerId = customerId;
         validateItems(items);
         this.items = Set.copyOf(items);
-
-        logger.info("New Order {} has been created.", orderId);
     }
 
     private void validateId(long id) {
@@ -75,5 +72,14 @@ public class Order {
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
         return orderId == order.orderId && customerId == order.customerId && Objects.equals(items, order.items);
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "orderId=" + orderId +
+                ", customerId=" + customerId +
+                ", items=" + items +
+                '}';
     }
 }

@@ -13,11 +13,11 @@ import java.util.Optional;
 
 @Service
 public class BasketService {
+    private final static Logger logger = LoggerFactory.getLogger(BasketService.class);
 
     private final ProductService productService;
     private final CustomerService customerService;
     private final BasketRepository repository;
-    private final static Logger logger = LoggerFactory.getLogger(BasketService.class);
 
     public BasketService(BasketRepository repository, CustomerService customerService, ProductService productService) {
         this.repository = repository;
@@ -26,7 +26,7 @@ public class BasketService {
     }
 
     private Optional<Basket> getBasket(long customerId) {
-        return repository.findById(customerId);
+        return repository.findByCustomerId(customerId);
     }
 
     public Map<Long, Integer> getContentOfBasket(long customerId) {
@@ -37,7 +37,7 @@ public class BasketService {
 
     public void dropBasket(long customerId) {
         logger.info("BasketService empties {} Basket", customerId);
-        repository.deleteById(customerId);
+        repository.deleteByCustomerId(customerId);
     }
 
     public void removeFromBasket(long customerId, long productId) {
@@ -61,7 +61,7 @@ public class BasketService {
     private Basket createBasket(long customerId) {
         customerService.validatePresence(customerId);
         Basket newBasket = new Basket(customerId);
-        logger.info("BasketService created new Basket with ID {}", customerId);
+        logger.info("BasketService created new empty Basket with ID {}", customerId);
         return newBasket;
     }
 }

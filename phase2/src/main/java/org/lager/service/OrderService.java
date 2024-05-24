@@ -8,16 +8,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
+    private final static Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository repository;
     private final BasketService basketService;
-    private final static Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     public OrderService(OrderRepository repository, BasketService basketService) {
         this.repository = repository;
@@ -28,30 +29,26 @@ public class OrderService {
         return repository.findById(orderID);
     }
 
-    public Order order(long basketId) {
-        return order(basketId, LocalDateTime.now());
-    }
-
-    public Order order(long basketId, LocalDateTime dataTime) {
-        logger.debug("OrderService starts to order {} Basket", basketId);
-        Set<OrderItem> items = getOrderItemsFromBasket(basketId);
-        Order newOrder = new Order(basketId, items);
+    public Order order(long customerId) {
+        logger.debug("OrderService starts to order {} Basket", customerId);
+        Set<OrderItem> items = getOrderItemsFromBasket(customerId);
+        Order newOrder = new Order(customerId, items);
         repository.save(newOrder);
-        basketService.dropBasket(basketId);
-        logger.debug("OrderService finished to order {} Basket", basketId);
+        basketService.dropBasket(customerId);
+        logger.debug("OrderService finished to order {} Basket", customerId);
         return newOrder;
     }
 
-    private Set<OrderItem> getOrderItemsFromBasket(long basketId) {
-        return getContentOfBasket(basketId).entrySet().stream()
+    private Set<OrderItem> getOrderItemsFromBasket(long customerId) {
+        return getContentOfBasket(customerId).entrySet().stream()
                 .map(entry -> new OrderItem(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toSet());
     }
 
-    private Map<Long, Integer> getContentOfBasket(long basketId) {
-        Map<Long, Integer> contentOfBasket = basketService.getContentOfBasket(basketId);
+    private Map<Long, Integer> getContentOfBasket(long customerId) {
+        Map<Long, Integer> contentOfBasket = basketService.getContentOfBasket(customerId);
         if (contentOfBasket.isEmpty())
-            throw new OrderItemListNotPresentException(basketId);
+            throw new OrderItemListNotPresentException(customerId);
         return contentOfBasket;
     }
 }

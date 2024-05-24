@@ -4,33 +4,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Table("BASKETS")
 public class Basket {
+    private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
     @Id
     private final long basketId;
     private final long customerId;
     @MappedCollection(idColumn = "BASKET_ID", keyColumn = "PRODUCT_ID")
     private final Map<Long, BasketItem> items;
-    @Transient
-    private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
     public Basket(long customerId) {
-        this.basketId = 0;
-        this.customerId = customerId;
-        this.items = new HashMap<>();
+        this(0, customerId, new HashMap<>());
         logger.info("New Basket {} has been created.", customerId);
     }
 
     @PersistenceCreator
-    public Basket(long basketId, long customerId, Map<Long, BasketItem> items) {
+    protected Basket(long basketId, long customerId, Map<Long, BasketItem> items) {
         this.basketId = basketId;
         this.customerId = customerId;
         this.items = items;
@@ -42,7 +40,7 @@ public class Basket {
     }
 
     public void insert(long productId, int amount) {
-        logger.debug("Basket {} is changing amount of {} Product about {}", basketId, productId, amount);
+        logger.debug("Basket {} is changing amount of {} Product about {}", this.basketId, productId, amount);
         int newAmount = amount;
         if (isProductPresent(productId))
             newAmount += items.get(productId).amount();

@@ -11,8 +11,9 @@ import java.util.*;
 
 @Service
 public class CustomerService {
-    private final CustomerRepository repository;
     private final static Logger logger = LoggerFactory.getLogger(CustomerService.class);
+
+    private final CustomerRepository repository;
 
     public CustomerService(CustomerRepository repository) {
         this.repository = repository;
