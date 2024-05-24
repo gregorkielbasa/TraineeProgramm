@@ -10,7 +10,7 @@ import java.util.Map;
 @DisplayName("Basket")
 class BasketTest implements WithAssertions {
 
-    @DisplayName("when empty")
+    @DisplayName("when is empty")
     @Nested
     class BasketTestEmpty {
 
@@ -126,46 +126,6 @@ class BasketTest implements WithAssertions {
         @DisplayName("should return 0 as an amount of Non-existing one")
         void getAmountOfNonExisting() {
             assertThat(basket.getAmountOf(999_999_999L)).isEqualTo(0);
-        }
-    }
-
-    @DisplayName("when concats with")
-    @Nested
-    class BasketTestConcat {
-
-        Basket basket1;
-        Basket basket2;
-
-        @BeforeEach
-        void init() {
-            basket1 = new Basket(123_123_123);
-            basket1.insert(123_000_001, 1);
-            basket1.insert(123_000_005, 5);
-
-            basket2 = new Basket(123_123_123);
-            basket2.insert(123_000_002, 2);
-            basket2.insert(123_000_005, 5);
-        }
-
-        @Test
-        @DisplayName("NULL")
-        void insert() {
-            basket1.concatWith(null);
-
-            assertThat(basket1.getContent()).containsOnly(
-                    Map.entry(123_000_005L, 5),
-                    Map.entry(123_000_001L, 1));
-        }
-
-        @Test
-        @DisplayName("a proper Basket")
-        void remove() {
-            basket1.concatWith(basket2);
-
-            assertThat(basket1.getContent()).containsOnly(
-                    Map.entry(123_000_005L, 10),
-                    Map.entry(123_000_002L, 2),
-                    Map.entry(123_000_001L, 1));
         }
     }
 

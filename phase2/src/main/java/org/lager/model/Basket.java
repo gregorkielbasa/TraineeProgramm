@@ -65,6 +65,14 @@ public class Basket {
                 : 0;
     }
 
+    public long getCustomerId() {
+        return customerId;
+    }
+
+    public long getBasketId() {
+        return basketId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

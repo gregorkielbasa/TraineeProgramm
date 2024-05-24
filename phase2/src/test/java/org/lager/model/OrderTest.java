@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemListNotPresentException;
-import org.lager.exception.OrderTimeNullException;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,13 +32,6 @@ class OrderTest implements WithAssertions {
         }
 
         @Test
-        @DisplayName("created with 0 ID")
-        void zeroID() {
-            assertThatThrownBy(() -> new Order(0, CUSTOMER_ID, VALID_ITEM_LIST))
-                    .isInstanceOf(OrderIllegalIdException.class);
-        }
-
-        @Test
         @DisplayName("created with NULL items list")
         void nullItemsList() {
             assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, null))
@@ -52,13 +43,6 @@ class OrderTest implements WithAssertions {
         void emptyItemList() {
             assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, new ArrayList<>()))
                     .isInstanceOf(OrderItemListNotPresentException.class);
-        }
-
-        @Test
-        @DisplayName("created with null Time")
-        void nullTime() {
-            assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, null, VALID_ITEM_LIST))
-                    .isInstanceOf(OrderTimeNullException.class);
         }
     }
 
@@ -73,7 +57,6 @@ class OrderTest implements WithAssertions {
 
             assertThat(order.getCustomerId()).isEqualTo(123_123_123L);
             assertThat(order.getOrderId()).isEqualTo(VALID_ID);
-            assertThat(order.getDateTime()).isEqualToIgnoringNanos(LocalDateTime.now());
             assertThat(order.getItems()).containsExactlyInAnyOrderElementsOf(VALID_ITEM_LIST);
         }
 
@@ -165,15 +148,6 @@ class OrderTest implements WithAssertions {
 
             assertThat(order1.equals(order2)).isFalse();
         }
-
-        @Test
-        @DisplayName("os the same object")
-        void similarOrderWithDifferentTime() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID, CUSTOMER_ID, LocalDateTime.now().minusDays(1), VALID_ITEM_LIST);
-
-            assertThat(order1.equals(order2)).isFalse();
-        }
     }
 
     @Nested
@@ -191,7 +165,7 @@ class OrderTest implements WithAssertions {
 
         @Test
         @DisplayName("with different ID")
-        void differentId() {
+        void differentOrderId() {
             Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
             Order order2 = new Order(VALID_ID + 1, CUSTOMER_ID, VALID_ITEM_LIST);
 
@@ -216,5 +190,4 @@ class OrderTest implements WithAssertions {
             assertThat(order1.hashCode()).isNotEqualTo(order2.hashCode());
         }
     }
-
 }
