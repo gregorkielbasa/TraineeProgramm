@@ -199,7 +199,7 @@ class OrderTest implements WithAssertions {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("to String")
     void orderToStringTest() {
         Order order = new Order(VALID_ID, List.of(ITEM_1));
 

@@ -249,7 +249,7 @@ class BasketTest implements WithAssertions {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("gives its ID")
     void getBasketIdTest() {
         Basket basket = new Basket(123_123_123L);
 
@@ -257,7 +257,7 @@ class BasketTest implements WithAssertions {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("to String")
     void basketToStringTest() {
         Basket basket = new Basket(123_123_123L);
 

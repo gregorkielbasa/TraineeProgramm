@@ -7,6 +7,7 @@ import org.lager.repository.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +30,7 @@ public class OrderService {
         return repository.findById(orderID);
     }
 
+    @Transactional
     public Order order(long customerId) {
         logger.debug("OrderService starts to order {} Basket", customerId);
         Set<OrderItem> items = getOrderItemsFromBasket(customerId);
