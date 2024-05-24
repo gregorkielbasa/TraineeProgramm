@@ -20,6 +20,14 @@ public class OrderFixtures {
     private final static OrderItem ITEM_1 = new OrderItem(defaultProductId(), 1);
     private final static OrderItem ITEM_2 = new OrderItem(anotherProductId(), 2);
 
+    public static long defaultOrderId() {
+        return ORDER_1_ID;
+    }
+
+    public static long anotherOrderId() {
+        return ORDER_2_ID;
+    }
+
     public static Order defaultOrder() {
         return new Order(ORDER_1_ID, CUSTOMER_1_ID, List.of(ITEM_1));
     }

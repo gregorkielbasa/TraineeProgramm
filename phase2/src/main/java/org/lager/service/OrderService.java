@@ -33,7 +33,7 @@ public class OrderService {
         logger.debug("OrderService starts to order {} Basket", customerId);
         Set<OrderItem> items = getOrderItemsFromBasket(customerId);
         Order newOrder = new Order(customerId, items);
-        repository.save(newOrder);
+        newOrder = repository.save(newOrder);
         basketService.dropBasket(customerId);
         logger.debug("OrderService finished to order {} Basket", customerId);
         return newOrder;
