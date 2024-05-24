@@ -187,7 +187,7 @@ class ProductServiceTest implements WithAssertions {
         @Test
         @DisplayName("existing one with a new proper name")
         void existingID() {
-            Mockito.when(repository.findById(any()))
+            Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.of(defaultProduct()));
 
             productService = new ProductService(repository);

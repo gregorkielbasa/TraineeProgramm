@@ -8,48 +8,43 @@ public class CustomerFixtures {
     private final static long CUSTOMER_2_ID = 100_000_001L;
     private final static String CUSTOMER_2_NAME = "customerTwo";
 
-    public static long defaultId() {
+    public static long defaultCustomerId() {
         return CUSTOMER_1_ID;
     }
 
-    public static long anotherId() {
+    public static long anotherCustomerId() {
         return CUSTOMER_2_ID;
     }
 
-    public static String defaultName() {
+    public static String defaultCustomerName() {
         return CUSTOMER_1_NAME;
     }
 
-    public static long incorrectId() {
+    public static long incorrectCustomerId() {
         return 1;
     }
 
-    public static long nonExistingId() {
+    public static long nonExistingCustomerId() {
         return 999_999_999L;
     }
 
-    public static String incorrectName() {
+    public static String incorrectCustomerName() {
         return "incorect!§$%&//(";
+    }
+
+    public static Customer defaultNewCustomer() {
+        return new Customer(CUSTOMER_1_NAME);
     }
 
     public static Customer defaultCustomer() {
         return new Customer(CUSTOMER_1_ID, CUSTOMER_1_NAME);
     }
 
-    public static String defaultCustomerAsCsvRecord() {
-        return CUSTOMER_1_ID + "," + CUSTOMER_1_NAME;
-
-    }
-
     public static Customer anotherCustomer() {
         return new Customer(CUSTOMER_2_ID, CUSTOMER_2_NAME);
     }
 
-    public static String anotherCustomerAsCsvRecord() {
-        return CUSTOMER_2_ID + "," + CUSTOMER_2_NAME;
-    }
-
-    public static Customer customerWithName(String newName) {
+    public static Customer defaultCustomerWithName(String newName) {
         return new Customer(CUSTOMER_1_ID, newName);
     }
 }

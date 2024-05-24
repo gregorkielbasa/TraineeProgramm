@@ -27,7 +27,7 @@ public class Customer {
     }
 
     @PersistenceCreator
-    protected Customer(long customerId, String customerName) {
+    public Customer(long customerId, String customerName) {
         validateId(customerId);
         validateName(customerName);
 
