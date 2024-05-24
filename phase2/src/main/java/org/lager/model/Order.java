@@ -31,7 +31,7 @@ public class Order {
     }
 
     @PersistenceCreator
-    protected Order(long orderId, long customerId, Collection<OrderItem> items) {
+    public Order(long orderId, long customerId, Collection<OrderItem> items) {
         validateId(orderId);
         this.orderId = orderId;
         this.customerId = customerId;
