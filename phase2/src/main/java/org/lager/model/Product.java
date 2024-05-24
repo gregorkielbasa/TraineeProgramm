@@ -27,7 +27,7 @@ public class Product {
     }
 
     @PersistenceCreator
-    protected Product(long productId, String productName) {
+    public Product(long productId, String productName) {
         validateId(productId);
         validateName(productName);
 

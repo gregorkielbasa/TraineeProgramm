@@ -217,7 +217,7 @@ class ProductTest implements WithAssertions {
         void testToString() {
             Product product = new Product(123_123_123L, "test");
 
-            assertThat(product.toString()).isEqualTo("Product{ID=123123123, name='test'}");
+            assertThat(product.toString()).isEqualTo("Product{ID=123123123, productName='test'}");
         }
     }
 }

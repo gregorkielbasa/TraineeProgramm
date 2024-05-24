@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.lager.exception.OrderIllegalIdException;
-import org.lager.exception.OrderItemListNotPresentException;
+import org.lager.exception.OrderItemSetNotPresentException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,14 +35,14 @@ class OrderTest implements WithAssertions {
         @DisplayName("created with NULL items list")
         void nullItemsList() {
             assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, null))
-                    .isInstanceOf(OrderItemListNotPresentException.class);
+                    .isInstanceOf(OrderItemSetNotPresentException.class);
         }
 
         @Test
         @DisplayName("created with invalid items list")
         void emptyItemList() {
             assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, new ArrayList<>()))
-                    .isInstanceOf(OrderItemListNotPresentException.class);
+                    .isInstanceOf(OrderItemSetNotPresentException.class);
         }
     }
 

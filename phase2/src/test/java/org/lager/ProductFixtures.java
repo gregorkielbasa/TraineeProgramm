@@ -8,36 +8,35 @@ public class ProductFixtures {
     private final static long PRODUCT_2_ID = 100_000_001L;
     private final static String PRODUCT_2_NAME = "Product Two";
 
-    public static long defaultId() {
+    public static long defaultProductId() {
         return PRODUCT_1_ID;
     }
 
-    public static String defaultName() {
+    public static String defaultProductName() {
         return PRODUCT_1_NAME;
     }
 
-    public static long incorrectId() {
+    public static long incorrectProductId() {
         return 1;
     }
 
-    public static long nonExistingId() {
+    public static long nonExistingProductId() {
         return 999_999_999L;
     }
 
-    public static String incorrectName() {
+    public static String incorrectProductName() {
         return "incorect!§$%&//(";
+    }
+
+    public static Product defaultNewProduct() {
+        return new Product(PRODUCT_1_NAME);
     }
 
     public static Product defaultProduct() {
         return new Product(PRODUCT_1_ID, PRODUCT_1_NAME);
     }
 
-    public static String defaultProductAsCsvRecord() {
-        return PRODUCT_1_ID + "," + PRODUCT_1_NAME;
-
-    }
-
-    public static long anotherId() {
+    public static long anotherProductId() {
         return PRODUCT_2_ID;
     }
 
@@ -45,11 +44,7 @@ public class ProductFixtures {
         return new Product(PRODUCT_2_ID, PRODUCT_2_NAME);
     }
 
-    public static String anotherProductAsCsvRecord() {
-        return PRODUCT_2_ID + "," + PRODUCT_2_NAME;
-    }
-
-    public static Product productWithName(String newName) {
+    public static Product defaultProductWithName(String newName) {
         return new Product(PRODUCT_1_ID, newName);
     }
 }

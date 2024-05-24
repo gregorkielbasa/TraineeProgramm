@@ -76,14 +76,13 @@ public class Basket {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Basket basket = (Basket) o;
-        return basketId == basket.basketId && Objects.equals(items, basket.items);
+        if (!(o instanceof Basket basket)) return false;
+        return basketId == basket.basketId && customerId == basket.customerId && Objects.equals(items, basket.items);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(items, basketId);
+        return Objects.hash(basketId, customerId, items);
     }
 
     @Override
