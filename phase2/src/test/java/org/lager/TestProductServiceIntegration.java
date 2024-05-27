@@ -1,6 +1,7 @@
 package org.lager;
 
 import org.assertj.core.api.WithAssertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.lager.exception.NoSuchProductException;
@@ -8,6 +9,7 @@ import org.lager.model.Product;
 import org.lager.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -27,6 +29,14 @@ class TestProductServiceIntegration implements WithAssertions {
 
     @Autowired
     ProductService service;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+    @AfterEach
+    public void cleanUp() {
+        jdbcTemplate.execute("DELETE FROM PRODUCTS;");  // Adjust the SQL as per your database
+        jdbcTemplate.execute("ALTER TABLE PRODUCTS ALTER COLUMN PRODUCT_ID RESTART WITH 100000000;");  // Adjust the SQL as per your database
+    }
 
     @Test
     @DisplayName("creats")
@@ -52,7 +62,6 @@ class TestProductServiceIntegration implements WithAssertions {
         service.validatePresence(defaultProductId());
         assertThatThrownBy(() -> service.validatePresence(anotherProductId()))
                 .isInstanceOf(NoSuchProductException.class);
-
     }
 
     @Test
