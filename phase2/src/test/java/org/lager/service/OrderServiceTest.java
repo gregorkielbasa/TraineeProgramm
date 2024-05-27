@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.lager.exception.OrderItemListNotPresentException;
+import org.lager.exception.OrderItemSetNotPresentException;
 import org.lager.model.Order;
 import org.lager.repository.OrderRepository;
 import org.mockito.Mock;
@@ -94,7 +94,7 @@ class OrderServiceTest implements WithAssertions {
             orderService = new OrderService(repository, basketService);
 
             assertThatThrownBy(() -> orderService.order(defaultCustomerId()))
-                    .isInstanceOf(OrderItemListNotPresentException.class);
+                    .isInstanceOf(OrderItemSetNotPresentException.class);
 
             Mockito.verify(basketService).getContentOfBasket(defaultCustomerId());
         }

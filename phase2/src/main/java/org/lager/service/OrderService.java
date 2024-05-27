@@ -1,6 +1,5 @@
 package org.lager.service;
 
-import org.lager.exception.OrderItemListNotPresentException;
 import org.lager.model.Order;
 import org.lager.model.OrderItem;
 import org.lager.repository.OrderRepository;
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,15 +40,8 @@ public class OrderService {
     }
 
     private Set<OrderItem> getOrderItemsFromBasket(long customerId) {
-        return getContentOfBasket(customerId).entrySet().stream()
+        return basketService.getContentOfBasket(customerId).entrySet().stream()
                 .map(entry -> new OrderItem(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toSet());
-    }
-
-    private Map<Long, Integer> getContentOfBasket(long customerId) {
-        Map<Long, Integer> contentOfBasket = basketService.getContentOfBasket(customerId);
-        if (contentOfBasket.isEmpty())
-            throw new OrderItemListNotPresentException(customerId);
-        return contentOfBasket;
     }
 }
