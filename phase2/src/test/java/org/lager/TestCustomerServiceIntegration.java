@@ -21,7 +21,7 @@ import static org.lager.CustomerFixtures.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@DisplayName("CustomerService")
+@DisplayName("integrated CustomerService")
 @Transactional
 @Rollback
 @TestPropertySource(locations = "classpath:integrationtest.properties")
@@ -32,10 +32,11 @@ class TestCustomerServiceIntegration implements WithAssertions {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
     @AfterEach
     public void cleanUp() {
-        jdbcTemplate.execute("DELETE FROM CUSTOMERS;");  // Adjust the SQL as per your database
-        jdbcTemplate.execute("ALTER TABLE CUSTOMERS ALTER COLUMN CUSTOMER_ID RESTART WITH 100000000;");  // Adjust the SQL as per your database
+        jdbcTemplate.execute("DELETE FROM CUSTOMERS;");
+        jdbcTemplate.execute("ALTER TABLE CUSTOMERS ALTER COLUMN CUSTOMER_ID RESTART WITH 100000000;");
     }
 
     @Test

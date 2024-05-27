@@ -11,5 +11,8 @@ public interface BasketRepository extends CrudRepository<Basket, Long> {
 
     Optional<Basket> findByCustomerId(long customerId);
 
-    void deleteByCustomerId(long customerId);
+    default void deleteByCustomerId(long customerId){
+        Optional<Basket> basket = findByCustomerId(customerId);
+        basket.ifPresent(this::delete);
+    }
 }

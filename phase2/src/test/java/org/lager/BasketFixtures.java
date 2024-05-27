@@ -56,6 +56,12 @@ public class BasketFixtures {
         return basket;
     }
 
+    public static Basket anotherBasketWith(long product, int amount) {
+        Basket basket = new Basket(BASKET_2_ID, CUSTOMER_2_ID, Map.of());
+        basket.insert(product, amount);
+        return basket;
+    }
+
     public static Map<Long, Integer> basketContentOf(Basket basket) {
         return basket.getContent();
     }

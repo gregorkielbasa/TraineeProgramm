@@ -20,6 +20,10 @@ public class CustomerFixtures {
         return CUSTOMER_1_NAME;
     }
 
+    public static String anotherCustomerName() {
+        return CUSTOMER_2_NAME;
+    }
+
     public static long incorrectCustomerId() {
         return 1;
     }

@@ -16,6 +16,10 @@ public class ProductFixtures {
         return PRODUCT_1_NAME;
     }
 
+    public static String anotherProductName() {
+        return PRODUCT_2_NAME;
+    }
+
     public static long anotherProductId() {
         return PRODUCT_2_ID;
     }
