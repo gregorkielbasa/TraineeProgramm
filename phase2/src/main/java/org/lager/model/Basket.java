@@ -1,26 +1,29 @@
 package org.lager.model;
 
+import jakarta.persistence.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.relational.core.mapping.MappedCollection;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Table("BASKETS")
+//@Table(name = "BASKETS")
+@Entity
 public class Basket {
     private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
     @Id
-    private final long basketId;
-    private final long customerId;
-    @MappedCollection(idColumn = "BASKET_ID", keyColumn = "PRODUCT_ID")
-    private final Map<Long, BasketItem> items;
+    private long basketId;
+    private long customerId;
+//    @MappedCollection(idColumn = "BASKET_ID", keyColumn = "PRODUCT_ID")
+    @OneToMany
+    private Map<Long, BasketItem> items;
+
+    public Basket() {
+    }
 
     public Basket(long customerId) {
         this(0, customerId, new HashMap<>());

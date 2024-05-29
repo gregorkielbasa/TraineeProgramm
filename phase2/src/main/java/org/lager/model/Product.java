@@ -1,16 +1,17 @@
 package org.lager.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import org.lager.exception.ProductIllegalIdException;
 import org.lager.exception.ProductIllegalNameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Objects;
 
-@Table("PRODUCTS")
+//@Table(name = "PRODUCTS")
+@Entity
 public class Product {
     private static final String NAME_REGEX = "^[a-zA-Z0-9- ]{3,24}$";
     private static final long ID_MIN = 100_000_000;
@@ -18,8 +19,11 @@ public class Product {
     private final static Logger logger = LoggerFactory.getLogger(Product.class);
 
     @Id
-    private final long productId;
+    private long productId;
     private String productName;
+
+    public Product() {
+    }
 
     public Product(String productName) {
         this(0, productName);

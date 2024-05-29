@@ -1,7 +1,13 @@
 package org.lager.model;
 
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-@Table("BASKET_ITEMS")
-public record BasketItem(long productId, int amount) {
+@Entity
+@Table(name = "BASKET_ITEMS")
+public record BasketItem(@Id long productId, int amount) {
+    public BasketItem() {
+        this(0, 0);
+    }
 }
