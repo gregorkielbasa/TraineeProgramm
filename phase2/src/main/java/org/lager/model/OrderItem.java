@@ -1,6 +1,6 @@
 package org.lager.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public record OrderItem(long productId, int amount) {

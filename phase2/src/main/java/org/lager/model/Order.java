@@ -1,6 +1,7 @@
 package org.lager.model;
 
 import jakarta.persistence.*;
+import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemSetNotPresentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,8 @@ public class Order {
     private final static Logger logger = LoggerFactory.getLogger(Order.class);
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ORDER_KEY")
+    @SequenceGenerator(name = "ORDER_KEY", initialValue = (int) ID_MIN, allocationSize = 1)
     private long orderId;
     private long customerId;
 
@@ -45,8 +47,8 @@ public class Order {
     }
 
     private void validateId(long id) {
-//        if (id != 0 && (id < ID_MIN || id > ID_MAX))
-//            throw new OrderIllegalIdException(id);
+        if (id != 0 && (id < ID_MIN || id > ID_MAX))
+            throw new OrderIllegalIdException(id);
     }
 
     private void validateItems(Collection<OrderItem> items) {

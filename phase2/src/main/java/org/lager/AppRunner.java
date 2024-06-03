@@ -26,25 +26,34 @@ public class AppRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        System.out.println(customerService.search(100_000_000L));
-        System.out.println(productService.search(100_000_000L));
-        System.out.println(basketService.getContentOfBasket(100_000_000L));
-        System.out.println(orderService.getOrder(1000L));
+        System.out.println(customerService.search(100_000_000));
+        System.out.println(productService.search(100_000_000));
+        System.out.println(basketService.getContentOfBasket(100_000_000));
+        System.out.println(orderService.getOrder(1000));
+
+        System.out.println("-----------------------------------------");
 
         customerService.create("testUser");
-        productService.create("testProduct");
-        basketService.addToBasket(100_000_000L, 100_000_000L, 11);
+        productService.create("testProduct1");
+        productService.create("testProduct2");
+        basketService.addToBasket(100_000_000, 100_000_000, 11);
+        basketService.addToBasket(100_000_000, 100_000_001, 5);
 
-        System.out.println(customerService.search(100_000_000L));
-        System.out.println(productService.search(100_000_000L));
-        System.out.println(basketService.getContentOfBasket(100_000_000L));
-        System.out.println(orderService.getOrder(1000L));
+        System.out.println("-----------------------------------------");
+
+        System.out.println(customerService.search(100_000_000));
+        System.out.println(productService.search(100_000_000));
+        System.out.println(basketService.getContentOfBasket(100_000_000));
+        System.out.println(orderService.getOrder(100_000_000));
+
+        System.out.println("-----------------------------------------");
 
         orderService.order(100000000L);
 
-        System.out.println(customerService.search(100_000_000L));
-        System.out.println(productService.search(100_000_000L));
-        System.out.println(basketService.getContentOfBasket(100_000_000L));
-        System.out.println(orderService.getOrder(1000L));
+        System.out.println(customerService.search(100_000_000));
+        System.out.println(productService.search(100_000_000));
+        System.out.println(basketService.getContentOfBasket(100_000_000));
+        System.out.println(orderService.getOrder(1000));
+        System.out.println(orderService.getOrder(1000));
     }
 }

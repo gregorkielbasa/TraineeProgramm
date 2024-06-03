@@ -16,7 +16,8 @@ public class Basket {
     private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "BASKET_KEY")
+    @SequenceGenerator(name = "BASKET_KEY", allocationSize = 1)
     private long basketId;
     private long customerId;
     @ElementCollection(targetClass = BasketItem.class, fetch = FetchType.EAGER)

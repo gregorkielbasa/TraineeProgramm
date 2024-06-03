@@ -1,9 +1,7 @@
 package org.lager.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.lager.exception.ProductIllegalIdException;
 import org.lager.exception.ProductIllegalNameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +18,8 @@ public class Product {
     private final static Logger logger = LoggerFactory.getLogger(Product.class);
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "PRODUCT_KEY")
+    @SequenceGenerator(name = "PRODUCT_KEY", initialValue = (int) ID_MIN, allocationSize = 1)
     private long productId;
     private String productName;
 
@@ -42,8 +41,8 @@ public class Product {
     }
 
     private static void validateId(long productId) {
-//        if (productId != 0 && (productId < ID_MIN || productId > ID_MAX))
-//            throw new ProductIllegalIdException(productId);
+        if (productId != 0 && (productId < ID_MIN || productId > ID_MAX))
+            throw new ProductIllegalIdException(productId);
     }
 
     private void validateName(String name) {
