@@ -10,16 +10,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-//@Table(name = "BASKETS")
+@Table(name = "BASKETS")
 @Entity
 public class Basket {
     private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
     @Id
+    @GeneratedValue
     private long basketId;
     private long customerId;
-//    @MappedCollection(idColumn = "BASKET_ID", keyColumn = "PRODUCT_ID")
-    @OneToMany
+    @ElementCollection(targetClass = BasketItem.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "BASKET_ITEMS", joinColumns = @JoinColumn(name = "BASKET_ID"))
+    @MapKeyColumn(name = "MAP_KEY")
     private Map<Long, BasketItem> items;
 
     public Basket() {

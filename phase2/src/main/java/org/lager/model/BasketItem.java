@@ -1,12 +1,9 @@
 package org.lager.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.Embeddable;
 
-@Entity
-@Table(name = "BASKET_ITEMS")
-public record BasketItem(@Id long productId, int amount) {
+@Embeddable
+public record BasketItem(long productId, int amount) {
     public BasketItem() {
         this(0, 0);
     }

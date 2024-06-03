@@ -1,18 +1,17 @@
 package org.lager.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import org.lager.exception.OrderIllegalIdException;
+import jakarta.persistence.*;
 import org.lager.exception.OrderItemSetNotPresentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.PersistenceCreator;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
-//@Table(name = "ORDERS")
+@Table(name = "ORDERS")
 @Entity
 public class Order {
     private static final long ID_MIN = 1000;
@@ -20,10 +19,13 @@ public class Order {
     private final static Logger logger = LoggerFactory.getLogger(Order.class);
 
     @Id
+    @GeneratedValue
     private long orderId;
     private long customerId;
-//    @MappedCollection(idColumn = "ORDER_ID")
-    private Set<OrderItem> items;
+
+    @ElementCollection(targetClass = OrderItem.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "ORDER_ITEMS", joinColumns = @JoinColumn(name = "ORDER_ID"))
+    private Set<OrderItem> items = new LinkedHashSet<>();
 
     public Order() {
     }
@@ -43,8 +45,8 @@ public class Order {
     }
 
     private void validateId(long id) {
-        if (id != 0 && (id < ID_MIN || id > ID_MAX))
-            throw new OrderIllegalIdException(id);
+//        if (id != 0 && (id < ID_MIN || id > ID_MAX))
+//            throw new OrderIllegalIdException(id);
     }
 
     private void validateItems(Collection<OrderItem> items) {

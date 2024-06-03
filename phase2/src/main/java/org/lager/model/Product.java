@@ -1,8 +1,9 @@
 package org.lager.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import org.lager.exception.ProductIllegalIdException;
+import jakarta.persistence.Table;
 import org.lager.exception.ProductIllegalNameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,7 @@ import org.springframework.data.annotation.PersistenceCreator;
 
 import java.util.Objects;
 
-//@Table(name = "PRODUCTS")
+@Table(name = "PRODUCTS")
 @Entity
 public class Product {
     private static final String NAME_REGEX = "^[a-zA-Z0-9- ]{3,24}$";
@@ -19,6 +20,7 @@ public class Product {
     private final static Logger logger = LoggerFactory.getLogger(Product.class);
 
     @Id
+    @GeneratedValue
     private long productId;
     private String productName;
 
@@ -40,8 +42,8 @@ public class Product {
     }
 
     private static void validateId(long productId) {
-        if (productId != 0 && (productId < ID_MIN || productId > ID_MAX))
-            throw new ProductIllegalIdException(productId);
+//        if (productId != 0 && (productId < ID_MIN || productId > ID_MAX))
+//            throw new ProductIllegalIdException(productId);
     }
 
     private void validateName(String name) {
