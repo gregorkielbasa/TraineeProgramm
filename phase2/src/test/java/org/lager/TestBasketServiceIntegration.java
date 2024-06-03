@@ -48,15 +48,14 @@ class TestBasketServiceIntegration implements WithAssertions {
 
     @AfterEach
     public void cleanUp() {
-        jdbcTemplate.execute("DELETE FROM BASKETS;");
         jdbcTemplate.execute("DELETE FROM BASKET_ITEMS;");
-        jdbcTemplate.execute("ALTER TABLE BASKETS ALTER COLUMN BASKET_ID RESTART WITH 1000;");
+        jdbcTemplate.execute("DELETE FROM BASKETS;");
 
         jdbcTemplate.execute("DELETE FROM PRODUCTS;");
-        jdbcTemplate.execute("ALTER TABLE PRODUCTS ALTER COLUMN PRODUCT_ID RESTART WITH 100000000;");
+        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS PRODUCT_KEY RESTART WITH 100000000;");
 
         jdbcTemplate.execute("DELETE FROM CUSTOMERS;");
-        jdbcTemplate.execute("ALTER TABLE CUSTOMERS ALTER COLUMN CUSTOMER_ID RESTART WITH 100000000;");
+        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS CUSTOMER_KEY RESTART WITH 100000000;");
     }
 
     @DisplayName("adds")

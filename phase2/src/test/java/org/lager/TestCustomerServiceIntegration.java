@@ -36,7 +36,7 @@ class TestCustomerServiceIntegration implements WithAssertions {
     @AfterEach
     public void cleanUp() {
         jdbcTemplate.execute("DELETE FROM CUSTOMERS;");
-        jdbcTemplate.execute("ALTER TABLE CUSTOMERS ALTER COLUMN CUSTOMER_ID RESTART WITH 100000000;");
+        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS CUSTOMER_KEY RESTART WITH 100000000;");
     }
 
     @Test

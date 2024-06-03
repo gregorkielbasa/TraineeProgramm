@@ -36,7 +36,7 @@ class TestProductServiceIntegration implements WithAssertions {
     @AfterEach
     public void cleanUp() {
         jdbcTemplate.execute("DELETE FROM PRODUCTS;");
-        jdbcTemplate.execute("ALTER TABLE PRODUCTS ALTER COLUMN PRODUCT_ID RESTART WITH 100000000;");
+        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS PRODUCT_KEY RESTART WITH 100000000;");
     }
 
     @Test
