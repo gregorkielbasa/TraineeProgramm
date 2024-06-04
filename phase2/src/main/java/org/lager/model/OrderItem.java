@@ -4,7 +4,7 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public record OrderItem(long productId, int amount) {
-    public OrderItem() {
+    private OrderItem() {
         this(0, 0);
     }
 }

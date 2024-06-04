@@ -20,10 +20,12 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "CUSTOMER_KEY")
     @SequenceGenerator(name = "CUSTOMER_KEY", initialValue = (int) ID_MIN, allocationSize = 1)
-    private long customerId;
+    private final long customerId;
     private String customerName;
 
-    public Customer() {
+    private Customer() {
+        this.customerId = 0;
+        customerName = "";
     }
 
     public Customer(String customerName) {

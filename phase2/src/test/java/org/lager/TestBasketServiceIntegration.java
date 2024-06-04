@@ -132,4 +132,19 @@ class TestBasketServiceIntegration implements WithAssertions {
         assertThat(basketBefore).containsExactlyInAnyOrderEntriesOf(basketContentOf(defaultBasket()));
         assertThat(basketAfter).isEmpty();
     }
+
+    @Test
+    @DisplayName("drops basket when customer is deleted")
+    void checkIfBasketIsDroppedWhenCustomerIsDeleted() {
+        //When
+        customerService.create(anotherCustomerName());
+        service.addToBasket(anotherCustomerId(), defaultProductId(), 1);
+        Map<Long, Integer> basketBefore = service.getContentOfBasket(anotherCustomerId());
+        customerService.delete(anotherCustomerId());
+        Map<Long, Integer> basketAfter = service.getContentOfBasket(anotherCustomerId());
+
+        //Then
+        assertThat(basketBefore).containsExactlyInAnyOrderEntriesOf(basketContentOf(defaultBasket()));
+        assertThat(basketAfter).isEmpty();
+    }
 }

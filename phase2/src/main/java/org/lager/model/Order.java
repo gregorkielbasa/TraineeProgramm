@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.PersistenceCreator;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,14 +21,17 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ORDER_KEY")
     @SequenceGenerator(name = "ORDER_KEY", initialValue = (int) ID_MIN, allocationSize = 1)
-    private long orderId;
-    private long customerId;
+    private final long orderId;
+    private final long customerId;
 
     @ElementCollection(targetClass = OrderItem.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "ORDER_ITEMS", joinColumns = @JoinColumn(name = "ORDER_ID"))
-    private Set<OrderItem> items = new LinkedHashSet<>();
+    private final Set<OrderItem> items;
 
-    public Order() {
+    private Order() {
+        this.orderId = 0;
+        this.customerId = 0;
+        this.items = Set.of();
     }
 
     public Order(long customerId, Collection<OrderItem> items) {

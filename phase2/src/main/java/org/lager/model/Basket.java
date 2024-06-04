@@ -18,18 +18,21 @@ public class Basket {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "BASKET_KEY")
     @SequenceGenerator(name = "BASKET_KEY", allocationSize = 1)
-    private long basketId;
-    private long customerId;
+    private final long basketId;
+    private final long customerId;
     @ElementCollection(targetClass = BasketItem.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "BASKET_ITEMS", joinColumns = @JoinColumn(name = "BASKET_ID"))
     @MapKeyColumn(name = "MAP_KEY")
-    private Map<Long, BasketItem> items;
+    private final Map<Long, BasketItem> items;
 
-    public Basket() {
+    private Basket() {
+        this.basketId = 0;
+        this.customerId = 0;
+        this.items = Map.of();
     }
 
     public Basket(long customerId) {
-        this(0, customerId, new HashMap<>());
+        this(0, customerId, Map.of());
         logger.info("New Basket {} has been created.", customerId);
     }
 

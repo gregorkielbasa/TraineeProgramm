@@ -2,10 +2,12 @@ package org.lager.service;
 
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.model.Customer;
+import org.lager.repository.BasketRepository;
 import org.lager.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -14,9 +16,11 @@ public class CustomerService {
     private final static Logger logger = LoggerFactory.getLogger(CustomerService.class);
 
     private final CustomerRepository repository;
+    private final BasketRepository basketRepository;
 
-    public CustomerService(CustomerRepository repository) {
+    public CustomerService(CustomerRepository repository, BasketRepository basketRepository) {
         this.repository = repository;
+        this.basketRepository = basketRepository;
     }
 
     public Customer create(String newCustomerName) {
@@ -36,8 +40,10 @@ public class CustomerService {
                 .orElseThrow(() -> new NoSuchCustomerException(customerId));
     }
 
+    @Transactional
     public void delete(long customerId) {
         logger.info("CustomerService deletes {} Customer", customerId);
+        basketRepository.deleteByCustomerId(customerId);
         repository.deleteById(customerId);
     }
 

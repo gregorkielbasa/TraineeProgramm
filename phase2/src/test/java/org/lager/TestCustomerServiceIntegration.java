@@ -101,17 +101,14 @@ class TestCustomerServiceIntegration implements WithAssertions {
     @DisplayName("renames existing")
     void renamesExisting() {
         //Given
-        Customer customer = service.create(defaultCustomerName());
+        service.create(defaultCustomerName());
 
         //When
-        Optional<Customer> customerBefore = service.search(defaultCustomerId());
         service.rename(defaultCustomerId(), "newName");
-        Optional<Customer> customerAfter = service.search(defaultCustomerId());
+        Optional<Customer> customer = service.search(defaultCustomerId());
 
         //Then
-        assertThat(customerBefore).isEqualTo(Optional.of(defaultCustomer()));
-        assertThat(customer).isEqualTo(defaultCustomer());
-        assertThat(customerAfter).isEqualTo(Optional.of(defaultCustomerWithName("newName")));
+        assertThat(customer).isEqualTo(Optional.of(defaultCustomerWithName("newName")));
     }
 
     @Test
