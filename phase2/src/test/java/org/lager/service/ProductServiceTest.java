@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.NoSuchProductException;
 import org.lager.exception.ProductIllegalNameException;
-import org.lager.model.Product;
+import org.lager.model.dto.ProductDto;
 import org.lager.repository.ProductRepository;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -39,9 +39,9 @@ class ProductServiceTest implements WithAssertions {
                     .thenReturn(defaultProduct());
 
             productService = new ProductService(repository);
-            Product product = productService.create(defaultProductName());
+            ProductDto product = productService.create(defaultProductName());
 
-            assertThat(product).isEqualTo(defaultProduct());
+            assertThat(product).isEqualTo(new ProductDto(defaultProduct()));
             Mockito.verify(repository).save(defaultNewProduct());
         }
 
@@ -76,9 +76,9 @@ class ProductServiceTest implements WithAssertions {
                     .thenReturn(Optional.of(defaultProduct()));
 
             productService = new ProductService(repository);
-            Optional<Product> product = productService.search(defaultProductId());
+            ProductDto product = productService.get(defaultProductId());
 
-            assertThat(product).isEqualTo(Optional.of(defaultProduct()));
+            assertThat(product).isEqualTo(new ProductDto(defaultProduct()));
             Mockito.verify(repository).findById(defaultProductId());
         }
 
@@ -89,9 +89,9 @@ class ProductServiceTest implements WithAssertions {
                     .thenReturn(Optional.empty());
 
             productService = new ProductService(repository);
-            Optional<Product> product = productService.search(defaultProductId());
+            assertThatThrownBy(() -> productService.get(defaultProductId()))
+                    .isInstanceOf(NoSuchProductException.class);
 
-            assertThat(product).isEmpty();
             Mockito.verify(repository).findById(defaultProductId());
         }
 
@@ -102,9 +102,9 @@ class ProductServiceTest implements WithAssertions {
                     .thenReturn(Optional.empty());
 
             productService = new ProductService(repository);
-            Optional<Product> product = productService.search(incorrectProductId());
+            assertThatThrownBy(() -> productService.get(incorrectProductId()))
+                    .isInstanceOf(NoSuchProductException.class);
 
-            assertThat(product).isEmpty();
             Mockito.verify(repository).findById(incorrectProductId());
         }
     }
@@ -189,6 +189,8 @@ class ProductServiceTest implements WithAssertions {
         void existingID() {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.of(defaultProduct()));
+            Mockito.when(repository.save(any()))
+                    .thenReturn((defaultProductWithName("newName")));
 
             productService = new ProductService(repository);
             productService.rename(defaultProductId(), "newName");

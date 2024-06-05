@@ -17,7 +17,7 @@ public class Product {
     private final static Logger logger = LoggerFactory.getLogger(Product.class);
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "PRODUCT_KEY")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PRODUCT_KEY")
     @SequenceGenerator(name = "PRODUCT_KEY", initialValue = (int) ID_MIN, allocationSize = 1)
     private final long productId;
     private String productName;

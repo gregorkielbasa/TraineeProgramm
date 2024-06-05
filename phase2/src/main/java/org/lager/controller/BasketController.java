@@ -10,6 +10,6 @@ public class BasketController {
 
     @GetMapping("/")
     public String test() {
-        return "hello word!";
+        return "hello world!";
     }
 }
