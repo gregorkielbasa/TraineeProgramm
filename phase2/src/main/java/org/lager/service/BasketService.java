@@ -25,7 +25,7 @@ public class BasketService {
         this.productService = productService;
     }
 
-    private Optional<Basket> getBasket(long customerId) {
+    public Optional<Basket> getBasket(long customerId) {
         return repository.findByCustomerId(customerId);
     }
 
