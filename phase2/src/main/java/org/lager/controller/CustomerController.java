@@ -19,7 +19,7 @@ public class CustomerController {
         this.service = service;
     }
 
-    @GetMapping("/")
+    @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     public List<Long> getAllIds() {
         return service.getAllIds();

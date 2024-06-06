@@ -19,7 +19,7 @@ public class BasketController {
         this.service = service;
     }
 
-    @GetMapping("/")
+    @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     public List<Long> getAllIds() {
         return service.getAllIds();
@@ -53,9 +53,9 @@ public class BasketController {
 
     @PostMapping({"/{customerId}/{productId}", "/{customerId}/{productId}/{amount}"})
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public BasketDto addToBasket(@PathVariable long customerId, @PathVariable long productId, @PathVariable(value = "1") int amount) {
+    public BasketDto addToBasket(@PathVariable long customerId, @PathVariable long productId, @PathVariable(required = false) Integer amount) {
         try {
-            return service.addToBasket(customerId, productId, amount);
+            return service.addToBasket(customerId, productId, amount == null ? 1 : amount);
         } catch (NoSuchProductException | NoSuchCustomerException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }

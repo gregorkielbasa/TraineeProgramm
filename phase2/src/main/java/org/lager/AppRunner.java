@@ -48,7 +48,7 @@ public class AppRunner implements ApplicationRunner {
 //
 //        System.out.println("-----------------------------------------");
 //
-//        orderService.order(100000000L);
+        orderService.order(100000000L);
 //
 //        System.out.println(customerService.search(100_000_000));
 //        System.out.println(productService.get(100_000_000));
