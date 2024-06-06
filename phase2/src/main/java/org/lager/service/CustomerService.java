@@ -23,6 +23,10 @@ public class CustomerService {
         this.basketRepository = basketRepository;
     }
 
+    public List<Long> getAllIds() {
+        return repository.getAllIds();
+    }
+
     public Customer create(String newCustomerName) {
         logger.debug("CustomerService starts to insert new Customer with {} name", newCustomerName);
         Customer newCustomer = new Customer(newCustomerName);

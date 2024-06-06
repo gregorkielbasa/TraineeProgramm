@@ -2,12 +2,14 @@ package org.lager.service;
 
 import org.lager.exception.NoSuchBasketException;
 import org.lager.model.Basket;
+import org.lager.model.dto.BasketDto;
 import org.lager.repository.BasketRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,12 +27,21 @@ public class BasketService {
         this.productService = productService;
     }
 
-    public Optional<Basket> getBasket(long customerId) {
+    private Optional<Basket> find(long customerId) {
         return repository.findByCustomerId(customerId);
     }
 
+    public BasketDto get(long customerId) {
+        return find(customerId).map(BasketDto::new)
+                .orElseThrow(() -> new NoSuchBasketException(customerId));
+    }
+
+    public List<Long> getAllIds() {
+        return repository.getAllIds();
+    }
+
     public Map<Long, Integer> getContentOfBasket(long customerId) {
-        return getBasket(customerId)
+        return find(customerId)
                 .map(Basket::getContent)
                 .orElse(Collections.emptyMap());
     }
@@ -42,7 +53,7 @@ public class BasketService {
 
     public void removeFromBasket(long customerId, long productId) {
         logger.debug("BasketService remove {} Product from {} Basket", productId, customerId);
-        Basket basket = getBasket(customerId)
+        Basket basket = find(customerId)
                 .orElseThrow(() -> new NoSuchBasketException(customerId));
         basket.remove(productId);
         repository.save(basket);
@@ -51,7 +62,7 @@ public class BasketService {
     public void addToBasket(long customerId, long productId, int amount) {
         logger.debug("BasketService starts to add {} Product to {} Basket", productId, customerId);
         productService.validatePresence(productId);
-        Basket basket = getBasket(customerId)
+        Basket basket = find(customerId)
                 .orElseGet(() -> createBasket(customerId));
         basket.insert(productId, amount);
         repository.save(basket);
