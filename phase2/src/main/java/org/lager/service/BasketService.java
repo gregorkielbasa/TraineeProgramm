@@ -51,22 +51,22 @@ public class BasketService {
         repository.deleteByCustomerId(customerId);
     }
 
-    public void removeFromBasket(long customerId, long productId) {
+    public BasketDto removeFromBasket(long customerId, long productId) {
         logger.debug("BasketService remove {} Product from {} Basket", productId, customerId);
         Basket basket = find(customerId)
                 .orElseThrow(() -> new NoSuchBasketException(customerId));
         basket.remove(productId);
-        repository.save(basket);
+        return new BasketDto(repository.save(basket));
     }
 
-    public void addToBasket(long customerId, long productId, int amount) {
+    public BasketDto addToBasket(long customerId, long productId, int amount) {
         logger.debug("BasketService starts to add {} Product to {} Basket", productId, customerId);
         productService.validatePresence(productId);
         Basket basket = find(customerId)
                 .orElseGet(() -> createBasket(customerId));
         basket.insert(productId, amount);
-        repository.save(basket);
         logger.debug("BasketService finished to add {} Product to {} Basket", productId, customerId);
+        return new BasketDto(repository.save(basket));
     }
 
     private Basket createBasket(long customerId) {

@@ -20,6 +20,7 @@ import static org.lager.BasketFixtures.*;
 import static org.lager.CustomerFixtures.defaultCustomerId;
 import static org.lager.ProductFixtures.anotherProductId;
 import static org.lager.ProductFixtures.defaultProductId;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
 @ExtendWith(MockitoExtension.class)
@@ -98,6 +99,8 @@ class BasketServiceTest implements WithAssertions {
         void emptyBasket() {
             Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.of(defaultBasket()));
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultEmptyBasket());
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.removeFromBasket(defaultCustomerId(), defaultProductId());
@@ -125,6 +128,8 @@ class BasketServiceTest implements WithAssertions {
         void nonExistingProduct() {
             Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.of(defaultBasket()));
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultBasket());
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.removeFromBasket(defaultCustomerId(), anotherProductId());
@@ -146,6 +151,8 @@ class BasketServiceTest implements WithAssertions {
             Mockito.doNothing().when(customerService).validatePresence(anyLong());
             Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.empty());
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultBasket());
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1);
@@ -162,6 +169,8 @@ class BasketServiceTest implements WithAssertions {
             Mockito.doNothing().when(productService).validatePresence(anyLong());
             Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.of(defaultEmptyBasket()));
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultBasket());
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1);
@@ -177,6 +186,8 @@ class BasketServiceTest implements WithAssertions {
             Mockito.doNothing().when(productService).validatePresence(anyLong());
             Mockito.when(repository.findByCustomerId(defaultCustomerId()))
                     .thenReturn(Optional.of(defaultBasket()));
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultBasketWith(defaultProductId(), 2));
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1);
