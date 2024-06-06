@@ -49,7 +49,7 @@ class ProductControllerTest implements WithAssertions {
             String expected = "[]";
 
             //When
-            String result = mockMvc.perform(get("/product/"))
+            String result = mockMvc.perform(get("/product"))
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
@@ -67,7 +67,7 @@ class ProductControllerTest implements WithAssertions {
             String expected = "[" + defaultProductId() + "," + anotherProductId() + "]";
 
             //When
-            String result = mockMvc.perform(get("/product/"))
+            String result = mockMvc.perform(get("/product"))
                     .andExpect(status().isOk())
                     .andExpect(content().string(expected))
                     .andReturn().getResponse().getContentAsString();
