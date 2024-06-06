@@ -39,7 +39,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{productId}/")
+    @GetMapping("/{productId}")
     @ResponseStatus(code = HttpStatus.OK)
     public ProductDto getProduct(@PathVariable long productId) {
         try {
@@ -59,7 +59,7 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping("/{productId}/")
+    @DeleteMapping("/{productId}")
     @ResponseStatus(code = HttpStatus.ACCEPTED)
     public void deleteProduct(@PathVariable long productId) {
         service.delete(productId);
