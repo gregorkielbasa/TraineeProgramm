@@ -33,7 +33,8 @@ public class ProductService {
     }
 
     public ProductDto get(long productId) {
-        return find(productId).map(ProductDto::new)
+        return find(productId)
+                .map(ProductDto::new)
                 .orElseThrow(() -> new NoSuchProductException(productId));
     }
 

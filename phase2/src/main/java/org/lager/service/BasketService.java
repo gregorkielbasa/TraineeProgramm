@@ -32,7 +32,8 @@ public class BasketService {
     }
 
     public BasketDto get(long customerId) {
-        return find(customerId).map(BasketDto::new)
+        return find(customerId)
+                .map(BasketDto::new)
                 .orElseThrow(() -> new NoSuchBasketException(customerId));
     }
 
