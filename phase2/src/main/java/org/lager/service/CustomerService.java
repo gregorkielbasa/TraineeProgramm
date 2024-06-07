@@ -2,6 +2,7 @@ package org.lager.service;
 
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.model.Customer;
+import org.lager.model.dto.CustomerDto;
 import org.lager.repository.BasketRepository;
 import org.lager.repository.CustomerRepository;
 import org.slf4j.Logger;
@@ -27,20 +28,26 @@ public class CustomerService {
         return repository.getAllIds();
     }
 
-    public Customer create(String newCustomerName) {
+    public CustomerDto create(String newCustomerName) {
         logger.debug("CustomerService starts to insert new Customer with {} name", newCustomerName);
         Customer newCustomer = new Customer(newCustomerName);
         newCustomer = repository.save(newCustomer);
         logger.debug("CustomerService finished to insert new {} Customer", newCustomer.getCustomerId());
-        return newCustomer;
+        return new CustomerDto(newCustomer);
     }
 
-    public Optional<Customer> search(long customerId) {
+    private Optional<Customer> find(long customerId) {
         return repository.findById(customerId);
     }
 
+    public CustomerDto get(long customerId) {
+        return find(customerId)
+                .map(CustomerDto::new)
+                .orElseThrow(() -> new NoSuchCustomerException(customerId));
+    }
+
     public void validatePresence(long customerId) {
-        search(customerId)
+        find(customerId)
                 .orElseThrow(() -> new NoSuchCustomerException(customerId));
     }
 
@@ -51,11 +58,11 @@ public class CustomerService {
         repository.deleteById(customerId);
     }
 
-    public void rename(long customerId, String customerNewName) {
+    public CustomerDto rename(long customerId, String customerNewName) {
         logger.debug("CustomerService tries to rename {} Customer to {}", customerId, customerNewName);
-        Customer customer = search(customerId)
+        Customer customer = find(customerId)
                 .orElseThrow(() -> new NoSuchCustomerException(customerId));
         customer.setCustomerName(customerNewName);
-        repository.save(customer);
+        return new CustomerDto(repository.save(customer));
     }
 }
