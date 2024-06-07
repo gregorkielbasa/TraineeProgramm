@@ -6,11 +6,11 @@ import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.lager.exception.NoSuchProductException;
-import org.lager.exception.ProductIllegalIdException;
-import org.lager.exception.ProductIllegalNameException;
-import org.lager.model.dto.ProductDto;
-import org.lager.service.ProductService;
+import org.lager.exception.NoSuchCustomerException;
+import org.lager.exception.CustomerIllegalIdException;
+import org.lager.exception.CustomerIllegalNameException;
+import org.lager.model.dto.CustomerDto;
+import org.lager.service.CustomerService;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,22 +20,23 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 
-import static org.lager.ProductFixtures.*;
+import static org.lager.CustomerFixtures.*;
+import static org.lager.CustomerFixtures.defaultCustomerId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ProductController.class)
-@DisplayName("ProductController")
-class ProductControllerTest implements WithAssertions {
-
+@WebMvcTest(CustomerController.class)
+@DisplayName("CustomerController")
+class CustomerControllerTest implements WithAssertions {
+    
     @Autowired
     private MockMvc mockMvc;
-
+    
     @MockBean
-    private ProductService service;
+    private CustomerService service;
 
     @Nested
     @DisplayName("calls getAllIds")
@@ -49,7 +50,7 @@ class ProductControllerTest implements WithAssertions {
             String expected = "[]";
 
             //When
-            String result = mockMvc.perform(get("/product"))
+            String result = mockMvc.perform(get("/customer"))
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
@@ -63,11 +64,11 @@ class ProductControllerTest implements WithAssertions {
         void nonEmptyDEB() throws Exception {
             //Given
             Mockito.when(service.getAllIds())
-                    .thenReturn(List.of(defaultProductId(), anotherProductId()));
-            String expected = "[" + defaultProductId() + "," + anotherProductId() + "]";
+                    .thenReturn(List.of(defaultCustomerId(), anotherCustomerId()));
+            String expected = "[" + defaultCustomerId() + "," + anotherCustomerId() + "]";
 
             //When
-            String result = mockMvc.perform(get("/product"))
+            String result = mockMvc.perform(get("/customer"))
                     .andExpect(status().isOk())
                     .andExpect(content().string(expected))
                     .andReturn().getResponse().getContentAsString();
@@ -80,24 +81,24 @@ class ProductControllerTest implements WithAssertions {
 
     @Nested
     @DisplayName("posts create")
-    class createProduct {
+    class createCustomer {
 
         @Test
-        @DisplayName("and creates a new product")
+        @DisplayName("and creates a new customer")
         void properCase() throws Exception {
             //Given
             Mockito.when(service.create(any()))
-                    .thenReturn(new ProductDto(defaultProduct()));
-            ProductDto expected = new ProductDto(defaultProduct());
+                    .thenReturn(new CustomerDto(defaultCustomer()));
+            CustomerDto expected = new CustomerDto(defaultCustomer());
 
             //When
-            ProductDto result = productDtoOf(
-                    mockMvc.perform(post("/product/{newProductName}", defaultProductName()))
+            CustomerDto result = customerDtoOf(
+                    mockMvc.perform(post("/customer/{newCustomerName}", defaultCustomerName()))
                             .andExpect(status().isCreated())
                             .andReturn());
 
             //Then
-            Mockito.verify(service).create(defaultProductName());
+            Mockito.verify(service).create(defaultCustomerName());
             assertThat(result).isEqualTo(expected);
         }
 
@@ -106,15 +107,18 @@ class ProductControllerTest implements WithAssertions {
         void incorrectName() throws Exception {
             //Given
             Mockito.when(service.create(any()))
-                    .thenThrow(ProductIllegalNameException.class);
+                    .thenThrow(CustomerIllegalNameException.class);
 
             //When
-            mockMvc.perform(post("/product/{newProductName}", defaultProductName()))
+//            Exception result =
+            mockMvc.perform(post("/customer/{newCustomerName}", defaultCustomerName()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
+//                    .getResolvedException();
 
             //Then
-            Mockito.verify(service).create(defaultProductName());
+            Mockito.verify(service).create(defaultCustomerName());
+//            assertThat(result).isEqualTo(CustomerIllegalNameException.class);
         }
 
         @Test
@@ -122,95 +126,95 @@ class ProductControllerTest implements WithAssertions {
         void incorrectId() throws Exception {
             //Given
             Mockito.when(service.create(any()))
-                    .thenThrow(ProductIllegalIdException.class);
+                    .thenThrow(CustomerIllegalIdException.class);
 
             //When
-            mockMvc.perform(post("/product/{newProductName}", defaultProductName()))
+            mockMvc.perform(post("/customer/{newCustomerName}", defaultCustomerName()))
                     .andExpect(status().isInternalServerError())
                     .andReturn();
 
             //Then
-            Mockito.verify(service).create(defaultProductName());
+            Mockito.verify(service).create(defaultCustomerName());
         }
     }
 
     @Nested
     @DisplayName("calls get")
-    class getProduct {
+    class getCustomer {
 
         @Test
-        @DisplayName("and gets a product")
+        @DisplayName("and gets a customer")
         void properCase() throws Exception {
             //Given
             Mockito.when(service.get(anyLong()))
-                    .thenReturn(new ProductDto(defaultProduct()));
-            ProductDto expected = new ProductDto(defaultProduct());
+                    .thenReturn(new CustomerDto(defaultCustomer()));
+            CustomerDto expected = new CustomerDto(defaultCustomer());
 
             //When
-            ProductDto result = productDtoOf(
-                    mockMvc.perform(get("/product/{productId}", defaultProductId()))
+            CustomerDto result = customerDtoOf(
+                    mockMvc.perform(get("/customer/{customerId}", defaultCustomerId()))
                             .andExpect(status().isOk())
                             .andReturn());
 
             //Then
-            Mockito.verify(service).get(defaultProductId());
+            Mockito.verify(service).get(defaultCustomerId());
             assertThat(result).isEqualTo(expected);
         }
 
         @Test
-        @DisplayName("and throws an Exception when product doesn't exists")
+        @DisplayName("and throws an Exception when customer doesn't exists")
         void nonExisting() throws Exception {
             //Given
             Mockito.when(service.get(anyLong()))
-                    .thenThrow(NoSuchProductException.class);
+                    .thenThrow(NoSuchCustomerException.class);
 
             //When
-            mockMvc.perform(get("/product/{productId}", defaultProductId()))
+            mockMvc.perform(get("/customer/{customerId}", defaultCustomerId()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             //Then
-            Mockito.verify(service).get(defaultProductId());
+            Mockito.verify(service).get(defaultCustomerId());
         }
     }
 
     @Nested
     @DisplayName("posts rename")
-    class renameProduct {
+    class renameCustomer {
 
         @Test
-        @DisplayName("and renames a product")
+        @DisplayName("and renames a customer")
         void properCase() throws Exception {
             //Given
             Mockito.when(service.rename(anyLong(), any()))
-                    .thenReturn(new ProductDto(defaultProduct()));
-            ProductDto expected = new ProductDto(defaultProduct());
+                    .thenReturn(new CustomerDto(defaultCustomer()));
+            CustomerDto expected = new CustomerDto(defaultCustomer());
 
             //When
-            ProductDto result = productDtoOf(
-                    mockMvc.perform(post("/product/{productId}/{productNewName}", defaultProductId(), defaultProductName()))
+            CustomerDto result = customerDtoOf(
+                    mockMvc.perform(post("/customer/{customerId}/{customerNewName}", defaultCustomerId(), defaultCustomerName()))
                             .andExpect(status().isAccepted())
                             .andReturn());
 
             //Then
-            Mockito.verify(service).rename(defaultProductId(), defaultProductName());
+            Mockito.verify(service).rename(defaultCustomerId(), defaultCustomerName());
             assertThat(result).isEqualTo(expected);
         }
 
         @Test
-        @DisplayName("and throws an Exception when product doesn't exists")
+        @DisplayName("and throws an Exception when customer doesn't exists")
         void nonExisting() throws Exception {
             //Given
             Mockito.when(service.rename(anyLong(), any()))
-                    .thenThrow(NoSuchProductException.class);
+                    .thenThrow(NoSuchCustomerException.class);
 
             //When
-            mockMvc.perform(post("/product/{productId}/{productNewName}", defaultProductId(), defaultProductName()))
+            mockMvc.perform(post("/customer/{customerId}/{customerNewName}", defaultCustomerId(), defaultCustomerName()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             //Then
-            Mockito.verify(service).rename(defaultProductId(), defaultProductName());
+            Mockito.verify(service).rename(defaultCustomerId(), defaultCustomerName());
         }
 
         @Test
@@ -218,38 +222,38 @@ class ProductControllerTest implements WithAssertions {
         void incorrectName() throws Exception {
             //Given
             Mockito.when(service.rename(anyLong(), any()))
-                    .thenThrow(ProductIllegalNameException.class);
+                    .thenThrow(CustomerIllegalNameException.class);
 
             //When
-            mockMvc.perform(post("/product/{productId}/{productNewName}", defaultProductId(), defaultProductName()))
+            mockMvc.perform(post("/customer/{customerId}/{customerNewName}", defaultCustomerId(), defaultCustomerName()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             //Then
-            Mockito.verify(service).rename(defaultProductId(), defaultProductName());
+            Mockito.verify(service).rename(defaultCustomerId(), defaultCustomerName());
         }
     }
 
     @Test
     @DisplayName("deletes")
-    void deleteProduct() throws Exception {
+    void deleteCustomer() throws Exception {
         //Given
         Mockito.doNothing().when(service).delete(anyLong());
 
         //When
-        mockMvc.perform(delete("/product/{productId}", defaultProductId()))
+        mockMvc.perform(delete("/customer/{customerId}", defaultCustomerId()))
                 .andExpect(status().isAccepted())
                 .andReturn();
 
         //Then
-        Mockito.verify(service).delete(defaultProductId());
+        Mockito.verify(service).delete(defaultCustomerId());
     }
 
-    private static ProductDto productDtoOf(MvcResult result) throws Exception {
+    private static CustomerDto customerDtoOf(MvcResult result) throws Exception {
         String json = result.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.readValue(json, ProductDto.class);
+            return objectMapper.readValue(json, CustomerDto.class);
         } catch (JsonProcessingException e) {
             throw new Exception(e);
         }
