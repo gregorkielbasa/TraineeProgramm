@@ -1,7 +1,10 @@
 package org.lager;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.NoSuchProductException;
 import org.lager.service.BasketService;
@@ -9,11 +12,9 @@ import org.lager.service.CustomerService;
 import org.lager.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -24,8 +25,7 @@ import static org.lager.ProductFixtures.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("integrated BasketService")
-@Transactional
-@Rollback
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(locations = "classpath:integrationtest.properties")
 class TestBasketServiceIntegration implements WithAssertions {
 
@@ -35,8 +35,6 @@ class TestBasketServiceIntegration implements WithAssertions {
     CustomerService customerService;
     @Autowired
     ProductService productService;
-    @Autowired
-    JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     public void init() {
@@ -44,18 +42,6 @@ class TestBasketServiceIntegration implements WithAssertions {
         productService.create(defaultProductName());
         customerService.create(anotherCustomerName());
         productService.create(anotherProductName());
-    }
-
-    @AfterEach
-    public void cleanUp() {
-        jdbcTemplate.execute("DELETE FROM BASKET_ITEMS;");
-        jdbcTemplate.execute("DELETE FROM BASKETS;");
-
-        jdbcTemplate.execute("DELETE FROM PRODUCTS;");
-        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS PRODUCT_KEY RESTART WITH 100000000;");
-
-        jdbcTemplate.execute("DELETE FROM CUSTOMERS;");
-        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS CUSTOMER_KEY RESTART WITH 100000000;");
     }
 
     @DisplayName("adds")

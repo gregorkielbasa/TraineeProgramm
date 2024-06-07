@@ -1,7 +1,6 @@
 package org.lager;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.lager.exception.NoSuchProductException;
@@ -9,11 +8,9 @@ import org.lager.model.dto.ProductDto;
 import org.lager.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.lager.ProductFixtures.*;
 
@@ -21,22 +18,12 @@ import static org.lager.ProductFixtures.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("integrated ProductService")
-@Transactional
-@Rollback
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(locations = "classpath:integrationtest.properties")
 class TestProductServiceIntegration implements WithAssertions {
 
     @Autowired
     ProductService service;
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    public void cleanUp() {
-        jdbcTemplate.execute("DELETE FROM PRODUCTS;");
-        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS PRODUCT_KEY RESTART WITH 100000000;");
-    }
 
     @Test
     @DisplayName("creates")

@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.lager.CustomerFixtures.*;
@@ -239,6 +240,43 @@ class CustomerServiceTest implements WithAssertions {
                     .isInstanceOf(NoSuchCustomerException.class);
 
             Mockito.verify(repository).findById(incorrectCustomerId());
+        }
+    }
+
+    @Nested
+    @DisplayName("get a list of all IDs")
+    class GetAllIdsTest {
+
+        @Test
+        @DisplayName("and should get an empty list")
+        void emptyDB() {
+            //Given
+            Mockito.when(repository.getAllIds())
+                    .thenReturn(List.of());
+
+            //When
+            customerService = new CustomerService(repository, basketRepository);
+            List<Long> result = customerService.getAllIds();
+
+            //Then
+            assertThat(result).isEmpty();
+            Mockito.verify(repository).getAllIds();
+        }
+
+        @Test
+        @DisplayName("and should get a list with two IDs")
+        void nonEmptyDB() {
+            //Given
+            Mockito.when(repository.getAllIds())
+                    .thenReturn(List.of(defaultCustomerId(), anotherCustomerId()));
+
+            //When
+            customerService = new CustomerService(repository, basketRepository);
+            List<Long> result = customerService.getAllIds();
+
+            //Then
+            assertThat(result).containsExactlyInAnyOrder(defaultCustomerId(), anotherCustomerId());
+            Mockito.verify(repository).getAllIds();
         }
     }
 }

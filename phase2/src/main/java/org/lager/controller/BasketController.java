@@ -28,11 +28,7 @@ public class BasketController {
     @GetMapping("/{customerId}")
     @ResponseStatus(code = HttpStatus.OK)
     public BasketDto getBasket(@PathVariable long customerId) {
-        try {
-            return service.get(customerId);
-        } catch (NoSuchBasketException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
-        }
+        return service.get(customerId);
     }
 
     @DeleteMapping("/{customerId}")

@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.lager.ProductFixtures.*;
@@ -236,6 +237,43 @@ class ProductServiceTest implements WithAssertions {
                     .isInstanceOf(NoSuchProductException.class);
 
             Mockito.verify(repository).findById(incorrectProductId());
+        }
+    }
+
+    @Nested
+    @DisplayName("get a list of all IDs")
+    class GetAllIdsTest {
+
+        @Test
+        @DisplayName("and should get an empty list")
+        void emptyDB() {
+            //Given
+            Mockito.when(repository.getAllIds())
+                    .thenReturn(List.of());
+
+            //When
+            productService = new ProductService(repository);
+            List<Long> result = productService.getAllIds();
+
+            //Then
+            assertThat(result).isEmpty();
+            Mockito.verify(repository).getAllIds();
+        }
+
+        @Test
+        @DisplayName("and should get a list with two IDs")
+        void nonEmptyDB() {
+            //Given
+            Mockito.when(repository.getAllIds())
+                    .thenReturn(List.of(defaultProductId(), anotherProductId()));
+
+            //When
+            productService = new ProductService(repository);
+            List<Long> result = productService.getAllIds();
+
+            //Then
+            assertThat(result).containsExactlyInAnyOrder(defaultProductId(), anotherProductId());
+            Mockito.verify(repository).getAllIds();
         }
     }
 }

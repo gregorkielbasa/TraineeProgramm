@@ -1,14 +1,13 @@
 package org.lager.repository;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.lager.model.Basket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,21 +18,12 @@ import static org.lager.CustomerFixtures.defaultCustomerId;
 import static org.lager.ProductFixtures.anotherProductId;
 
 @DataJpaTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("Basket Repository")
 class BasketRepositoryTest implements WithAssertions {
 
     @Autowired
     BasketRepository repository;
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    public void cleanUp() {
-        jdbcTemplate.execute("DELETE FROM BASKET_ITEMS;");
-        jdbcTemplate.execute("DELETE FROM BASKETS;");
-        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS BASKET_KEY RESTART WITH 1;");
-    }
 
     @Test
     @DisplayName("saves and reads two baskets")

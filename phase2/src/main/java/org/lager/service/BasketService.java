@@ -8,10 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BasketService {
@@ -34,7 +31,7 @@ public class BasketService {
     public BasketDto get(long customerId) {
         return find(customerId)
                 .map(BasketDto::new)
-                .orElseThrow(() -> new NoSuchBasketException(customerId));
+                .orElse(new BasketDto(customerId, Set.of()));
     }
 
     public List<Long> getAllIds() {

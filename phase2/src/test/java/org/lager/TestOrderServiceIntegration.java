@@ -1,7 +1,6 @@
 package org.lager;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,11 +13,9 @@ import org.lager.service.OrderService;
 import org.lager.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.lager.CustomerFixtures.*;
 import static org.lager.OrderFixtures.defaultOrder;
@@ -28,8 +25,7 @@ import static org.lager.ProductFixtures.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("integrated OrderService")
-@Transactional
-@Rollback
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(locations = "classpath:integrationtest.properties")
 class TestOrderServiceIntegration implements WithAssertions {
 
@@ -41,8 +37,6 @@ class TestOrderServiceIntegration implements WithAssertions {
     ProductService productService;
     @Autowired
     BasketService basketService;
-    @Autowired
-    JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     public void init() {
@@ -51,22 +45,6 @@ class TestOrderServiceIntegration implements WithAssertions {
         customerService.create(anotherCustomerName());
         productService.create(anotherProductName());
         basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1);
-    }
-
-    @AfterEach
-    public void cleanUp() {
-        jdbcTemplate.execute("DELETE FROM ORDER_ITEMS;");
-        jdbcTemplate.execute("DELETE FROM ORDERS;");
-        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS ORDER_KEY RESTART WITH 1000;");
-
-        jdbcTemplate.execute("DELETE FROM BASKET_ITEMS;");
-        jdbcTemplate.execute("DELETE FROM BASKETS;");
-
-        jdbcTemplate.execute("DELETE FROM PRODUCTS;");
-        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS PRODUCT_KEY RESTART WITH 100000000;");
-
-        jdbcTemplate.execute("DELETE FROM CUSTOMERS;");
-        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS CUSTOMER_KEY RESTART WITH 100000000;");
     }
 
     @Test
