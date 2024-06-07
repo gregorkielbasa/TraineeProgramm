@@ -5,8 +5,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.lager.exception.NoSuchOrderException;
 import org.lager.exception.OrderItemSetNotPresentException;
-import org.lager.model.Order;
+import org.lager.model.dto.OrderDto;
 import org.lager.service.BasketService;
 import org.lager.service.CustomerService;
 import org.lager.service.OrderService;
@@ -18,8 +19,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static org.lager.CustomerFixtures.*;
 import static org.lager.OrderFixtures.defaultOrder;
@@ -72,24 +71,23 @@ class TestOrderServiceIntegration implements WithAssertions {
 
     @Test
     @DisplayName("orders a basket")
-    void properCase() {
-        Optional<Order> orderBefore = service.getOrder(defaultOrderId());
+    void properCase() throws NoSuchOrderException {
+        assertThatThrownBy(() -> service.get(defaultOrderId()))
+                .isInstanceOf(NoSuchOrderException.class);
         service.order(defaultCustomerId());
-        Optional<Order> orderAfter = service.getOrder(defaultOrderId());
+        OrderDto orderAfter = service.get(defaultOrderId());
 
-        assertThat(orderBefore).isEmpty();
-        assertThat(orderAfter).isEqualTo(Optional.of(defaultOrder()));
+        assertThat(orderAfter).isEqualTo(new OrderDto(defaultOrder()));
     }
 
     @Test
     @DisplayName("orders an empty/non-existing basket")
     void emptyBasket() {
-        Optional<Order> orderBefore = service.getOrder(defaultOrderId());
+        assertThatThrownBy(() -> service.get(defaultOrderId()))
+                .isInstanceOf(NoSuchOrderException.class);
         assertThatThrownBy(() -> service.order(nonExistingCustomerId()))
                 .isInstanceOf(OrderItemSetNotPresentException.class);
-        Optional<Order> orderAfter = service.getOrder(defaultOrderId());
-
-        assertThat(orderBefore).isEmpty();
-        assertThat(orderAfter).isEmpty();
+        assertThatThrownBy(() -> service.get(defaultOrderId()))
+                .isInstanceOf(NoSuchOrderException.class);
     }
 }
