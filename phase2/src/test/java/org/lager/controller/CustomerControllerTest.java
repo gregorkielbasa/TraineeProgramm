@@ -110,15 +110,12 @@ class CustomerControllerTest implements WithAssertions {
                     .thenThrow(CustomerIllegalNameException.class);
 
             //When
-//            Exception result =
             mockMvc.perform(post("/customer/{newCustomerName}", defaultCustomerName()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
-//                    .getResolvedException();
 
             //Then
             Mockito.verify(service).create(defaultCustomerName());
-//            assertThat(result).isEqualTo(CustomerIllegalNameException.class);
         }
 
         @Test

@@ -38,11 +38,11 @@ public class BasketController {
     }
 
     @DeleteMapping("/{customerId}/{productId}")
-    @ResponseStatus(code = HttpStatus.CREATED)
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
     public BasketDto removeFromBasket(@PathVariable long customerId, @PathVariable long productId) {
         try {
             return service.removeFromBasket(customerId, productId);
-        } catch (NoSuchProductException | NoSuchCustomerException e) {
+        } catch (NoSuchBasketException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
     }
