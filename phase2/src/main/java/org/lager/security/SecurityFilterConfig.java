@@ -2,6 +2,7 @@ package org.lager.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,8 +18,8 @@ public class SecurityFilterConfig {
         http.csrf((csrf) -> csrf. disable());
         http.authorizeHttpRequests((requests) -> {
             requests.requestMatchers("/user/**").hasRole("ADMIN");
+            requests.requestMatchers(HttpMethod.GET, "/product/**").permitAll();
             requests.anyRequest().hasAnyRole("USER", "ADMIN");});
-        //            requests.anyRequest().permitAll();});
         http.httpBasic(withDefaults());
         return http.build();
     }
