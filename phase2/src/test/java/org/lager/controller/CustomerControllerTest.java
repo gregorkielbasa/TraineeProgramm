@@ -10,11 +10,14 @@ import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.CustomerIllegalIdException;
 import org.lager.exception.CustomerIllegalNameException;
 import org.lager.model.dto.CustomerDto;
+import org.lager.security.SecurityFilterConfig;
 import org.lager.service.CustomerService;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -29,7 +32,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CustomerController.class)
+@Import(SecurityFilterConfig.class)
 @DisplayName("CustomerController")
+@WithMockUser
 class CustomerControllerTest implements WithAssertions {
     
     @Autowired

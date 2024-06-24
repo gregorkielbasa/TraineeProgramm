@@ -10,11 +10,14 @@ import org.lager.exception.NoSuchBasketException;
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.NoSuchProductException;
 import org.lager.model.dto.BasketDto;
+import org.lager.security.SecurityFilterConfig;
 import org.lager.service.BasketService;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -32,7 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BasketController.class)
+@Import(SecurityFilterConfig.class)
 @DisplayName("Basket Controller")
+@WithMockUser
 class BasketControllerTest implements WithAssertions {
 
     @Autowired

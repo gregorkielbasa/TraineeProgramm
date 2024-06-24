@@ -10,11 +10,14 @@ import org.lager.exception.NoSuchProductException;
 import org.lager.exception.ProductIllegalIdException;
 import org.lager.exception.ProductIllegalNameException;
 import org.lager.model.dto.ProductDto;
+import org.lager.security.SecurityFilterConfig;
 import org.lager.service.ProductService;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -28,7 +31,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ProductController.class)
+@Import(SecurityFilterConfig.class)
 @DisplayName("ProductController")
+@WithMockUser
 class ProductControllerTest implements WithAssertions {
 
     @Autowired
@@ -166,7 +171,7 @@ class ProductControllerTest implements WithAssertions {
 
             //When
             mockMvc.perform(get("/product/{productId}", defaultProductId()))
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().isNotFound())
                     .andReturn();
 
             //Then

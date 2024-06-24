@@ -1,9 +1,6 @@
 package org.lager.controller;
 
-import org.lager.exception.NoSuchProductException;
-import org.lager.exception.ProductIllegalIdException;
-import org.lager.exception.ProductIllegalNameException;
-import org.lager.exception.ProductIllegalPriceException;
+import org.lager.exception.*;
 import org.lager.model.dto.ProductDto;
 import org.lager.service.ProductService;
 import org.springframework.http.HttpStatus;
@@ -33,12 +30,10 @@ public class ProductController {
     public ProductDto createProduct(@PathVariable String newProductName) {
         try {
             return service.create(newProductName);
-        } catch (ProductIllegalNameException e) {
+        } catch (ProductIllegalNameException | ProductIllegalPriceException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         } catch (ProductIllegalIdException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
-        } catch (ProductIllegalPriceException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -48,7 +43,7 @@ public class ProductController {
         try {
             return service.get(productId);
         } catch (NoSuchProductException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
 

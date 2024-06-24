@@ -10,11 +10,14 @@ import org.lager.exception.NoSuchOrderException;
 import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemSetNotPresentException;
 import org.lager.model.dto.OrderDto;
+import org.lager.security.SecurityFilterConfig;
 import org.lager.service.OrderService;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -30,7 +33,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(OrderController.class)
+@Import(SecurityFilterConfig.class)
 @DisplayName("Order Controller")
+@WithMockUser
 class OrderControllerTest implements WithAssertions {
 
     @Autowired
