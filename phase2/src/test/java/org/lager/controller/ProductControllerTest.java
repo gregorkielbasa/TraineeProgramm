@@ -3,6 +3,7 @@ package org.lager.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.WithAssertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.lager.exception.NoSuchProductException;
 import org.lager.exception.ProductIllegalIdException;
 import org.lager.exception.ProductIllegalNameException;
 import org.lager.model.dto.ProductDto;
+import org.lager.security.JwtTokenProvider;
 import org.lager.security.SecurityFilterConfig;
 import org.lager.service.ProductService;
 import org.mockito.Mockito;
@@ -22,10 +24,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.lager.ProductFixtures.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,6 +43,14 @@ class ProductControllerTest implements WithAssertions {
 
     @MockBean
     private ProductService service;
+    @MockBean
+    private JwtTokenProvider tokenProvider;
+
+    @BeforeEach
+    void init () {
+        Mockito.when(tokenProvider.getUser(anyString()))
+                .thenReturn(Optional.empty());
+    }
 
     @Nested
     @DisplayName("calls getAllIds")

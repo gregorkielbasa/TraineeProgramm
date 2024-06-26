@@ -3,13 +3,12 @@ package org.lager.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.lager.exception.NoSuchBasketException;
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.NoSuchProductException;
 import org.lager.model.dto.BasketDto;
+import org.lager.security.JwtTokenProvider;
 import org.lager.security.SecurityFilterConfig;
 import org.lager.service.BasketService;
 import org.mockito.Mockito;
@@ -22,14 +21,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.lager.BasketFixtures.defaultBasket;
 import static org.lager.CustomerFixtures.*;
 import static org.lager.ProductFixtures.defaultProductId;
 import static org.lager.ProductFixtures.incorrectProductId;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,6 +44,14 @@ class BasketControllerTest implements WithAssertions {
 
     @MockBean
     private BasketService service;
+    @MockBean
+    private JwtTokenProvider tokenProvider;
+
+    @BeforeEach
+    void init () {
+        Mockito.when(tokenProvider.getUser(anyString()))
+                .thenReturn(Optional.empty());
+    }
 
     @Nested
     @DisplayName("calls getAllIds")

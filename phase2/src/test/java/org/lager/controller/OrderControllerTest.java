@@ -3,6 +3,7 @@ package org.lager.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.WithAssertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.lager.exception.NoSuchOrderException;
 import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemSetNotPresentException;
 import org.lager.model.dto.OrderDto;
+import org.lager.security.JwtTokenProvider;
 import org.lager.security.SecurityFilterConfig;
 import org.lager.service.OrderService;
 import org.mockito.Mockito;
@@ -22,11 +24,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.lager.CustomerFixtures.defaultCustomerId;
 import static org.lager.CustomerFixtures.incorrectCustomerId;
 import static org.lager.OrderFixtures.*;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -43,6 +47,14 @@ class OrderControllerTest implements WithAssertions {
 
     @MockBean
     private OrderService service;
+    @MockBean
+    private JwtTokenProvider tokenProvider;
+
+    @BeforeEach
+    void init () {
+        Mockito.when(tokenProvider.getUser(anyString()))
+                .thenReturn(Optional.empty());
+    }
 
     @Nested
     @DisplayName("calls getAllIds")
