@@ -1,0 +1,39 @@
+version: '3'
+services:
+  postgresdb:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=admin
+  postgresgui:
+    image: dpage/pgadmin4
+    ports:
+      - 80:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@test.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+  shopapp:
+    image: gregorkielbasa/shop:1.1
+    ports:
+      - 8080:8080
+
+#docker run -d \
+#-e POSTGRES_PASSWORD=admin \
+#--net mynetwork \
+#--name postgresdb \
+#postgres
+#
+#docker run -d \
+#-e PGADMIN_DEFAULT_EMAIL=admin@test.com \
+#-e PGADMIN_DEFAULT_PASSWORD=admin \
+#--net mynetwork \
+#-p 80:80 \
+#--name postgresgui \
+#dpage/pgadmin4
+#
+#docker build -t sec
+#
+#docker run -d \
+#--net mynetwork \
+#-p 8080:8080 \
+#--name securityapp \
+#sec
