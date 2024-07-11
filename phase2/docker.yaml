@@ -4,6 +4,8 @@ services:
     image: postgres
     environment:
       - POSTGRES_PASSWORD=admin
+    volumes:
+      - database-files:/var/lib/postgresql/data
   postgresgui:
     image: dpage/pgadmin4
     ports:
@@ -15,6 +17,9 @@ services:
     image: gregorkielbasa/shop:1.1
     ports:
       - 8080:8080
+volumes:
+  database-files:
+    driver: local
 
 #docker run -d \
 #-e POSTGRES_PASSWORD=admin \
