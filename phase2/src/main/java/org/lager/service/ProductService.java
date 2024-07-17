@@ -11,24 +11,24 @@ import java.util.*;
 
 @Service
 public class ProductService {
-    private final ProductRepository repository;
     private final static Logger logger = LoggerFactory.getLogger(ProductService.class);
+
+    private final ProductRepository repository;
 
     public ProductService(ProductRepository repository) {
         this.repository = repository;
     }
 
     public Product create(String newProductName) {
-        long newProductId = repository.getNextAvailableId();
-        logger.debug("ProductService starts to insert new Product with {} ID and {} name", newProductId, newProductName);
-        Product newProduct = new Product(newProductId, newProductName);
-        repository.save(newProduct);
-        logger.debug("ProductService finished to insert new {} Product", newProductId);
+        logger.debug("ProductService starts to insert new Product with {} name", newProductName);
+        Product newProduct = new Product(newProductName);
+        newProduct = repository.save(newProduct);
+        logger.debug("ProductService finished to insert new {} Product", newProduct.getProductId());
         return newProduct;
     }
 
     public Optional<Product> search(long productId) {
-        return repository.read(productId);
+        return repository.findById(productId);
     }
 
     public void validatePresence(long productId) {
@@ -38,14 +38,14 @@ public class ProductService {
 
     public void delete(long productId) {
         logger.info("ProductService deletes {} Product", productId);
-        repository.delete(productId);
+        repository.deleteById(productId);
     }
 
     public void rename(long productId, String productNewName) {
         logger.debug("ProductService tries to rename {} Product to {}", productId, productNewName);
         Product product = search(productId)
                 .orElseThrow(() -> new NoSuchProductException(productId));
-        product.setName(productNewName);
+        product.setProductName(productNewName);
         repository.save(product);
     }
 }

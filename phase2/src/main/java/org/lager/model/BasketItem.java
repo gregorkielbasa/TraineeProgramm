@@ -2,6 +2,6 @@ package org.lager.model;
 
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("ORDER_ITEMS")
-public record OrderItem(long productId, int amount) {
+@Table("BASKET_ITEMS")
+public record BasketItem(long productId, int amount) {
 }

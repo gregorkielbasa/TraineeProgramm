@@ -21,35 +21,35 @@ class ProductTest implements WithAssertions {
             @Test
             @DisplayName("NULL")
             void nullName() {
-                assertThatThrownBy(() -> new Product(123_123_123, null))
+                assertThatThrownBy(() -> new Product(null))
                         .isInstanceOf(ProductIllegalNameException.class);
             }
 
             @Test
             @DisplayName("empty")
             void emptyName() {
-                assertThatThrownBy(() -> new Product(123_123_123, ""))
+                assertThatThrownBy(() -> new Product(""))
                         .isInstanceOf(ProductIllegalNameException.class);
             }
 
             @Test
             @DisplayName("too short")
             void shortName() {
-                assertThatThrownBy(() -> new Product(123_123_123, "na"))
+                assertThatThrownBy(() -> new Product("na"))
                         .isInstanceOf(ProductIllegalNameException.class);
             }
 
             @Test
             @DisplayName("too long")
             void longName() { //25 characters
-                assertThatThrownBy(() -> new Product(123_123_123, "namenamenamenamenamenamen"))
+                assertThatThrownBy(() -> new Product("namenamenamenamenamenamen"))
                         .isInstanceOf(ProductIllegalNameException.class);
             }
 
             @Test
             @DisplayName("contains illegal character")
             void illegalCharacterName() { //illegal '.'
-                assertThatThrownBy(() -> new Product(123_123_123, "name123.321name"))
+                assertThatThrownBy(() -> new Product("name123.321name"))
                         .isInstanceOf(ProductIllegalNameException.class);
             }
         }
@@ -76,42 +76,42 @@ class ProductTest implements WithAssertions {
 
     @Test
     @DisplayName("with a proper name and ID")
-    void getNameAndID() {
+    void getProductNameAndID() {
         Product product = new Product(123_123_123, "proper name");
 
-        assertThat(product.getId()).isEqualTo(123_123_123L);
-        assertThat(product.getName()).isEqualTo("proper name");
+        assertThat(product.getProductId()).isEqualTo(123_123_123L);
+        assertThat(product.getProductName()).isEqualTo("proper name");
     }
 
     @Nested
     @DisplayName("when tries to change name")
-    class ProductSetNameTest {
+    class ProductsetProductNameTest {
 
         Product product;
 
         @BeforeEach
         void init() {
-            product = new Product(123_123_123L, "name");
+            product = new Product("name");
         }
 
         @Test
         @DisplayName("works with a proper name")
         void properCase() {
-            product.setName("new name");
-            assertThat(product.getName()).isEqualTo("new name");
+            product.setProductName("new name");
+            assertThat(product.getProductName()).isEqualTo("new name");
         }
 
         @Test
         @DisplayName("throws an exception with too long name")
         void longName() {  //25 characters
-            assertThatThrownBy(() -> product.setName("namenamenamenamenamenamen"))
+            assertThatThrownBy(() -> product.setProductName("namenamenamenamenamenamen"))
                     .isInstanceOf(ProductIllegalNameException.class);
         }
 
         @Test
         @DisplayName("throws an exception when name contains illegal character")
         void illegalCharacterName() {  //illegal '.'
-            assertThatThrownBy(() -> product.setName("name123.321name"))
+            assertThatThrownBy(() -> product.setProductName("name123.321name"))
                     .isInstanceOf(ProductIllegalNameException.class);
         }
     }
@@ -211,13 +211,14 @@ class ProductTest implements WithAssertions {
 
             assertThat(product1.hashCode()).isNotEqualTo(product2.hashCode());
         }
-
-        @Test
-        @DisplayName("to String")
-        void testToString() {
-            Product product = new Product(123_123_123L, "test");
-
-            assertThat(product.toString()).isEqualTo("Product{ID=123123123, name='test'}");
-        }
     }
+
+    @Test
+    @DisplayName("to String")
+    void testToString() {
+        Product product = new Product(123_123_123L, "test");
+
+        assertThat(product.toString()).isEqualTo("Product{ID=123123123, productName='test'}");
+    }
+
 }

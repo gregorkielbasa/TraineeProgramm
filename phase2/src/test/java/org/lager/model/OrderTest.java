@@ -5,10 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.lager.exception.OrderIllegalIdException;
-import org.lager.exception.OrderItemListNotPresentException;
-import org.lager.exception.OrderTimeNullException;
+import org.lager.exception.OrderItemSetNotPresentException;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,16 +25,16 @@ class OrderTest implements WithAssertions {
     class OrderThrowsException {
 
         @Test
-        @DisplayName("created with invalid ID")
-        void invalidID() {
+        @DisplayName("created with invalid ID (too high)")
+        void toHightId() {
             assertThatThrownBy(() -> new Order(INVALID_ID, CUSTOMER_ID, VALID_ITEM_LIST))
                     .isInstanceOf(OrderIllegalIdException.class);
         }
 
         @Test
-        @DisplayName("created with 0 ID")
-        void zeroID() {
-            assertThatThrownBy(() -> new Order(0, CUSTOMER_ID, VALID_ITEM_LIST))
+        @DisplayName("created with invalid ID (too low)")
+        void toLowId() {
+            assertThatThrownBy(() -> new Order(1, CUSTOMER_ID, VALID_ITEM_LIST))
                     .isInstanceOf(OrderIllegalIdException.class);
         }
 
@@ -44,21 +42,14 @@ class OrderTest implements WithAssertions {
         @DisplayName("created with NULL items list")
         void nullItemsList() {
             assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, null))
-                    .isInstanceOf(OrderItemListNotPresentException.class);
+                    .isInstanceOf(OrderItemSetNotPresentException.class);
         }
 
         @Test
         @DisplayName("created with invalid items list")
         void emptyItemList() {
             assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, new ArrayList<>()))
-                    .isInstanceOf(OrderItemListNotPresentException.class);
-        }
-
-        @Test
-        @DisplayName("created with null Time")
-        void nullTime() {
-            assertThatThrownBy(() -> new Order(VALID_ID, CUSTOMER_ID, null, VALID_ITEM_LIST))
-                    .isInstanceOf(OrderTimeNullException.class);
+                    .isInstanceOf(OrderItemSetNotPresentException.class);
         }
     }
 
@@ -72,8 +63,7 @@ class OrderTest implements WithAssertions {
             Order order = new Order(VALID_ID, 123_123_123L, VALID_ITEM_LIST);
 
             assertThat(order.getCustomerId()).isEqualTo(123_123_123L);
-            assertThat(order.getId()).isEqualTo(VALID_ID);
-            assertThat(order.getDateTime()).isEqualToIgnoringNanos(LocalDateTime.now());
+            assertThat(order.getOrderId()).isEqualTo(VALID_ID);
             assertThat(order.getItems()).containsExactlyInAnyOrderElementsOf(VALID_ITEM_LIST);
         }
 
@@ -165,15 +155,6 @@ class OrderTest implements WithAssertions {
 
             assertThat(order1.equals(order2)).isFalse();
         }
-
-        @Test
-        @DisplayName("os the same object")
-        void similarOrderWithDifferentTime() {
-            Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
-            Order order2 = new Order(VALID_ID, CUSTOMER_ID, LocalDateTime.now().minusDays(1), VALID_ITEM_LIST);
-
-            assertThat(order1.equals(order2)).isFalse();
-        }
     }
 
     @Nested
@@ -191,7 +172,7 @@ class OrderTest implements WithAssertions {
 
         @Test
         @DisplayName("with different ID")
-        void differentId() {
+        void differentOrderId() {
             Order order1 = new Order(VALID_ID, CUSTOMER_ID, VALID_ITEM_LIST);
             Order order2 = new Order(VALID_ID + 1, CUSTOMER_ID, VALID_ITEM_LIST);
 
@@ -217,4 +198,11 @@ class OrderTest implements WithAssertions {
         }
     }
 
+    @Test
+    @DisplayName("to String")
+    void orderToStringTest() {
+        Order order = new Order(VALID_ID, List.of(ITEM_1));
+
+        assertThat(order.toString()).isEqualTo("Order{orderId=0, customerId=1234, items=[OrderItem[productId=123123123, amount=3]]}");
+    }
 }

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.NoSuchProductException;
 import org.lager.exception.ProductIllegalNameException;
-import org.lager.exception.RepositoryException;
 import org.lager.model.Product;
 import org.lager.repository.ProductRepository;
 import org.mockito.Mock;
@@ -17,6 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.lager.ProductFixtures.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Product Service")
@@ -34,24 +35,20 @@ class ProductServiceTest implements WithAssertions {
         @Test
         @DisplayName("adds one Product")
         void properOne() {
-            Mockito.when(repository.getNextAvailableId())
-                    .thenReturn(defaultId());
-            Mockito.doNothing().when(repository).save(Mockito.any());
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultProduct());
 
             productService = new ProductService(repository);
-            Product newProduct = productService.create(defaultName());
+            Product product = productService.create(defaultProductName());
 
-            assertThat(newProduct).isEqualTo(defaultProduct());
-            Mockito.verify(repository).save(defaultProduct());
+            assertThat(product).isEqualTo(defaultProduct());
+            Mockito.verify(repository).save(defaultNewProduct());
         }
 
 
         @Test
         @DisplayName("a product with null Name should throw an exception")
         void nullName() {
-            Mockito.when(repository.getNextAvailableId())
-                    .thenReturn(defaultId());
-
             productService = new ProductService(repository);
 
             assertThatThrownBy(() -> productService.create(null))
@@ -61,27 +58,10 @@ class ProductServiceTest implements WithAssertions {
         @Test
         @DisplayName("a product with invalid Name should throw an exception")
         void invalidName() {
-            Mockito.when(repository.getNextAvailableId())
-                    .thenReturn(defaultId());
-
             productService = new ProductService(repository);
 
-            assertThatThrownBy(() -> productService.create(incorrectName()))
+            assertThatThrownBy(() -> productService.create(incorrectProductName()))
                     .isInstanceOf(ProductIllegalNameException.class);
-        }
-
-        @Test
-        @DisplayName("a product but repository cannot save")
-        void repositoryException() {
-            Mockito.when(repository.getNextAvailableId())
-                    .thenReturn(defaultId());
-            Mockito.doThrow(new RepositoryException("any"))
-                    .when(repository).save(Mockito.any());
-
-            productService = new ProductService(repository);
-
-            assertThatThrownBy(() -> productService.create(defaultName()))
-                    .isInstanceOf(RepositoryException.class);
         }
     }
 
@@ -92,33 +72,40 @@ class ProductServiceTest implements WithAssertions {
         @Test
         @DisplayName("existing one")
         void existingID() {
-            Mockito.when(repository.read(defaultId()))
+            Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.of(defaultProduct()));
 
             productService = new ProductService(repository);
-            assertThat(productService.search(defaultId())).isEqualTo(
-                    Optional.of(defaultProduct())
-            );
+            Optional<Product> product = productService.search(defaultProductId());
+
+            assertThat(product).isEqualTo(Optional.of(defaultProduct()));
+            Mockito.verify(repository).findById(defaultProductId());
         }
 
         @Test
         @DisplayName("non-existing one")
         void nonExistingID() {
-            Mockito.when(repository.read(defaultId()))
+            Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
             productService = new ProductService(repository);
-            assertThat(productService.search(defaultId())).isEmpty();
+            Optional<Product> product = productService.search(defaultProductId());
+
+            assertThat(product).isEmpty();
+            Mockito.verify(repository).findById(defaultProductId());
         }
 
         @Test
         @DisplayName("invalid ID")
         void invalidID() {
-            Mockito.when(repository.read(incorrectId()))
+            Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
             productService = new ProductService(repository);
-            assertThat(productService.search(incorrectId())).isEmpty();
+            Optional<Product> product = productService.search(incorrectProductId());
+
+            assertThat(product).isEmpty();
+            Mockito.verify(repository).findById(incorrectProductId());
         }
     }
 
@@ -129,35 +116,39 @@ class ProductServiceTest implements WithAssertions {
         @Test
         @DisplayName("existing one")
         void existingID() {
-            Mockito.when(repository.read(defaultId()))
+            Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.of(defaultProduct()));
 
             productService = new ProductService(repository);
-            productService.validatePresence(defaultId());
+            productService.validatePresence(defaultProductId());
 
-            Mockito.verify(repository).read(defaultId());
+            Mockito.verify(repository).findById(defaultProductId());
         }
 
         @Test
         @DisplayName("non-existing one")
         void nonExistingID() {
-            Mockito.when(repository.read(defaultId()))
+            Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
             productService = new ProductService(repository);
-            assertThatThrownBy(() -> productService.validatePresence(defaultId()))
+            assertThatThrownBy(() -> productService.validatePresence(defaultProductId()))
                     .isInstanceOf(NoSuchProductException.class);
+
+            Mockito.verify(repository).findById(defaultProductId());
         }
 
         @Test
         @DisplayName("invalid ID")
         void invalidID() {
-            Mockito.when(repository.read(incorrectId()))
+            Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
             productService = new ProductService(repository);
-            assertThatThrownBy(() -> productService.validatePresence(incorrectId()))
+            assertThatThrownBy(() -> productService.validatePresence(incorrectProductId()))
                     .isInstanceOf(NoSuchProductException.class);
+
+            Mockito.verify(repository).findById(incorrectProductId());
         }
     }
 
@@ -168,24 +159,24 @@ class ProductServiceTest implements WithAssertions {
         @Test
         @DisplayName("existing one")
         void existingID() {
-            Mockito.doNothing().when(repository).delete(Mockito.anyLong());
+            Mockito.doNothing().when(repository).deleteById(anyLong());
 
             productService = new ProductService(repository);
-            productService.delete(defaultId());
+            productService.delete(defaultProductId());
 
-            Mockito.verify(repository).delete(defaultId());
+            Mockito.verify(repository).deleteById(defaultProductId());
         }
 
 
         @Test
         @DisplayName("invalid ID")
         void invalidID() {
-            Mockito.doNothing().when(repository).delete(incorrectId());
+            Mockito.doNothing().when(repository).deleteById(anyLong());
 
             productService = new ProductService(repository);
-            productService.delete(incorrectId());
+            productService.delete(incorrectProductId());
 
-            Mockito.verify(repository).delete(incorrectId());
+            Mockito.verify(repository).deleteById(incorrectProductId());
         }
     }
 
@@ -196,43 +187,53 @@ class ProductServiceTest implements WithAssertions {
         @Test
         @DisplayName("existing one with a new proper name")
         void existingID() {
-            Mockito.when(repository.read(defaultId())).thenReturn(Optional.of(defaultProduct()));
-            Mockito.doNothing().when(repository).save(Mockito.any());
+            Mockito.when(repository.findById(anyLong()))
+                    .thenReturn(Optional.of(defaultProduct()));
 
             productService = new ProductService(repository);
-            productService.rename(defaultId(), "newName");
+            productService.rename(defaultProductId(), "newName");
 
-            Mockito.verify(repository).save(productWithName("newName"));
+            Mockito.verify(repository).findById(defaultProductId());
+            Mockito.verify(repository).save(defaultProductWithName("newName"));
         }
 
         @Test
         @DisplayName("existing one with a new invalid name throws an exception")
         void invalidNameExistingID() {
-            Mockito.when(repository.read(defaultId())).thenReturn(Optional.of(defaultProduct()));
+            Mockito.when(repository.findById(anyLong()))
+                    .thenReturn(Optional.of(defaultNewProduct()));
 
             productService = new ProductService(repository);
-            assertThatThrownBy(() -> productService.rename(defaultId(), "new . Name"))
+            assertThatThrownBy(() -> productService.rename(defaultProductId(), "new . Name"))
                     .isInstanceOf(ProductIllegalNameException.class);
+
+            Mockito.verify(repository).findById(defaultProductId());
         }
 
         @Test
         @DisplayName("non-existing one throws an exception")
         void nonExistingID() {
-            Mockito.when(repository.read(nonExistingId())).thenReturn(Optional.empty());
+            Mockito.when(repository.findById(anyLong()))
+                    .thenReturn(Optional.empty());
 
             productService = new ProductService(repository);
-            assertThatThrownBy(() -> productService.rename(nonExistingId(), "newName"))
+            assertThatThrownBy(() -> productService.rename(nonExistingProductId(), "newName"))
                     .isInstanceOf(NoSuchProductException.class);
+
+            Mockito.verify(repository).findById(nonExistingProductId());
         }
 
         @Test
         @DisplayName("invalid ID throws an exception")
         void invalidID() {
-            Mockito.when(repository.read(incorrectId())).thenReturn(Optional.empty());
+            Mockito.when(repository.findById(anyLong()))
+                    .thenReturn(Optional.empty());
 
             productService = new ProductService(repository);
-            assertThatThrownBy(() -> productService.rename(incorrectId(), "newName"))
+            assertThatThrownBy(() -> productService.rename(incorrectProductId(), "newName"))
                     .isInstanceOf(NoSuchProductException.class);
+
+            Mockito.verify(repository).findById(incorrectProductId());
         }
     }
 }

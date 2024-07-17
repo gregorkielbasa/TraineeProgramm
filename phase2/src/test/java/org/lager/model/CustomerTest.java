@@ -21,42 +21,42 @@ class CustomerTest implements WithAssertions {
             @Test
             @DisplayName("NULL")
             void nullName() {
-                assertThatThrownBy(() -> new Customer(123_123_123, null))
+                assertThatThrownBy(() -> new Customer(null))
                         .isInstanceOf(CustomerIllegalNameException.class);
             }
 
             @Test
             @DisplayName("empty")
             void emptyName() {
-                assertThatThrownBy(() -> new Customer(123_123_123, ""))
+                assertThatThrownBy(() -> new Customer(""))
                         .isInstanceOf(CustomerIllegalNameException.class);
             }
 
             @Test
             @DisplayName("too short")
             void shortName() {
-                assertThatThrownBy(() -> new Customer(123_123_123, "na"))
+                assertThatThrownBy(() -> new Customer("na"))
                         .isInstanceOf(CustomerIllegalNameException.class);
             }
 
             @Test
             @DisplayName("too long")
             void longName() { //25 characters
-                assertThatThrownBy(() -> new Customer(123_123_123, "namenamenamenamenamenamen"))
+                assertThatThrownBy(() -> new Customer("namenamenamenamenamenamen"))
                         .isInstanceOf(CustomerIllegalNameException.class);
             }
 
             @Test
             @DisplayName("contains digits")
             void nameWithDigits() {
-                assertThatThrownBy(() -> new Customer(123_123_123, "name123name"))
+                assertThatThrownBy(() -> new Customer("name123name"))
                         .isInstanceOf(CustomerIllegalNameException.class);
             }
 
             @Test
             @DisplayName("contains illegal character")
             void nameWithWhiteSymbols() { //illegal '.'
-                assertThatThrownBy(() -> new Customer(123_123_123, "abc.abc"))
+                assertThatThrownBy(() -> new Customer("abc.abc"))
                         .isInstanceOf(CustomerIllegalNameException.class);
             }
         }
@@ -83,42 +83,42 @@ class CustomerTest implements WithAssertions {
 
     @Test
     @DisplayName("with a proper name and ID")
-    void getNameAndId() {
+    void getCustomerNameAndId() {
         Customer customer = new Customer(123_123_123, "properName");
 
-        assertThat(customer.getId()).isEqualTo(123_123_123L);
-        assertThat(customer.getName()).isEqualTo("properName");
+        assertThat(customer.getCustomerId()).isEqualTo(123_123_123L);
+        assertThat(customer.getCustomerName()).isEqualTo("properName");
     }
 
     @Nested
     @DisplayName("when tries to change name")
-    class CustomerSetNameTest {
+    class CustomersetCustomerNameTest {
 
         Customer customer;
 
         @BeforeEach
         void init() {
-            customer = new Customer(123_123_123L, "TestABCabc");
+            customer = new Customer("TestABCabc");
         }
 
         @Test
         @DisplayName("works with a proper name")
         void properCase() {
-            customer.setName("newName");
-            assertThat(customer.getName()).isEqualTo("newName");
+            customer.setCustomerName("newName");
+            assertThat(customer.getCustomerName()).isEqualTo("newName");
         }
 
         @Test
         @DisplayName("throws an exception with too long name")
         void longName() { //25 characters
-            assertThatThrownBy(() -> customer.setName("namenamenamenamenamenamen"))
+            assertThatThrownBy(() -> customer.setCustomerName("namenamenamenamenamenamen"))
                     .isInstanceOf(CustomerIllegalNameException.class);
         }
 
         @Test
         @DisplayName("throws an exception when name contains illegal character")
         void illegalCharacterName() { //illegal '.'
-            assertThatThrownBy(() -> customer.setName("name.name"))
+            assertThatThrownBy(() -> customer.setCustomerName("name.name"))
                     .isInstanceOf(CustomerIllegalNameException.class);
         }
 
@@ -150,7 +150,7 @@ class CustomerTest implements WithAssertions {
     @DisplayName("is NOT equal when comparing")
     class CustomerTestNotEquals {
 
-        Customer customer1 = new Customer(123_123_123L, "Test");
+        Customer customer1 = new Customer( "Test");
 
         @Test
         @DisplayName("to NULL")
@@ -171,7 +171,7 @@ class CustomerTest implements WithAssertions {
         @Test
         @DisplayName("to an object with a different name")
         void testEqualsName() {
-            Customer customer2 = new Customer(123_123_123L, "DifferentTest");
+            Customer customer2 = new Customer("DifferentTest");
 
             assertFalse(customer1.equals(customer2));
         }
@@ -230,6 +230,6 @@ class CustomerTest implements WithAssertions {
     void testToString() {
         Customer customer = new Customer(123_123_123L, "test");
 
-        assertThat(customer.toString()).isEqualTo("Customer{ID=123123123, name='test'}");
+        assertThat(customer.toString()).isEqualTo("Customer{ID=123123123, customerName='test'}");
     }
 }
