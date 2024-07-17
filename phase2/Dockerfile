@@ -1,6 +1,6 @@
 FROM eclipse-temurin:latest
 LABEL authors="Gregor Kielbasa"
 
-COPY phase2-1.1.jar /run/
+COPY /target/phase2-1.2.jar /run/
 WORKDIR /run
-CMD ["java","-jar","/run/phase2-1.1.jar"]
+CMD ["java","-jar","/run/phase2-1.2.jar"]
