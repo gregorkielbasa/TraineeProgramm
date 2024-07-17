@@ -1,6 +1,9 @@
 package org.lager.service;
 
 import org.lager.exception.NoSuchProductException;
+import org.lager.exception.ProductIllegalIdException;
+import org.lager.exception.ProductIllegalNameException;
+import org.lager.exception.ProductIllegalPriceException;
 import org.lager.model.Product;
 import org.lager.model.dto.ProductDto;
 import org.lager.repository.ProductRepository;
@@ -23,7 +26,7 @@ public class ProductService {
 
     public ProductDto create(String newProductName) {
         logger.debug("ProductService starts to insert new Product with {} name", newProductName);
-        Product newProduct = repository.save(new Product(newProductName));
+        Product newProduct = repository.save(new Product(newProductName, 0.0));
         logger.debug("ProductService finished to insert new {} Product", newProduct.getProductId());
         return new ProductDto(newProduct);
     }
