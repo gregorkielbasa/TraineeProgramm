@@ -1,8 +1,6 @@
 package org.lager.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.lager.exception.ProductIllegalIdException;
 import org.lager.exception.ProductIllegalNameException;
 import org.lager.exception.ProductIllegalPriceException;
@@ -23,9 +21,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PRODUCT_KEY")
     @SequenceGenerator(name = "PRODUCT_KEY", initialValue = (int) ID_MIN, allocationSize = 1)
     private final long productId;
-    @NotBlank
+
     private String productName;
-    @NotNull
+
     private double productPrice;
 
     private Product() {

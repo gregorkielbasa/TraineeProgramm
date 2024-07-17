@@ -3,6 +3,7 @@ package org.lager.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.WithAssertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,26 +11,32 @@ import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.CustomerIllegalIdException;
 import org.lager.exception.CustomerIllegalNameException;
 import org.lager.model.dto.CustomerDto;
+import org.lager.security.JwtTokenProvider;
+import org.lager.security.SecurityFilterConfig;
 import org.lager.service.CustomerService;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.lager.CustomerFixtures.*;
 import static org.lager.CustomerFixtures.defaultCustomerId;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CustomerController.class)
+@Import(SecurityFilterConfig.class)
 @DisplayName("CustomerController")
+@WithMockUser
 class CustomerControllerTest implements WithAssertions {
     
     @Autowired
@@ -37,6 +44,14 @@ class CustomerControllerTest implements WithAssertions {
     
     @MockBean
     private CustomerService service;
+    @MockBean
+    private JwtTokenProvider tokenProvider;
+
+    @BeforeEach
+    void init () {
+        Mockito.when(tokenProvider.getUser(anyString()))
+                .thenReturn(Optional.empty());
+    }
 
     @Nested
     @DisplayName("calls getAllIds")
