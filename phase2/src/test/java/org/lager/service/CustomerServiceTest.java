@@ -7,13 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.CustomerIllegalNameException;
 import org.lager.exception.NoSuchCustomerException;
-import org.lager.model.Customer;
+import org.lager.model.dto.CustomerDto;
 import org.lager.repository.BasketRepository;
 import org.lager.repository.CustomerRepository;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.lager.CustomerFixtures.*;
@@ -42,9 +43,9 @@ class CustomerServiceTest implements WithAssertions {
                     .thenReturn(defaultCustomer());
 
             customerService = new CustomerService(repository, basketRepository);
-            Customer customer = customerService.create(defaultCustomerName());
+            CustomerDto customer = customerService.create(defaultCustomerName());
 
-            assertThat(customer).isEqualTo(defaultCustomer());
+            assertThat(customer).isEqualTo(new CustomerDto(defaultCustomer()));
             Mockito.verify(repository).save(defaultNewCustomer());
         }
 
@@ -79,9 +80,9 @@ class CustomerServiceTest implements WithAssertions {
                     .thenReturn(Optional.of(defaultCustomer()));
 
             customerService = new CustomerService(repository, basketRepository);
-            Optional<Customer> customer = customerService.search(defaultCustomerId());
+            CustomerDto customer = customerService.get(defaultCustomerId());
 
-            assertThat(customer).isEqualTo(Optional.of(defaultCustomer()));
+            assertThat(customer).isEqualTo(new CustomerDto(defaultCustomer()));
             Mockito.verify(repository).findById(defaultCustomerId());
         }
 
@@ -92,9 +93,9 @@ class CustomerServiceTest implements WithAssertions {
                     .thenReturn(Optional.empty());
 
             customerService = new CustomerService(repository, basketRepository);
-            Optional<Customer> customer = customerService.search(defaultCustomerId());
+            assertThatThrownBy(()->customerService.get(defaultCustomerId()))
+                    .isInstanceOf(NoSuchCustomerException.class);
 
-            assertThat(customer).isEmpty();
             Mockito.verify(repository).findById(defaultCustomerId());
         }
 
@@ -105,9 +106,9 @@ class CustomerServiceTest implements WithAssertions {
                     .thenReturn(Optional.empty());
 
             customerService = new CustomerService(repository, basketRepository);
-            Optional<Customer> customer = customerService.search(incorrectCustomerId());
+            assertThatThrownBy(()->customerService.get(incorrectCustomerId()))
+                    .isInstanceOf(NoSuchCustomerException.class);
 
-            assertThat(customer).isEmpty();
             Mockito.verify(repository).findById(incorrectCustomerId());
         }
     }
@@ -192,6 +193,8 @@ class CustomerServiceTest implements WithAssertions {
         void existingID() {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.of(defaultCustomer()));
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultCustomerWithName("newName"));
 
             customerService = new CustomerService(repository, basketRepository);
             customerService.rename(defaultCustomerId(), "newName");
@@ -237,6 +240,43 @@ class CustomerServiceTest implements WithAssertions {
                     .isInstanceOf(NoSuchCustomerException.class);
 
             Mockito.verify(repository).findById(incorrectCustomerId());
+        }
+    }
+
+    @Nested
+    @DisplayName("get a list of all IDs")
+    class GetAllIdsTest {
+
+        @Test
+        @DisplayName("and should get an empty list")
+        void emptyDB() {
+            //Given
+            Mockito.when(repository.getAllIds())
+                    .thenReturn(List.of());
+
+            //When
+            customerService = new CustomerService(repository, basketRepository);
+            List<Long> result = customerService.getAllIds();
+
+            //Then
+            assertThat(result).isEmpty();
+            Mockito.verify(repository).getAllIds();
+        }
+
+        @Test
+        @DisplayName("and should get a list with two IDs")
+        void nonEmptyDB() {
+            //Given
+            Mockito.when(repository.getAllIds())
+                    .thenReturn(List.of(defaultCustomerId(), anotherCustomerId()));
+
+            //When
+            customerService = new CustomerService(repository, basketRepository);
+            List<Long> result = customerService.getAllIds();
+
+            //Then
+            assertThat(result).containsExactlyInAnyOrder(defaultCustomerId(), anotherCustomerId());
+            Mockito.verify(repository).getAllIds();
         }
     }
 }

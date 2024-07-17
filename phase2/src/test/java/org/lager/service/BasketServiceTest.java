@@ -8,18 +8,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.NoSuchBasketException;
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.exception.NoSuchProductException;
+import org.lager.model.dto.BasketDto;
 import org.lager.repository.BasketRepository;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.lager.BasketFixtures.*;
+import static org.lager.CustomerFixtures.anotherCustomerId;
 import static org.lager.CustomerFixtures.defaultCustomerId;
 import static org.lager.ProductFixtures.anotherProductId;
 import static org.lager.ProductFixtures.defaultProductId;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
 @ExtendWith(MockitoExtension.class)
@@ -78,6 +82,49 @@ class BasketServiceTest implements WithAssertions {
         }
     }
 
+    @Nested
+    @DisplayName("when gets")
+    class GetBasketServiceTest {
+
+        @Test
+        @DisplayName("existing Basket")
+        void existingID() {
+            Mockito.when(repository.findByCustomerId(anyLong()))
+                    .thenReturn(Optional.of(defaultBasket()));
+
+            basketService = new BasketService(repository, customerService, productService);
+            BasketDto result = basketService.get(defaultCustomerId());
+
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            assertThat(result).isEqualTo(new BasketDto(defaultBasket()));
+        }
+
+        @Test
+        @DisplayName("non-existing Basket")
+        void nonExistingID() {
+            Mockito.when(repository.findByCustomerId(anyLong()))
+                    .thenReturn(Optional.empty());
+
+            basketService = new BasketService(repository, customerService, productService);
+            BasketDto result = basketService.get(defaultCustomerId());
+
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            assertThat(result).isEqualTo(new BasketDto(defaultEmptyBasket()));
+        }
+
+        @Test
+        @DisplayName("empty Basket")
+        void emptyID() {Mockito.when(repository.findByCustomerId(anyLong()))
+                .thenReturn(Optional.of(defaultEmptyBasket()));
+
+            basketService = new BasketService(repository, customerService, productService);
+            BasketDto result = basketService.get(defaultCustomerId());
+
+            Mockito.verify(repository).findByCustomerId(defaultCustomerId());
+            assertThat(result).isEqualTo(new BasketDto(defaultEmptyBasket()));
+        }
+    }
+
     @Test
     @DisplayName("drop (deletes) a Basket")
     void NotEmptyBasket() {
@@ -98,6 +145,8 @@ class BasketServiceTest implements WithAssertions {
         void emptyBasket() {
             Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.of(defaultBasket()));
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultEmptyBasket());
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.removeFromBasket(defaultCustomerId(), defaultProductId());
@@ -125,6 +174,8 @@ class BasketServiceTest implements WithAssertions {
         void nonExistingProduct() {
             Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.of(defaultBasket()));
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultBasket());
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.removeFromBasket(defaultCustomerId(), anotherProductId());
@@ -146,6 +197,8 @@ class BasketServiceTest implements WithAssertions {
             Mockito.doNothing().when(customerService).validatePresence(anyLong());
             Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.empty());
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultBasket());
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1);
@@ -162,6 +215,8 @@ class BasketServiceTest implements WithAssertions {
             Mockito.doNothing().when(productService).validatePresence(anyLong());
             Mockito.when(repository.findByCustomerId(anyLong()))
                     .thenReturn(Optional.of(defaultEmptyBasket()));
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultBasket());
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1);
@@ -177,6 +232,8 @@ class BasketServiceTest implements WithAssertions {
             Mockito.doNothing().when(productService).validatePresence(anyLong());
             Mockito.when(repository.findByCustomerId(defaultCustomerId()))
                     .thenReturn(Optional.of(defaultBasket()));
+            Mockito.when(repository.save(any()))
+                    .thenReturn(defaultBasketWith(defaultProductId(), 2));
 
             basketService = new BasketService(repository, customerService, productService);
             basketService.addToBasket(defaultCustomerId(), defaultProductId(), 1);
@@ -214,6 +271,43 @@ class BasketServiceTest implements WithAssertions {
 
             Mockito.verify(productService).validatePresence(defaultProductId());
             Mockito.verify(customerService).validatePresence(defaultCustomerId());
+        }
+    }
+
+    @Nested
+    @DisplayName("get a list of all IDs")
+    class GetAllIdsTest {
+
+        @Test
+        @DisplayName("and should get an empty list")
+        void emptyDB() {
+            //Given
+            Mockito.when(repository.getAllIds())
+                    .thenReturn(List.of());
+
+            //When
+            basketService = new BasketService(repository, customerService, productService);
+            List<Long> result = basketService.getAllIds();
+
+            //Then
+            assertThat(result).isEmpty();
+            Mockito.verify(repository).getAllIds();
+        }
+
+        @Test
+        @DisplayName("and should get a list with two IDs")
+        void nonEmptyDB() {
+            //Given
+            Mockito.when(repository.getAllIds())
+                    .thenReturn(List.of(defaultProductId(), anotherCustomerId()));
+
+            //When
+            basketService = new BasketService(repository, customerService, productService);
+            List<Long> result = basketService.getAllIds();
+
+            //Then
+            assertThat(result).containsExactlyInAnyOrder(defaultCustomerId(), anotherCustomerId());
+            Mockito.verify(repository).getAllIds();
         }
     }
 }

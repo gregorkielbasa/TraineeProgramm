@@ -10,8 +10,8 @@ import static org.lager.ProductFixtures.anotherProductId;
 import static org.lager.ProductFixtures.defaultProductId;
 
 public class BasketFixtures {
-    private final static long BASKET_1_ID = 1000L;
-    private final static long BASKET_2_ID = 1001L;
+    private final static long BASKET_1_ID = 1L;
+    private final static long BASKET_2_ID = 2L;
     private final static long CUSTOMER_1_ID = defaultCustomerId();
     private final static long CUSTOMER_2_ID = anotherCustomerId();
     private final static long PRODUCT_1_ID = defaultProductId();
@@ -51,6 +51,13 @@ public class BasketFixtures {
 
     public static Basket anotherBasket() {
         Basket basket = new Basket(BASKET_2_ID, CUSTOMER_2_ID, Map.of());
+        basket.insert(PRODUCT_1_ID, 2);
+        basket.insert(PRODUCT_2_ID, 3);
+        return basket;
+    }
+
+    public static Basket anotherNewBasket() {
+        Basket basket = new Basket(CUSTOMER_2_ID);
         basket.insert(PRODUCT_1_ID, 2);
         basket.insert(PRODUCT_2_ID, 3);
         return basket;

@@ -5,13 +5,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.lager.exception.NoSuchOrderException;
 import org.lager.exception.OrderItemSetNotPresentException;
-import org.lager.model.Order;
+import org.lager.model.dto.OrderDto;
 import org.lager.repository.OrderRepository;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -19,6 +21,8 @@ import static org.lager.BasketFixtures.basketContentOf;
 import static org.lager.BasketFixtures.defaultBasket;
 import static org.lager.CustomerFixtures.defaultCustomerId;
 import static org.lager.OrderFixtures.*;
+import static org.lager.ProductFixtures.anotherProductId;
+import static org.lager.ProductFixtures.defaultProductId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
@@ -27,7 +31,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 class OrderServiceTest implements WithAssertions {
 
     @Mock
-    OrderRepository repository;
+    OrderRepository orderRepository;
     @Mock
     BasketService basketService;
 
@@ -40,27 +44,27 @@ class OrderServiceTest implements WithAssertions {
         @Test
         @DisplayName("non existing Order")
         void nonExisting() {
-            Mockito.when(repository.findById(anyLong()))
+            Mockito.when(orderRepository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
-            orderService = new OrderService(repository, basketService);
-            Optional<Order> order = orderService.getOrder(defaultOrderId());
+            orderService = new OrderService(orderRepository, basketService);
+            assertThatThrownBy(() -> orderService.get(defaultOrderId()))
+                    .isInstanceOf(NoSuchOrderException.class);
 
-            assertThat(order).isEmpty();
-            Mockito.verify(repository).findById(defaultOrderId());
+            Mockito.verify(orderRepository).findById(defaultOrderId());
         }
 
         @Test
         @DisplayName("existing Order")
-        void properCase() {
-            Mockito.when(repository.findById(anyLong()))
+        void properCase() throws NoSuchOrderException {
+            Mockito.when(orderRepository.findById(anyLong()))
                     .thenReturn(Optional.of(defaultOrder()));
 
-            orderService = new OrderService(repository, basketService);
-            Optional<Order> order = orderService.getOrder(defaultOrderId());
+            orderService = new OrderService(orderRepository, basketService);
+            OrderDto order = orderService.get(defaultOrderId());
 
-            assertThat(order).isEqualTo(Optional.of(defaultOrder()));
-            Mockito.verify(repository).findById(defaultOrderId());
+            assertThat(order).isEqualTo(new OrderDto(defaultOrder()));
+            Mockito.verify(orderRepository).findById(defaultOrderId());
         }
     }
 
@@ -73,15 +77,15 @@ class OrderServiceTest implements WithAssertions {
         void simplyBasket() {
             Mockito.when(basketService.getContentOfBasket(anyLong()))
                     .thenReturn(basketContentOf(defaultBasket()));
-            Mockito.when(repository.save(any()))
+            Mockito.when(orderRepository.save(any()))
                     .thenReturn(defaultOrder());
 
-            orderService = new OrderService(repository, basketService);
-            Order order = orderService.order(defaultCustomerId());
+            orderService = new OrderService(orderRepository, basketService);
+            OrderDto order = orderService.order(defaultCustomerId());
 
-            assertThat(order).isEqualTo(defaultOrder());
+            assertThat(order).isEqualTo(new OrderDto(defaultOrder()));
             Mockito.verify(basketService).getContentOfBasket(defaultCustomerId());
-            Mockito.verify(repository).save(defaultNewOrder());
+            Mockito.verify(orderRepository).save(defaultNewOrder());
             Mockito.verify(basketService).dropBasket(defaultCustomerId());
         }
 
@@ -91,12 +95,49 @@ class OrderServiceTest implements WithAssertions {
             Mockito.when(basketService.getContentOfBasket(anyLong()))
                     .thenReturn(Map.of());
 
-            orderService = new OrderService(repository, basketService);
+            orderService = new OrderService(orderRepository, basketService);
 
             assertThatThrownBy(() -> orderService.order(defaultCustomerId()))
                     .isInstanceOf(OrderItemSetNotPresentException.class);
 
             Mockito.verify(basketService).getContentOfBasket(defaultCustomerId());
+        }
+    }
+
+    @Nested
+    @DisplayName("get a list of all IDs")
+    class GetAllIdsTest {
+
+        @Test
+        @DisplayName("and should get an empty list")
+        void emptyDB() {
+            //Given
+            Mockito.when(orderRepository.getAllIds())
+                    .thenReturn(List.of());
+
+            //When
+            orderService = new OrderService(orderRepository, basketService);
+            List<Long> result = orderService.getAllIds();
+
+            //Then
+            assertThat(result).isEmpty();
+            Mockito.verify(orderRepository).getAllIds();
+        }
+
+        @Test
+        @DisplayName("and should get a list with two IDs")
+        void nonEmptyDB() {
+            //Given
+            Mockito.when(orderRepository.getAllIds())
+                    .thenReturn(List.of(defaultProductId(), anotherProductId()));
+
+            //When
+            orderService = new OrderService(orderRepository, basketService);
+            List<Long> result = orderService.getAllIds();
+
+            //Then
+            assertThat(result).containsExactlyInAnyOrder(defaultProductId(), anotherProductId());
+            Mockito.verify(orderRepository).getAllIds();
         }
     }
 }

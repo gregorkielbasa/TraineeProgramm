@@ -36,16 +36,20 @@ public class CustomerFixtures {
         return "incorect!§$%&//(";
     }
 
-    public static Customer defaultNewCustomer() {
-        return new Customer(CUSTOMER_1_NAME);
-    }
-
     public static Customer defaultCustomer() {
         return new Customer(CUSTOMER_1_ID, CUSTOMER_1_NAME);
     }
 
+    public static Customer defaultNewCustomer() {
+        return new Customer(CUSTOMER_1_NAME);
+    }
+
     public static Customer anotherCustomer() {
         return new Customer(CUSTOMER_2_ID, CUSTOMER_2_NAME);
+    }
+
+    public static Customer anotherNewCustomer() {
+        return new Customer(CUSTOMER_2_NAME);
     }
 
     public static Customer defaultCustomerWithName(String newName) {

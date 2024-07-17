@@ -1,66 +1,51 @@
 package org.lager;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.lager.exception.NoSuchCustomerException;
-import org.lager.model.Customer;
+import org.lager.model.dto.CustomerDto;
 import org.lager.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static org.lager.CustomerFixtures.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("integrated CustomerService")
-@Transactional
-@Rollback
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(locations = "classpath:integrationtest.properties")
 class TestCustomerServiceIntegration implements WithAssertions {
 
     @Autowired
     CustomerService service;
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    public void cleanUp() {
-        jdbcTemplate.execute("DELETE FROM CUSTOMERS;");
-        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS CUSTOMER_KEY RESTART WITH 100000000;");
-    }
-
     @Test
-    @DisplayName("creats")
+    @DisplayName("creates")
     public void testCreateCustomer() {
         //When
-        Optional<Customer> customerBefore = service.search(defaultCustomerId());
-        Customer customer = service.create(defaultCustomerName());
-        Optional<Customer> customerAfter = service.search(defaultCustomerId());
+        assertThatThrownBy(() -> service.validatePresence(defaultCustomerId()))
+                .isInstanceOf(NoSuchCustomerException.class);
+        CustomerDto customer = service.create(defaultCustomerName());
 
         //Then
-        assertThat(customerBefore).isEmpty();
-        assertThat(customer).isEqualTo(defaultCustomer());
-        assertThat(customerAfter).isEqualTo(Optional.of(defaultCustomer()));
+        assertThat(customer).isEqualTo(new CustomerDto(defaultCustomer()));
     }
 
     @Test
     @DisplayName("validates presence")
     void validPresenceTest() {
         //Given
-        Customer customer = service.create(defaultCustomerName());
+        assertThatThrownBy(() -> service.validatePresence(defaultCustomerId()))
+                .isInstanceOf(NoSuchCustomerException.class);
+        CustomerDto customer = service.create(defaultCustomerName());
 
         //When
-        service.validatePresence(defaultCustomerId());
+        assertThatNoException().isThrownBy(() -> service.validatePresence(defaultCustomerId()));
         assertThatThrownBy(() -> service.validatePresence(anotherCustomerId()))
                 .isInstanceOf(NoSuchCustomerException.class);
     }
@@ -69,17 +54,15 @@ class TestCustomerServiceIntegration implements WithAssertions {
     @DisplayName("deletes existing")
     void deletesExisting() {
         //Given
-        Customer customer = service.create(defaultCustomerName());
+        CustomerDto customer = service.create(defaultCustomerName());
 
         //When
-        Optional<Customer> customerBefore = service.search(defaultCustomerId());
+        assertThatNoException().isThrownBy(() -> service.validatePresence(defaultCustomerId()));
         service.delete(defaultCustomerId());
-        Optional<Customer> customerAfter = service.search(defaultCustomerId());
-
+        assertThatThrownBy(() -> service.validatePresence(defaultCustomerId()))
+                .isInstanceOf(NoSuchCustomerException.class);
         //Then
-        assertThat(customerBefore).isEqualTo(Optional.of(defaultCustomer()));
-        assertThat(customer).isEqualTo(defaultCustomer());
-        assertThat(customerAfter).isEmpty();
+        assertThat(customer).isEqualTo(new CustomerDto(defaultCustomer()));
     }
 
     @Test
@@ -88,13 +71,13 @@ class TestCustomerServiceIntegration implements WithAssertions {
         //Given
 
         //When
-        Optional<Customer> customerBefore = service.search(defaultCustomerId());
+        assertThatThrownBy(() -> service.validatePresence(defaultCustomerId()))
+                .isInstanceOf(NoSuchCustomerException.class);
         service.delete(defaultCustomerId());
-        Optional<Customer> customerAfter = service.search(defaultCustomerId());
+        assertThatThrownBy(() -> service.validatePresence(defaultCustomerId()))
+                .isInstanceOf(NoSuchCustomerException.class);
 
         //Then
-        assertThat(customerBefore).isEmpty();
-        assertThat(customerAfter).isEmpty();
     }
 
     @Test
@@ -104,11 +87,12 @@ class TestCustomerServiceIntegration implements WithAssertions {
         service.create(defaultCustomerName());
 
         //When
+        assertThatNoException().isThrownBy(() -> service.validatePresence(defaultCustomerId()));
         service.rename(defaultCustomerId(), "newName");
-        Optional<Customer> customer = service.search(defaultCustomerId());
+        CustomerDto customer = service.get(defaultCustomerId());
 
         //Then
-        assertThat(customer).isEqualTo(Optional.of(defaultCustomerWithName("newName")));
+        assertThat(customer).isEqualTo(new CustomerDto(defaultCustomerWithName("newName")));
     }
 
     @Test
@@ -117,11 +101,11 @@ class TestCustomerServiceIntegration implements WithAssertions {
         //Given
 
         //When
-        Optional<Customer> customerBefore = service.search(defaultCustomerId());
+        assertThatThrownBy(() -> service.validatePresence(defaultCustomerId()))
+                .isInstanceOf(NoSuchCustomerException.class);
         assertThatThrownBy(() -> service.rename(defaultCustomerId(), "newName"))
                 .isInstanceOf(NoSuchCustomerException.class);
 
         //Then
-        assertThat(customerBefore).isEmpty();
     }
 }

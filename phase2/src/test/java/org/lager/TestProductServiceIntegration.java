@@ -1,21 +1,16 @@
 package org.lager;
 
 import org.assertj.core.api.WithAssertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.lager.exception.NoSuchProductException;
-import org.lager.model.Product;
+import org.lager.model.dto.ProductDto;
 import org.lager.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static org.lager.ProductFixtures.*;
 
@@ -23,45 +18,35 @@ import static org.lager.ProductFixtures.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("integrated ProductService")
-@Transactional
-@Rollback
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(locations = "classpath:integrationtest.properties")
 class TestProductServiceIntegration implements WithAssertions {
 
     @Autowired
     ProductService service;
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    public void cleanUp() {
-        jdbcTemplate.execute("DELETE FROM PRODUCTS;");
-        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS PRODUCT_KEY RESTART WITH 100000000;");
-    }
-
     @Test
-    @DisplayName("creats")
+    @DisplayName("creates")
     public void testCreateProduct() {
         //When
-        Optional<Product> productBefore = service.search(defaultProductId());
-        Product product = service.create(defaultProductName());
-        Optional<Product> productAfter = service.search(defaultProductId());
+        assertThatThrownBy(() -> service.validatePresence(defaultProductId()))
+                .isInstanceOf(NoSuchProductException.class);
+        ProductDto product = service.create(defaultProductName());
 
         //Then
-        assertThat(productBefore).isEmpty();
-        assertThat(product).isEqualTo(defaultProduct());
-        assertThat(productAfter).isEqualTo(Optional.of(defaultProduct()));
+        assertThat(product).isEqualTo(new ProductDto(defaultProduct()));
     }
 
     @Test
     @DisplayName("validates presence")
     void validPresenceTest() {
         //Given
-        Product product = service.create(defaultProductName());
+        assertThatThrownBy(() -> service.validatePresence(defaultProductId()))
+                .isInstanceOf(NoSuchProductException.class);
+        ProductDto product = service.create(defaultProductName());
 
         //When
-        service.validatePresence(defaultProductId());
+        assertThatNoException().isThrownBy(() -> service.validatePresence(defaultProductId()));
         assertThatThrownBy(() -> service.validatePresence(anotherProductId()))
                 .isInstanceOf(NoSuchProductException.class);
     }
@@ -70,17 +55,16 @@ class TestProductServiceIntegration implements WithAssertions {
     @DisplayName("deletes existing")
     void deletesExisting() {
         //Given
-        Product product = service.create(defaultProductName());
+        ProductDto product = service.create(defaultProductName());
 
         //When
-        Optional<Product> productBefore = service.search(defaultProductId());
+        assertThatNoException().isThrownBy(() -> service.validatePresence(defaultProductId()));
         service.delete(defaultProductId());
-        Optional<Product> productAfter = service.search(defaultProductId());
+        assertThatThrownBy(() -> service.validatePresence(defaultProductId()))
+                .isInstanceOf(NoSuchProductException.class);
 
         //Then
-        assertThat(productBefore).isEqualTo(Optional.of(defaultProduct()));
-        assertThat(product).isEqualTo(defaultProduct());
-        assertThat(productAfter).isEmpty();
+        assertThat(product).isEqualTo(new ProductDto(defaultProduct()));
     }
 
     @Test
@@ -89,13 +73,13 @@ class TestProductServiceIntegration implements WithAssertions {
         //Given
 
         //When
-        Optional<Product> productBefore = service.search(defaultProductId());
+        assertThatThrownBy(() -> service.get(defaultProductId()))
+                .isInstanceOf(NoSuchProductException.class);
         service.delete(defaultProductId());
-        Optional<Product> productAfter = service.search(defaultProductId());
+        assertThatThrownBy(() -> service.get(defaultProductId()))
+                .isInstanceOf(NoSuchProductException.class);
 
         //Then
-        assertThat(productBefore).isEmpty();
-        assertThat(productAfter).isEmpty();
     }
 
     @Test
@@ -105,11 +89,12 @@ class TestProductServiceIntegration implements WithAssertions {
         service.create(defaultProductName());
 
         //When
+        assertThatNoException().isThrownBy(() -> service.validatePresence(defaultProductId()));
         service.rename(defaultProductId(), "new Name");
-        Optional<Product> product = service.search(defaultProductId());
+        ProductDto product = service.get(defaultProductId());
 
         //Then
-        assertThat(product).isEqualTo(Optional.of(defaultProductWithName("new Name")));
+        assertThat(product).isEqualTo(new ProductDto(defaultProductWithName("new Name")));
     }
 
     @Test
@@ -118,11 +103,11 @@ class TestProductServiceIntegration implements WithAssertions {
         //Given
 
         //When
-        Optional<Product> productBefore = service.search(defaultProductId());
+        assertThatThrownBy(() -> service.get(defaultProductId()))
+                .isInstanceOf(NoSuchProductException.class);
         assertThatThrownBy(() -> service.rename(defaultProductId(), "new Name"))
                 .isInstanceOf(NoSuchProductException.class);
 
         //Then
-        assertThat(productBefore).isEmpty();
     }
 }

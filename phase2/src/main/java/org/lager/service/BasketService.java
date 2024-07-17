@@ -2,14 +2,13 @@ package org.lager.service;
 
 import org.lager.exception.NoSuchBasketException;
 import org.lager.model.Basket;
+import org.lager.model.dto.BasketDto;
 import org.lager.repository.BasketRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BasketService {
@@ -25,12 +24,22 @@ public class BasketService {
         this.productService = productService;
     }
 
-    private Optional<Basket> getBasket(long customerId) {
+    private Optional<Basket> find(long customerId) {
         return repository.findByCustomerId(customerId);
     }
 
+    public BasketDto get(long customerId) {
+        return find(customerId)
+                .map(BasketDto::new)
+                .orElse(new BasketDto(customerId, Set.of()));
+    }
+
+    public List<Long> getAllIds() {
+        return repository.getAllIds();
+    }
+
     public Map<Long, Integer> getContentOfBasket(long customerId) {
-        return getBasket(customerId)
+        return find(customerId)
                 .map(Basket::getContent)
                 .orElse(Collections.emptyMap());
     }
@@ -40,22 +49,22 @@ public class BasketService {
         repository.deleteByCustomerId(customerId);
     }
 
-    public void removeFromBasket(long customerId, long productId) {
+    public BasketDto removeFromBasket(long customerId, long productId) {
         logger.debug("BasketService remove {} Product from {} Basket", productId, customerId);
-        Basket basket = getBasket(customerId)
+        Basket basket = find(customerId)
                 .orElseThrow(() -> new NoSuchBasketException(customerId));
         basket.remove(productId);
-        repository.save(basket);
+        return new BasketDto(repository.save(basket));
     }
 
-    public void addToBasket(long customerId, long productId, int amount) {
+    public BasketDto addToBasket(long customerId, long productId, int amount) {
         logger.debug("BasketService starts to add {} Product to {} Basket", productId, customerId);
         productService.validatePresence(productId);
-        Basket basket = getBasket(customerId)
+        Basket basket = find(customerId)
                 .orElseGet(() -> createBasket(customerId));
         basket.insert(productId, amount);
-        repository.save(basket);
         logger.debug("BasketService finished to add {} Product to {} Basket", productId, customerId);
+        return new BasketDto(repository.save(basket));
     }
 
     private Basket createBasket(long customerId) {

@@ -1,13 +1,16 @@
 package org.lager.service;
 
+import org.lager.exception.NoSuchOrderException;
 import org.lager.model.Order;
 import org.lager.model.OrderItem;
+import org.lager.model.dto.OrderDto;
 import org.lager.repository.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,19 +27,28 @@ public class OrderService {
         this.basketService = basketService;
     }
 
-    public Optional<Order> getOrder(long orderID) {
-        return repository.findById(orderID);
+    private Optional<Order> find(long orderId) {
+        return repository.findById(orderId);
+    }
+
+    public OrderDto get(long orderId) throws NoSuchOrderException {
+        return find(orderId)
+                .map(OrderDto::new)
+                .orElseThrow(() -> new NoSuchOrderException(orderId));
+    }
+
+    public List<Long> getAllIds() {
+        return repository.getAllIds();
     }
 
     @Transactional
-    public Order order(long customerId) {
+    public OrderDto order(long customerId) {
         logger.debug("OrderService starts to order {} Basket", customerId);
         Set<OrderItem> items = getOrderItemsFromBasket(customerId);
-        Order newOrder = new Order(customerId, items);
-        newOrder = repository.save(newOrder);
+        Order newOrder = repository.save(new Order(customerId, items));
         basketService.dropBasket(customerId);
         logger.debug("OrderService finished to order {} Basket", customerId);
-        return newOrder;
+        return new OrderDto(newOrder);
     }
 
     private Set<OrderItem> getOrderItemsFromBasket(long customerId) {

@@ -8,6 +8,7 @@ import org.springframework.data.annotation.PersistenceCreator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Table(name = "BASKETS")
@@ -49,6 +50,10 @@ public class Basket {
 
     public long getCustomerId() {
         return customerId;
+    }
+
+    public Set<BasketItem> getItems() {
+        return Set.copyOf(items.values());
     }
 
     public Map<Long, Integer> getContent() {

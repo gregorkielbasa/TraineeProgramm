@@ -2,12 +2,14 @@ package org.lager.service;
 
 import org.lager.exception.NoSuchProductException;
 import org.lager.model.Product;
+import org.lager.model.dto.ProductDto;
 import org.lager.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -19,20 +21,29 @@ public class ProductService {
         this.repository = repository;
     }
 
-    public Product create(String newProductName) {
+    public ProductDto create(String newProductName) {
         logger.debug("ProductService starts to insert new Product with {} name", newProductName);
-        Product newProduct = new Product(newProductName);
-        newProduct = repository.save(newProduct);
+        Product newProduct = repository.save(new Product(newProductName));
         logger.debug("ProductService finished to insert new {} Product", newProduct.getProductId());
-        return newProduct;
+        return new ProductDto(newProduct);
     }
 
-    public Optional<Product> search(long productId) {
+    private Optional<Product> find(long productId) {
         return repository.findById(productId);
     }
 
+    public ProductDto get(long productId) {
+        return find(productId)
+                .map(ProductDto::new)
+                .orElseThrow(() -> new NoSuchProductException(productId));
+    }
+
+    public List<Long> getAllIds() {
+        return repository.getAllIds();
+    }
+
     public void validatePresence(long productId) {
-        search(productId)
+        find(productId)
                 .orElseThrow(() -> new NoSuchProductException(productId));
     }
 
@@ -41,11 +52,11 @@ public class ProductService {
         repository.deleteById(productId);
     }
 
-    public void rename(long productId, String productNewName) {
+    public ProductDto rename(long productId, String productNewName) {
         logger.debug("ProductService tries to rename {} Product to {}", productId, productNewName);
-        Product product = search(productId)
+        Product product = find(productId)
                 .orElseThrow(() -> new NoSuchProductException(productId));
         product.setProductName(productNewName);
-        repository.save(product);
+        return new ProductDto(repository.save(product));
     }
 }

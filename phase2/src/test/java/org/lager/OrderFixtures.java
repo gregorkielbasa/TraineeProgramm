@@ -40,6 +40,10 @@ public class OrderFixtures {
         return new Order(ORDER_2_ID, CUSTOMER_2_ID, List.of(ITEM_1, ITEM_2));
     }
 
+    public static Order anotherNewOrder() {
+        return new Order(0, CUSTOMER_2_ID, List.of(ITEM_1, ITEM_2));
+    }
+
     public static Map<Long, OrderItem> defaultOrderContent() {
         return Map.of(ITEM_1.productId(), ITEM_1);
     }
