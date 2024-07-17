@@ -1,16 +1,16 @@
 package org.lager.model;
 
+import jakarta.persistence.*;
 import org.lager.exception.CustomerIllegalIdException;
 import org.lager.exception.CustomerIllegalNameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Objects;
 
-@Table("CUSTOMERS")
+@Table(name = "CUSTOMERS")
+@Entity
 public class Customer {
     private static final String NAME_REGEX = "^[a-zA-Z]{3,16}$";
     private static final long ID_MIN = 100_000_000;
@@ -18,8 +18,15 @@ public class Customer {
     private final static Logger logger = LoggerFactory.getLogger(Customer.class);
 
     @Id
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "CUSTOMER_KEY")
+    @SequenceGenerator(name = "CUSTOMER_KEY", initialValue = (int) ID_MIN, allocationSize = 1)
     private final long customerId;
     private String customerName;
+
+    private Customer() {
+        this.customerId = 0;
+        customerName = "";
+    }
 
     public Customer(String customerName) {
         this(0, customerName);

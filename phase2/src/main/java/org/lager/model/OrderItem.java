@@ -1,7 +1,10 @@
 package org.lager.model;
 
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.Embeddable;
 
-@Table("ORDER_ITEMS")
+@Embeddable
 public record OrderItem(long productId, int amount) {
+    private OrderItem() {
+        this(0, 0);
+    }
 }

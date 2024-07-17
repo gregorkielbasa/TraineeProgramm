@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.lager.exception.CustomerIllegalNameException;
 import org.lager.exception.NoSuchCustomerException;
 import org.lager.model.Customer;
+import org.lager.repository.BasketRepository;
 import org.lager.repository.CustomerRepository;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -25,6 +26,8 @@ class CustomerServiceTest implements WithAssertions {
 
     @Mock
     private CustomerRepository repository;
+    @Mock
+    private BasketRepository basketRepository;
 
     CustomerService customerService;
 
@@ -38,7 +41,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.save(any()))
                     .thenReturn(defaultCustomer());
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             Customer customer = customerService.create(defaultCustomerName());
 
             assertThat(customer).isEqualTo(defaultCustomer());
@@ -49,7 +52,7 @@ class CustomerServiceTest implements WithAssertions {
         @Test
         @DisplayName("a customer with null Name should throw an exception")
         void nullName() {
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
 
             assertThatThrownBy(() -> customerService.create(null))
                     .isInstanceOf(CustomerIllegalNameException.class);
@@ -58,7 +61,7 @@ class CustomerServiceTest implements WithAssertions {
         @Test
         @DisplayName("a customer with invalid Name should throw an exception")
         void invalidName() {
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
 
             assertThatThrownBy(() -> customerService.create(incorrectCustomerName()))
                     .isInstanceOf(CustomerIllegalNameException.class);
@@ -75,9 +78,9 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.of(defaultCustomer()));
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             Optional<Customer> customer = customerService.search(defaultCustomerId());
-            
+
             assertThat(customer).isEqualTo(Optional.of(defaultCustomer()));
             Mockito.verify(repository).findById(defaultCustomerId());
         }
@@ -88,7 +91,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             Optional<Customer> customer = customerService.search(defaultCustomerId());
 
             assertThat(customer).isEmpty();
@@ -101,7 +104,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             Optional<Customer> customer = customerService.search(incorrectCustomerId());
 
             assertThat(customer).isEmpty();
@@ -119,7 +122,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.of(defaultCustomer()));
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             customerService.validatePresence(defaultCustomerId());
 
             Mockito.verify(repository).findById(defaultCustomerId());
@@ -131,7 +134,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             assertThatThrownBy(() -> customerService.validatePresence(defaultCustomerId()))
                     .isInstanceOf(NoSuchCustomerException.class);
 
@@ -144,7 +147,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             assertThatThrownBy(() -> customerService.validatePresence(incorrectCustomerId()))
                     .isInstanceOf(NoSuchCustomerException.class);
 
@@ -161,7 +164,7 @@ class CustomerServiceTest implements WithAssertions {
         void existingID() {
             Mockito.doNothing().when(repository).deleteById(anyLong());
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             customerService.delete(defaultCustomerId());
 
             Mockito.verify(repository).deleteById(defaultCustomerId());
@@ -173,7 +176,7 @@ class CustomerServiceTest implements WithAssertions {
         void invalidID() {
             Mockito.doNothing().when(repository).deleteById(anyLong());
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             customerService.delete(incorrectCustomerId());
 
             Mockito.verify(repository).deleteById(incorrectCustomerId());
@@ -190,7 +193,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.of(defaultCustomer()));
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             customerService.rename(defaultCustomerId(), "newName");
 
             Mockito.verify(repository).findById(defaultCustomerId());
@@ -203,7 +206,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.of(defaultCustomer()));
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             assertThatThrownBy(() -> customerService.rename(defaultCustomerId(), "new . Name"))
                     .isInstanceOf(CustomerIllegalNameException.class);
 
@@ -216,7 +219,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.findById(nonExistingCustomerId()))
                     .thenReturn(Optional.empty());
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             assertThatThrownBy(() -> customerService.rename(nonExistingCustomerId(), "newName"))
                     .isInstanceOf(NoSuchCustomerException.class);
 
@@ -229,7 +232,7 @@ class CustomerServiceTest implements WithAssertions {
             Mockito.when(repository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
-            customerService = new CustomerService(repository);
+            customerService = new CustomerService(repository, basketRepository);
             assertThatThrownBy(() -> customerService.rename(incorrectCustomerId(), "newName"))
                     .isInstanceOf(NoSuchCustomerException.class);
 

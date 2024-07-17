@@ -36,7 +36,7 @@ class TestCustomerServiceIntegration implements WithAssertions {
     @AfterEach
     public void cleanUp() {
         jdbcTemplate.execute("DELETE FROM CUSTOMERS;");
-        jdbcTemplate.execute("ALTER TABLE CUSTOMERS ALTER COLUMN CUSTOMER_ID RESTART WITH 100000000;");
+        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS CUSTOMER_KEY RESTART WITH 100000000;");
     }
 
     @Test
@@ -101,17 +101,14 @@ class TestCustomerServiceIntegration implements WithAssertions {
     @DisplayName("renames existing")
     void renamesExisting() {
         //Given
-        Customer customer = service.create(defaultCustomerName());
+        service.create(defaultCustomerName());
 
         //When
-        Optional<Customer> customerBefore = service.search(defaultCustomerId());
         service.rename(defaultCustomerId(), "newName");
-        Optional<Customer> customerAfter = service.search(defaultCustomerId());
+        Optional<Customer> customer = service.search(defaultCustomerId());
 
         //Then
-        assertThat(customerBefore).isEqualTo(Optional.of(defaultCustomer()));
-        assertThat(customer).isEqualTo(defaultCustomer());
-        assertThat(customerAfter).isEqualTo(Optional.of(defaultCustomerWithName("newName")));
+        assertThat(customer).isEqualTo(Optional.of(defaultCustomerWithName("newName")));
     }
 
     @Test

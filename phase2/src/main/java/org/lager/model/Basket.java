@@ -1,29 +1,38 @@
 package org.lager.model;
 
+import jakarta.persistence.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.relational.core.mapping.MappedCollection;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Table("BASKETS")
+@Table(name = "BASKETS")
+@Entity
 public class Basket {
     private final static Logger logger = LoggerFactory.getLogger(Basket.class);
 
     @Id
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "BASKET_KEY")
+    @SequenceGenerator(name = "BASKET_KEY", allocationSize = 1)
     private final long basketId;
     private final long customerId;
-    @MappedCollection(idColumn = "BASKET_ID", keyColumn = "PRODUCT_ID")
+    @ElementCollection(targetClass = BasketItem.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "BASKET_ITEMS", joinColumns = @JoinColumn(name = "BASKET_ID"))
+    @MapKeyColumn(name = "MAP_KEY")
     private final Map<Long, BasketItem> items;
 
+    private Basket() {
+        this.basketId = 0;
+        this.customerId = 0;
+        this.items = Map.of();
+    }
+
     public Basket(long customerId) {
-        this(0, customerId, new HashMap<>());
+        this(0, customerId, Map.of());
         logger.info("New Basket {} has been created.", customerId);
     }
 

@@ -1,29 +1,38 @@
 package org.lager.model;
 
+import jakarta.persistence.*;
 import org.lager.exception.OrderIllegalIdException;
 import org.lager.exception.OrderItemSetNotPresentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.relational.core.mapping.MappedCollection;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
-@Table("ORDERS")
+@Table(name = "ORDERS")
+@Entity
 public class Order {
     private static final long ID_MIN = 1000;
     private static final long ID_MAX = 9999;
     private final static Logger logger = LoggerFactory.getLogger(Order.class);
 
     @Id
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ORDER_KEY")
+    @SequenceGenerator(name = "ORDER_KEY", initialValue = (int) ID_MIN, allocationSize = 1)
     private final long orderId;
     private final long customerId;
-    @MappedCollection(idColumn = "ORDER_ID")
+
+    @ElementCollection(targetClass = OrderItem.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "ORDER_ITEMS", joinColumns = @JoinColumn(name = "ORDER_ID"))
     private final Set<OrderItem> items;
+
+    private Order() {
+        this.orderId = 0;
+        this.customerId = 0;
+        this.items = Set.of();
+    }
 
     public Order(long customerId, Collection<OrderItem> items) {
         this(0, customerId, items);

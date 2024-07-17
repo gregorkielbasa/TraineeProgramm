@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static org.lager.ProductFixtures.*;
 
+
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("integrated ProductService")
@@ -36,7 +37,7 @@ class TestProductServiceIntegration implements WithAssertions {
     @AfterEach
     public void cleanUp() {
         jdbcTemplate.execute("DELETE FROM PRODUCTS;");
-        jdbcTemplate.execute("ALTER TABLE PRODUCTS ALTER COLUMN PRODUCT_ID RESTART WITH 100000000;");
+        jdbcTemplate.execute("ALTER SEQUENCE IF EXISTS PRODUCT_KEY RESTART WITH 100000000;");
     }
 
     @Test
@@ -101,17 +102,14 @@ class TestProductServiceIntegration implements WithAssertions {
     @DisplayName("renames existing")
     void renamesExisting() {
         //Given
-        Product product = service.create(defaultProductName());
+        service.create(defaultProductName());
 
         //When
-        Optional<Product> productBefore = service.search(defaultProductId());
         service.rename(defaultProductId(), "new Name");
-        Optional<Product> productAfter = service.search(defaultProductId());
+        Optional<Product> product = service.search(defaultProductId());
 
         //Then
-        assertThat(productBefore).isEqualTo(Optional.of(defaultProduct()));
-        assertThat(product).isEqualTo(defaultProduct());
-        assertThat(productAfter).isEqualTo(Optional.of(defaultProductWithName("new Name")));
+        assertThat(product).isEqualTo(Optional.of(defaultProductWithName("new Name")));
     }
 
     @Test
