@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        APP_IMAGE = 'shop'
-        CONTAINER_NAME = 'shop-container'
+        APP_IMAGE = 'trainee-app'
+        CONTAINER_NAME = 'trainee-app-container'
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
     }
 
@@ -27,6 +27,7 @@ pipeline {
             steps {
                     // Use Maven Docker image to build the JAR file without running tests
                     sh 'mvn -B -DskipTests clean package'
+                    stash includes: 'target/*.jar', name: 'targetfiles'
             }
         }
 
@@ -41,18 +42,23 @@ pipeline {
                     // Use Maven Docker image to run the tests
                         sh 'mvn test'
             }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
         }
 
         stage('Stop and remove running containers') {
             steps {
                 script {
-                  try {
-                      sh 'docker stop ${CONTAINER_NAME}'
-                      sh 'docker system prune -f'
-                  } catch (Exception e) {
-                      echo 'Exception occurred: ' + e.toString()
-                      echo 'continues to the next stage'
-                  }
+                    try {
+                        sh 'docker compose -f docker.yaml down'
+                        sh 'docker system prune -f'
+                    } catch (Exception e) {
+                        echo 'Exception occurred: ' + e.toString()
+                        echo 'continues to the next stage'
+                    }
                 }
             }
         }
@@ -61,6 +67,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image from the Dockerfile
+                    unstash 'targetfiles'
                     sh 'docker build -t gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER .'
                 }
             }
@@ -75,7 +82,25 @@ pipeline {
             }
         }
 
-        stage('Login') {
+        stage('Update the latest version') {
+            steps {
+                script {
+                    // Build the Docker image from the Dockerfile
+                    sh 'docker image tag gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER gregorkielbasa/${APP_IMAGE}:latest'
+                }
+            }
+        }
+
+        stage('Run Docker Compose') {
+            steps {
+                script {
+                    // Run the Docker container
+                    sh 'docker compose -f docker.yaml up -d'
+                }
+            }
+        }
+
+        stage('Log in in DockerHub') {
             steps {
                 sh 'docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW'
             }
@@ -84,6 +109,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 sh 'docker push gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER'
+                sh 'docker push gregorkielbasa/${APP_IMAGE}:lts'
             }
         }
     }
