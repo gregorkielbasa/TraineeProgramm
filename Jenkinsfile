@@ -42,11 +42,6 @@ pipeline {
                     // Use Maven Docker image to run the tests
                         sh 'mvn test'
             }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
         }
 
         stage('Stop and remove running containers') {
