@@ -73,15 +73,6 @@ pipeline {
             }
         }
 
-        stage('Run Docker Container') {
-            steps {
-                script {
-                    // Run the Docker container
-                    sh 'docker run -d -p 8080:8080 --name ${CONTAINER_NAME} gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER'
-                }
-            }
-        }
-
         stage('Update the latest version') {
             steps {
                 script {
