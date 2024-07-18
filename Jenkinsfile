@@ -53,7 +53,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'docker compose -f docker.yaml down'
+                        sh 'docker-compose -f docker.yaml down'
                         sh 'docker system prune -f'
                     } catch (Exception e) {
                         echo 'Exception occurred: ' + e.toString()
@@ -86,7 +86,7 @@ pipeline {
             steps {
                 script {
                     // Run the Docker container
-                    sh 'docker compose -f docker.yaml up -d'
+                    sh 'docker-compose -f docker.yaml up -d'
                 }
             }
         }
