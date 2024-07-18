@@ -100,7 +100,6 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 sh 'docker push gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER'
-                sh 'docker push gregorkielbasa/${APP_IMAGE}:lts'
             }
         }
     }
