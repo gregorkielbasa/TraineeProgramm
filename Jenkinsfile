@@ -8,7 +8,7 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Clone Git Repository') {
             steps {
                 // Clone the repository containing the source code and Dockerfile
                 git branch: 'feature/jenkins',
@@ -31,7 +31,7 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Maven Tests') {
             agent {
                 docker {
                     image 'maven:3.9.8-eclipse-temurin'
@@ -73,7 +73,7 @@ pipeline {
             }
         }
 
-        stage('Update the latest version') {
+        stage('Set up the latest version') {
             steps {
                 script {
                     // Build the Docker image from the Dockerfile
