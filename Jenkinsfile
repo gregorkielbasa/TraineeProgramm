@@ -12,7 +12,7 @@ pipeline {
             steps {
                 // Clone the repository containing the source code and Dockerfile
                 git branch: 'feature/jenkins',
-                    credentialsId: 'bec7a7b5-44ca-4c02-b36c-0893918bd09a',
+                    credentialsId: 'git-hub-credentials',
                     url: 'https://github.com/gregorkielbasa/TraineeProgramm.git'
             }
         }
