@@ -52,6 +52,19 @@ class UserControllerTest {
     class CreateTest {
 
         @Test
+        @DisplayName("fails")
+        void testToFail() throws Exception {
+            //Given
+            UserDto userDto = new UserDto("validLogin", "validPassword");
+
+            //When
+            mockMvc.perform(post("/user"))
+                    .andExpect(status().isOk());
+
+            //Then
+        }
+
+        @Test
         @DisplayName("but is unauthorised")
         void unauthorised() throws Exception {
             //Given
