@@ -2,17 +2,17 @@ pipeline {
     agent any
 
     environment {
-        APP_IMAGE = 'shop'
-        CONTAINER_NAME = 'shop-container'
+        APP_IMAGE = 'trainee-app'
+        CONTAINER_NAME = 'trainee-app-container'
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Clone Git Repository') {
             steps {
                 // Clone the repository containing the source code and Dockerfile
                 git branch: 'feature/jenkins',
-                    credentialsId: 'bec7a7b5-44ca-4c02-b36c-0893918bd09a',
+                    credentialsId: 'git-hub-credentials',
                     url: 'https://github.com/gregorkielbasa/TraineeProgramm.git'
             }
         }
@@ -27,10 +27,11 @@ pipeline {
             steps {
                     // Use Maven Docker image to build the JAR file without running tests
                     sh 'mvn -B -DskipTests clean package'
+                    stash includes: 'target/*.jar', name: 'targetfiles'
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Maven Tests') {
             agent {
                 docker {
                     image 'maven:3.9.8-eclipse-temurin'
@@ -46,13 +47,13 @@ pipeline {
         stage('Stop and remove running containers') {
             steps {
                 script {
-                  try {
-                      sh 'docker stop ${CONTAINER_NAME}'
-                      sh 'docker system prune -f'
-                  } catch (Exception e) {
-                      echo 'Exception occurred: ' + e.toString()
-                      echo 'continues to the next stage'
-                  }
+                    try {
+                        sh 'docker-compose -f docker.yaml down'
+                        sh 'docker system prune -f'
+                    } catch (Exception e) {
+                        echo 'Exception occurred: ' + e.toString()
+                        echo 'continues to the next stage'
+                    }
                 }
             }
         }
@@ -61,21 +62,31 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image from the Dockerfile
+                    unstash 'targetfiles'
                     sh 'docker build -t gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER .'
                 }
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Set up the latest version') {
             steps {
                 script {
-                    // Run the Docker container
-                    sh 'docker run -d -p 8080:8080 --name ${CONTAINER_NAME} gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER'
+                    // Build the Docker image from the Dockerfile
+                    sh 'docker image tag gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER gregorkielbasa/${APP_IMAGE}:latest'
                 }
             }
         }
 
-        stage('Login') {
+        stage('Run Docker Compose') {
+            steps {
+                script {
+                    // Run the Docker container
+                    sh 'docker-compose -f docker.yaml up -d'
+                }
+            }
+        }
+
+        stage('Log in in DockerHub') {
             steps {
                 sh 'docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW'
             }
