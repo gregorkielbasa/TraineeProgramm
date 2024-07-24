@@ -44,44 +44,12 @@ pipeline {
             }
         }
 
-        stage('Stop and remove running containers') {
-            steps {
-                script {
-                    try {
-                        sh 'docker-compose -f docker.yaml down'
-                        sh 'docker system prune -f'
-                    } catch (Exception e) {
-                        echo 'Exception occurred: ' + e.toString()
-                        echo 'continues to the next stage'
-                    }
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
                     // Build the Docker image from the Dockerfile
                     unstash 'targetfiles'
                     sh 'docker build -t gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER .'
-                }
-            }
-        }
-
-        stage('Set up the latest version') {
-            steps {
-                script {
-                    // Build the Docker image from the Dockerfile
-                    sh 'docker image tag gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER gregorkielbasa/${APP_IMAGE}:latest'
-                }
-            }
-        }
-
-        stage('Run Docker Compose') {
-            steps {
-                script {
-                    // Run the Docker container
-                    sh 'docker-compose -f docker.yaml up -d'
                 }
             }
         }
@@ -95,6 +63,14 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 sh 'docker push gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER'
+            }
+        }
+
+        stage('Update Kubernetes yaml') {
+            steps {
+                sh 'echo kubernetes/webapp.yaml'
+                sh 'sed -i s+gregorkielbasa/*+gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER kubernetes/webapp.yaml'
+                sh 'echo kubernetes/webapp.yaml'
             }
         }
     }
