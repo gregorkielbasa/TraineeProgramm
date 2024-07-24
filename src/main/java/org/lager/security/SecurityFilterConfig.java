@@ -25,6 +25,7 @@ public class SecurityFilterConfig {
         http.csrf((csrf) -> csrf. disable());
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         http.authorizeHttpRequests((requests) -> {
+            requests.requestMatchers(HttpMethod.GET,"/").permitAll();
             requests.requestMatchers(HttpMethod.GET,"/login").permitAll();
             requests.requestMatchers(HttpMethod.GET, "/product/**").permitAll();
             requests.requestMatchers("/user/**").hasRole("ADMIN");
