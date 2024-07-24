@@ -40,7 +40,7 @@ pipeline {
            }
             steps {
                     // Use Maven Docker image to run the tests
-                        sh 'mvn test'
+                    sh 'mvn test'
             }
         }
 
@@ -68,9 +68,10 @@ pipeline {
 
         stage('Update Kubernetes yaml') {
             steps {
-                sh 'echo kubernetes/webapp.yaml'
+                sh 'ls -ls -a'
+                sh 'cat kubernetes/webapp.yaml'
                 sh "sed -i 's+gregorkielbasa/*+gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER+g' kubernetes/webapp.yaml"
-                sh 'echo kubernetes/webapp.yaml'
+                sh 'cat kubernetes/webapp.yaml'
             }
         }
     }
