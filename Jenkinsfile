@@ -11,7 +11,7 @@ pipeline {
         stage('Clone Git Repository') {
             steps {
                 // Clone the repository containing the source code and Dockerfile
-                git branch: 'feature/jenkins',
+                git branch: 'feature/kubernetes',
                     credentialsId: 'git-hub-credentials',
                     url: 'https://github.com/gregorkielbasa/TraineeProgramm.git'
             }
