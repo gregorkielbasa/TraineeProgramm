@@ -19,6 +19,17 @@ spec:
           image: gregorkielbasa/trainee-app:latest
           ports:
             - containerPort: 8080
+          env:
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: postgres-url
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-password
 ---
 apiVersion: v1
 kind: Service

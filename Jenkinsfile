@@ -84,6 +84,8 @@ pipeline {
 
         stage('Starts Kubernetes files') {
             steps {
+                sh 'kubectl apply -f kubernetes/postgres-config.yaml'
+                sh 'kubectl apply -f kubernetes/postgres-secret.yaml'
                 sh 'kubectl apply -f kubernetes/volume.yaml'
                 sh 'kubectl apply -f kubernetes/postgres.yaml'
                 sh 'kubectl apply -f kubernetes/webapp.yaml'
