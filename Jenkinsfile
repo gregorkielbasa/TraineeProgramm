@@ -17,15 +17,6 @@ pipeline {
             }
         }
 
-        stage('Update Kubernetes yaml') {
-            steps {
-                sh 'ls -ls -a'
-                sh 'cat kubernetes/webapp.yaml'
-                sh "sed -i 's|image: .*|image: gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER|' kubernetes/webapp.yaml"
-                sh 'cat kubernetes/webapp.yaml'
-            }
-        }
-
         stage('Build JAR with Maven') {
             agent {
                 docker {
@@ -72,6 +63,21 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 sh 'docker push gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER'
+            }
+        }
+
+        stage('Update Kubernetes yaml') {
+            steps {
+                sh "sed -i 's|image: .*|image: gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER|' kubernetes/webapp.yaml"
+                sh 'cat kubernetes/webapp.yaml'
+            }
+        }
+
+        stage('Starts Kubernetes files') {
+            steps {
+                sh 'kubectl apply -f kubernetes/volume.yaml'
+                sh 'kubectl apply -f kubernetes/postgres.yaml'
+                sh 'kubectl apply -f kubernetes/webapp.yaml'
             }
         }
     }
