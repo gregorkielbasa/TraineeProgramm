@@ -69,7 +69,7 @@ pipeline {
         stage('Update Kubernetes yaml') {
             steps {
                 sh 'echo kubernetes/webapp.yaml'
-                sh 'sed -i s+gregorkielbasa/*+gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER kubernetes/webapp.yaml'
+                sh 'sed -i s+gregorkielbasa/*+gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER+g kubernetes/webapp.yaml'
                 sh 'echo kubernetes/webapp.yaml'
             }
         }
