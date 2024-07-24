@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh 'ls -ls -a'
                 sh 'cat kubernetes/webapp.yaml'
-                sh "sed -i 's+gregorkielbasa/*+gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER+g' kubernetes/webapp.yaml"
+                sh "sed -i 's|image: .*|image: gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER|' kubernetes/webapp.yaml"
                 sh 'cat kubernetes/webapp.yaml'
             }
         }
