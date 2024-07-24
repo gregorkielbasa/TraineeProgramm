@@ -17,6 +17,15 @@ pipeline {
             }
         }
 
+        stage('Test connection to Docker and Kubernetes') {
+            steps {
+                script {
+                    sh 'docker ps'
+                    sh 'kubectl get all -o wide'
+                }
+            }
+        }
+
         stage('Build JAR with Maven') {
             agent {
                 docker {

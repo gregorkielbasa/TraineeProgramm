@@ -8,7 +8,6 @@ docker run -d --name jenkins \
   --network minikube \
   -v jenkins_home:/var/jenkins_home \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v ~/.kube/config:/var/jenkins_home/.kube/config \
   --user 0:1 \
   jenkins/jenkins:lts
 
