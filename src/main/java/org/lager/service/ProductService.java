@@ -1,9 +1,6 @@
 package org.lager.service;
 
 import org.lager.exception.NoSuchProductException;
-import org.lager.exception.ProductIllegalIdException;
-import org.lager.exception.ProductIllegalNameException;
-import org.lager.exception.ProductIllegalPriceException;
 import org.lager.model.Product;
 import org.lager.model.dto.ProductDto;
 import org.lager.repository.ProductRepository;
