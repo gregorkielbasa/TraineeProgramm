@@ -41,9 +41,11 @@ spec:
   selector:
     app: portainer
   ports:
-    - protocol: TCP
+    - name: portainer-http
+      protocol: TCP
       port: 8000
       targetPort: 8000
-    - protocol: TCP
+    - name: portainer-https
+      protocol: TCP
       port: 9443
       targetPort: 9443
