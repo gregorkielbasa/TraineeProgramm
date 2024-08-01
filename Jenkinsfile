@@ -88,9 +88,11 @@ pipeline {
                 sh 'kubectl apply -f kubernetes/postgres-secret.yaml'
                 sh 'kubectl apply -f kubernetes/postgres-volume.yaml'
                 sh 'kubectl apply -f kubernetes/pgadmin-volume.yaml'
+                sh 'kubectl apply -f kubernetes/portainer-volume.yaml'
                 sh 'kubectl apply -f kubernetes/postgres.yaml'
                 sh 'kubectl apply -f kubernetes/pgadmin.yaml'
                 sh 'kubectl apply -f kubernetes/webapp.yaml'
+                sh 'kubectl apply -f kubernetes/portainer.yaml'
             }
         }
     }
