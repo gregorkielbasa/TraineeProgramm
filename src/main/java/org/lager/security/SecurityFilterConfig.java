@@ -8,8 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityFilterConfig {
@@ -22,14 +20,12 @@ public class SecurityFilterConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-//        http.csrf(AbstractHttpConfigurer::disable);
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         http.authorizeHttpRequests(requests -> {
             requests.requestMatchers(HttpMethod.GET, "/login").permitAll();
             requests.requestMatchers(HttpMethod.GET, "/product/**").permitAll();
             requests.requestMatchers("/user/**").hasRole("ADMIN");
             requests.anyRequest().authenticated();});
-        http.httpBasic(withDefaults());
         return http.build();
     }
 }
