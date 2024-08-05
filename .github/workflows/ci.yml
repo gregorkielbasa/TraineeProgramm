@@ -39,15 +39,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
+      - uses: javiertuya/sonarqube-action@main
         with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Check code's clean-code
-        run: mvn clean verify -DskipTests sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+          restore-artifact-name1: "test-coverage-files"
 
   test:
     name: Test
