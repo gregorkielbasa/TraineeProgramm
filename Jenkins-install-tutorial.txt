@@ -5,6 +5,7 @@
 
 docker run -d --name jenkins \
   -p 9000:8080 -p 50000:50000 \
+  --network minikube \
   -v jenkins_home:/var/jenkins_home \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --user 0:1 \
@@ -41,3 +42,28 @@ chmod +x /usr/local/bin/docker-compose
 exit
 docker --version
 docker-compose --version
+
+
+
+
+
+
+## Install kubectl CLI
+# download kubectl file
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+
+# make it executable
+
+chmod +x ./kubectl
+
+
+# move it to bin dir
+
+mv ./kubectl /usr/local/bin/kubectl
+
+
+# test it!
+
+kubectl version --client

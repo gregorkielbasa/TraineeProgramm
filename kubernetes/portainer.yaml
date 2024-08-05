@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portainer-deployment
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portainer
+  template:
+    metadata:
+      labels:
+        app: portainer
+    spec:
+      volumes:
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: portainerdata
+          persistentVolumeClaim:
+            claimName: portainer-pvc
+      containers:
+        - name: portainer
+          image: portainer/portainer-ce:latest
+          ports:
+            - containerPort: 8000
+            - containerPort: 9443
+          volumeMounts:
+            - mountPath: "/var/run/docker.sock"
+              name: dockersock
+            - mountPath: "/data"
+              name: portainerdata
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: portainer
+spec:
+  selector:
+    app: portainer
+  ports:
+    - name: portainer-http
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+    - name: portainer-https
+      protocol: TCP
+      port: 9443
+      targetPort: 9443

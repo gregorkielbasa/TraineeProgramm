@@ -11,9 +11,18 @@ pipeline {
         stage('Clone Git Repository') {
             steps {
                 // Clone the repository containing the source code and Dockerfile
-                git branch: 'feature/jenkins',
+                git branch: 'feature/kubernetes',
                     credentialsId: 'git-hub-credentials',
                     url: 'https://github.com/gregorkielbasa/TraineeProgramm.git'
+            }
+        }
+
+        stage('Test connection to Docker and Kubernetes') {
+            steps {
+                script {
+                    sh 'docker ps'
+                    sh 'kubectl get all -o wide'
+                }
             }
         }
 
@@ -40,21 +49,7 @@ pipeline {
            }
             steps {
                     // Use Maven Docker image to run the tests
-                        sh 'mvn test'
-            }
-        }
-
-        stage('Stop and remove running containers') {
-            steps {
-                script {
-                    try {
-                        sh 'docker-compose -f docker.yaml down'
-                        sh 'docker system prune -f'
-                    } catch (Exception e) {
-                        echo 'Exception occurred: ' + e.toString()
-                        echo 'continues to the next stage'
-                    }
-                }
+                    sh 'mvn test'
             }
         }
 
@@ -68,24 +63,6 @@ pipeline {
             }
         }
 
-        stage('Set up the latest version') {
-            steps {
-                script {
-                    // Build the Docker image from the Dockerfile
-                    sh 'docker image tag gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER gregorkielbasa/${APP_IMAGE}:latest'
-                }
-            }
-        }
-
-        stage('Run Docker Compose') {
-            steps {
-                script {
-                    // Run the Docker container
-                    sh 'docker-compose -f docker.yaml up -d'
-                }
-            }
-        }
-
         stage('Log in in DockerHub') {
             steps {
                 sh 'docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW'
@@ -95,6 +72,27 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 sh 'docker push gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER'
+            }
+        }
+
+        stage('Update Kubernetes yaml') {
+            steps {
+                sh "sed -i 's|image: .*|image: gregorkielbasa/${APP_IMAGE}:$BUILD_NUMBER|' kubernetes/webapp.yaml"
+                sh 'cat kubernetes/webapp.yaml'
+            }
+        }
+
+        stage('Starts Kubernetes files') {
+            steps {
+                sh 'kubectl apply -f kubernetes/postgres-config.yaml'
+                sh 'kubectl apply -f kubernetes/postgres-secret.yaml'
+                sh 'kubectl apply -f kubernetes/postgres-volume.yaml'
+                sh 'kubectl apply -f kubernetes/pgadmin-volume.yaml'
+                sh 'kubectl apply -f kubernetes/portainer-volume.yaml'
+                sh 'kubectl apply -f kubernetes/postgres.yaml'
+                sh 'kubectl apply -f kubernetes/pgadmin.yaml'
+                sh 'kubectl apply -f kubernetes/webapp.yaml'
+                sh 'kubectl apply -f kubernetes/portainer.yaml'
             }
         }
     }
