@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Table(name = "BASKETS")
 @Entity
 public class Basket {
-    private final static Logger logger = LoggerFactory.getLogger(Basket.class);
+    private static final Logger logger = LoggerFactory.getLogger(Basket.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "BASKET_KEY")
