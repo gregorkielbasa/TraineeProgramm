@@ -14,7 +14,7 @@ import java.util.*;
 
 @Service
 public class CustomerService {
-    private final static Logger logger = LoggerFactory.getLogger(CustomerService.class);
+    private static final Logger logger = LoggerFactory.getLogger(CustomerService.class);
 
     private final CustomerRepository repository;
     private final BasketRepository basketRepository;
