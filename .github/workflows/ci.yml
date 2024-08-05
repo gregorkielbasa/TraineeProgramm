@@ -31,7 +31,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B -DskipTests package --file pom.xml
 
-  sonarcloud:
+  sonar_analise:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
