@@ -42,6 +42,11 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@v2.3.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: my-custom-directory
+          args:
+            -Dsonar.organization=gregorkielbasa
+            -Dsonar.projectKey=gregorkielbasa_TraineeProgramm
 
   test:
     name: Test
