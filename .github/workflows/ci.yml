@@ -47,7 +47,7 @@ jobs:
           cache: maven
 
       - name: Check code's clean-code
-        run: mvn clean verify -DskipTests sonar:sonar
+        run: mvn clean verify -DskipTests sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
   test:
     name: Test
