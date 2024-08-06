@@ -8,7 +8,9 @@
 
 name: Java CI with Maven
 
-on:
+on:  
+  push:
+    branches: [ "feature/sonar" ]
   pull_request:
     branches: [ "main" ]
 
