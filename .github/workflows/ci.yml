@@ -10,13 +10,11 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "feature/git-hub-actions", "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ "feature/sonar" ]
 
 jobs:
   build:
-    name: Build
+    name: Build and analyze
     runs-on: ubuntu-latest
 
     steps:
@@ -30,8 +28,11 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build with Maven
-        run: mvn -B -DskipTests package --file pom.xml
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B -DskipTests package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=gregorkielbasa_sonar
 
   test:
     name: Test
