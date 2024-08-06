@@ -14,8 +14,8 @@ import java.util.Optional;
 @Component
 public class JwtTokenProvider {
 
-    private final static int VALID_DURATION = 900_000; // 15 min
-    private final static Key KEY = Jwts.SIG.HS256.key().build();
+    private static final int VALID_DURATION = 900_000; // 15 min
+    private static final Key KEY = Jwts.SIG.HS256.key().build();
 
     private final UserDetailsManager userDetailsManager;
 

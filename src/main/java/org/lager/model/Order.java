@@ -16,7 +16,7 @@ import java.util.Set;
 public class Order {
     private static final long ID_MIN = 1000;
     private static final long ID_MAX = 9999;
-    private final static Logger logger = LoggerFactory.getLogger(Order.class);
+    private static final Logger logger = LoggerFactory.getLogger(Order.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ORDER_KEY")

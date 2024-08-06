@@ -12,7 +12,7 @@ import java.util.*;
 
 @Service
 public class BasketService {
-    private final static Logger logger = LoggerFactory.getLogger(BasketService.class);
+    private static final Logger logger = LoggerFactory.getLogger(BasketService.class);
 
     private final ProductService productService;
     private final CustomerService customerService;
